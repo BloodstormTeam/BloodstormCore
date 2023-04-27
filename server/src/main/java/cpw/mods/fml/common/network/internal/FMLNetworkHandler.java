@@ -27,7 +27,6 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.world.World;
-import org.apache.logging.log4j.core.helpers.Integers;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -60,8 +59,8 @@ import org.bukkit.event.inventory.InventoryType;
 
 public class FMLNetworkHandler
 {
-    public static final int READ_TIMEOUT = Integers.parseInt(System.getProperty("fml.readTimeout","30"),30);
-    public static final int LOGIN_TIMEOUT = Integers.parseInt(System.getProperty("fml.loginTimeout","600"),600);
+    public static final int READ_TIMEOUT = Integer.parseInt(System.getProperty("fml.readTimeout","30"));
+    public static final int LOGIN_TIMEOUT = Integer.parseInt(System.getProperty("fml.loginTimeout","600"));
     private static EnumMap<Side, FMLEmbeddedChannel> channelPair;
 
     public static void fmlServerHandshake(ServerConfigurationManager scm, NetworkManager manager, EntityPlayerMP player)

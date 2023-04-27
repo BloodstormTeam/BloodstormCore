@@ -31,7 +31,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-import org.apache.logging.log4j.core.helpers.Strings;
 import org.lwjgl.opengl.GL11;
 import tv.twitch.AuthToken;
 import tv.twitch.ErrorCode;
@@ -80,8 +79,7 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
         this.field_152951_c.func_152842_a("nmt37qblda36pvonovdkbopzfzw3wlq");
         this.field_152952_d.func_152984_a("nmt37qblda36pvonovdkbopzfzw3wlq");
         this.field_152954_f.getChatStyle().setColor(EnumChatFormatting.DARK_PURPLE);
-
-        if (Strings.isNotEmpty(p_i1012_2_) && OpenGlHelper.framebufferSupported)
+        if (!p_i1012_2_.isEmpty() && OpenGlHelper.framebufferSupported)
         {
             Thread thread = new Thread("Twitch authenticator")
             {

@@ -57,8 +57,8 @@ dependencies {
     implementation("net.java.jutils:jutils:1.0.0")
     implementation("com.google.code.gson:gson:2.2.4")
     implementation("com.mojang:authlib:1.5.16")
-    implementation("org.apache.logging.log4j:log4j-api:2.0-beta9")
-    implementation("org.apache.logging.log4j:log4j-core:2.0-beta9")
+    implementation("org.apache.logging.log4j:log4j-api:2.3.2")
+    implementation("org.apache.logging.log4j:log4j-core:2.3.2")
     implementation("org.lwjgl.lwjgl:lwjgl:2.9.1")
     implementation("org.lwjgl.lwjgl:lwjgl_util:2.9.1")
     implementation("tv.twitch:twitch:5.16")
@@ -69,7 +69,6 @@ dependencies {
     implementation("jline:jline:2.13")
     implementation("com.koloboke:koloboke-impl-jdk8:1.0.0")
     implementation("net.openhft:affinity:3.0.1")
-    implementation("mysql:mysql-connector-java:5.1.31")
     implementation("org.eclipse.collections:eclipse-collections-api:11.1.0")
     implementation("org.eclipse.collections:eclipse-collections:11.1.0")
     implementation("it.unimi.dsi:fastutil:8.2.2")
@@ -77,7 +76,6 @@ dependencies {
     implementation("org.avaje:ebean:2.7.3")
     implementation("com.googlecode.json-simple:json-simple:1.1")
     implementation("commons-lang:commons-lang:2.6")
-    implementation("org.eclipse.jetty:jetty-util:9.0.3.v20130506")
     implementation("net.md-5:SpecialSource:1.7.4")
 }
 
