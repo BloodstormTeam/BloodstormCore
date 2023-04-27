@@ -83,19 +83,6 @@ public class ASMModParser
         annotations.addFirst(ann);
     }
 
-    @Override
-    public String toString()
-    {
-        return Objects.toStringHelper("ASMAnnotationDiscoverer")
-                .add("className", asmType.getClassName())
-                .add("classVersion", classVersion)
-                .add("superName", asmSuperType.getClassName())
-                .add("annotations", annotations)
-                .add("isBaseMod", isBaseMod(Collections.<String>emptyList()))
-                .add("baseModProperties", baseModProperties)
-                .toString();
-    }
-
     public Type getASMType()
     {
         return asmType;

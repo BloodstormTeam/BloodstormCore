@@ -79,9 +79,4 @@ public class Metadata
     {
         return this.field_152812_b;
     }
-
-    public String toString()
-    {
-        return Objects.toStringHelper(this).add("name", this.field_152812_b).add("description", this.field_152813_c).add("data", this.func_152806_b()).toString();
-    }
 }

@@ -2857,7 +2857,7 @@ public class Minecraft implements IPlayerUsage
             }
             catch (Exception exception)
             {
-                return Futures.immediateFailedCheckedFuture(exception);
+                return Futures.immediateFailedFuture(exception);
             }
         }
     }

@@ -57,16 +57,6 @@ public class ModAnnotation
         this.type = type;
         this.asmType = asmType;
     }
-    @Override
-    public String toString()
-    {
-        return Objects.toStringHelper("Annotation")
-                .add("type",type)
-                .add("name",asmType.getClassName())
-                .add("member",member)
-                .add("values", values)
-                .toString();
-    }
     public AnnotationType getType()
     {
         return type;

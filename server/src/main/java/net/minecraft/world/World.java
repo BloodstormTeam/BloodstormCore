@@ -714,55 +714,32 @@ public abstract class World implements IBlockAccess
     }
 
 	public boolean checkChunksExist(int p_72904_1_, int p_72904_2_, int p_72904_3_, int p_72904_4_, int p_72904_5_, int p_72904_6_)
-	{
-		if (p_72904_5_ >= 0 && p_72904_2_ < 256)
-		{
-			if (!(this.chunkProvider instanceof ChunkProviderServer))
-			{
-				p_72904_1_ >>= 4;
-				p_72904_3_ >>= 4;
-				p_72904_4_ >>= 4;
-				p_72904_6_ >>= 4;
-	
-				for (int k1 = p_72904_1_; k1 <= p_72904_4_; ++k1)
-				{
-					for (int l1 = p_72904_3_; l1 <= p_72904_6_; ++l1)
-					{
-						if (!this.chunkExists(k1, l1))
-						{
-							return false;
-						}
-					}
-				}
-	
-				return true;
-			}
-			else
-			{
-				p_72904_1_ >>= 4;
-				p_72904_3_ >>= 4;
-				p_72904_4_ >>= 4;
-				p_72904_6_ >>= 4;
-	
-				ArrayList<int[]> st = new ArrayList<int[]>();
-				st.ensureCapacity((p_72904_4_ - p_72904_1_+1) * (p_72904_6_ - p_72904_3_ + 1));
-	
-				for (int k1 = p_72904_1_; k1 <= p_72904_4_; ++k1)
-				{
-					for (int l1 = p_72904_3_; l1 <= p_72904_6_; ++l1)
-					{
-						st.add(new int[] { k1, l1} );
-					}
-				}
-				ChunkProviderServer cps = (ChunkProviderServer) this.chunkProvider;
-				return cps.loadedChunkHashMap_KC.rawThermos().bulkCheck(st);            	
-			}
-		}
-		else
-		{
-			return false;
-		}
-	}
+    {
+        if (p_72904_5_ >= 0 && p_72904_2_ < 256)
+        {
+            p_72904_1_ >>= 4;
+            p_72904_3_ >>= 4;
+            p_72904_4_ >>= 4;
+            p_72904_6_ >>= 4;
+
+            for (int k1 = p_72904_1_; k1 <= p_72904_4_; ++k1)
+            {
+                for (int l1 = p_72904_3_; l1 <= p_72904_6_; ++l1)
+                {
+                    if (!this.chunkExists(k1, l1))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     public boolean chunkExists(int p_72916_1_, int p_72916_2_) // Cauldron - protected -> public for repackaging
     {

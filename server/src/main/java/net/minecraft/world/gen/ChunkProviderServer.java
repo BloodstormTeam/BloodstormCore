@@ -1,33 +1,24 @@
 package net.minecraft.world.gen;
 
-import com.google.common.collect.Lists;
-
+import co.aikar.timings.Timing;
+import com.bloodstorm.core.chunk.ChunkMap;
+import com.bloodstorm.core.util.ChunkHash;
 import cpw.mods.fml.common.registry.GameRegistry;
-import gnu.trove.impl.sync.TSynchronizedLongObjectMap;
-import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TLongObjectHashMap;
-import gnu.trove.procedure.TObjectProcedure;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import io.github.crucible.CrucibleConfigs;
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import net.minecraft.block.BlockSand;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IProgressUpdate;
-import net.minecraft.util.LongHashMap;
 import net.minecraft.util.ReportedException;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.ChunkPosition;
-import net.minecraft.world.MinecraftException;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
@@ -35,71 +26,30 @@ import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraft.world.chunk.storage.IChunkLoader;
+import net.minecraftforge.cauldron.CauldronHooks;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.chunkio.ChunkIOExecutor;
-import thermos.wrapper.ChunkBlockHashMap;
-import thermos.wrapper.VanillaChunkHashMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-
-
-
-
-// CraftBukkit start
-import java.util.Random;
-
-import net.minecraft.block.BlockSand;
-
 import org.bukkit.Server;
 import org.bukkit.craftbukkit.util.LongHash;
 import org.bukkit.craftbukkit.util.LongHashSet;
-import org.bukkit.craftbukkit.util.LongObjectHashMap;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
+import java.util.List;
+import java.util.Random;
 
-
-
-
-// CraftBukkit end
-// Cauldron start
-import cpw.mods.fml.common.FMLCommonHandler;
-import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.cauldron.configuration.CauldronConfig;
-import net.minecraftforge.cauldron.CauldronHooks;
-// Cauldron end
-
-public class ChunkProviderServer implements IChunkProvider
-{
-
-/*
-    private Set chunksToUnload = Collections.newSetFromMap(new ConcurrentHashMap());
-    private Chunk defaultEmptyChunk;
-    public IChunkProvider currentChunkProvider;
-    public IChunkLoader currentChunkLoader;
-    public boolean loadChunkOnProvideRequest = true;
-    public LongHashMap loadedChunkHashMap = new LongHashMap();
-    public List loadedChunks = new ArrayList();
-    public WorldServer worldObj;
-    private Set<Long> loadingChunks = com.google.common.collect.Sets.newHashSet();
-
-*/
-
+public class ChunkProviderServer implements IChunkProvider {
     private static final Logger logger = LogManager.getLogger();
-    public LongHashSet chunksToUnload = new LongHashSet(); // LongHashSet
     public Chunk defaultEmptyChunk;
     public IChunkProvider currentChunkProvider;
     public IChunkLoader currentChunkLoader;
-    public boolean loadChunkOnProvideRequest = CrucibleConfigs.configs.cauldron_settings_loadChunkOnRequest; // Cauldron - if true, allows mods to force load chunks. to disable, set load-chunk-on-request in cauldron.yml to false
-    public int initialTick; // Cauldron counter to keep track of when this loader was created
-    public List loadedChunks = new ArrayList(); // Cauldron - vanilla compatibility
     public WorldServer worldObj;
-    private Set<Long> loadingChunks = com.google.common.collect.Sets.newHashSet();
-    public VanillaChunkHashMap loadedChunkHashMap_KC = new thermos.wrapper.VanillaChunkHashMap(new ChunkBlockHashMap());// Mobiuscraft KC compat
-    public LongHashMap loadedChunkHashMap = loadedChunkHashMap_KC.thisIsNotMyRealFace(); // KCauldron - vanilla/mystcraft compatibility
-    private static final String __OBFID = "CL_00001436";
+    public IntSet chunksToUnload = new IntLinkedOpenHashSet();
+    public ChunkMap chunkMap = new ChunkMap();
+    public int initialTick;
+    public boolean loadChunkOnProvideRequest = CrucibleConfigs.configs.cauldron_settings_loadChunkOnRequest; // Cauldron - if true, allows mods to force load chunks. to disable, set load-chunk-on-request in cauldron.yml to false
 
     public ChunkProviderServer(WorldServer p_i1520_1_, IChunkLoader p_i1520_2_, IChunkProvider p_i1520_3_)
     {
@@ -110,161 +60,120 @@ public class ChunkProviderServer implements IChunkProvider
         this.currentChunkProvider = p_i1520_3_;
     }
 
-    public boolean chunkExists(int p_73149_1_, int p_73149_2_)
+    public boolean chunkExists(int x, int z)
     {
-        return this.loadedChunkHashMap_KC.rawThermos().get(p_73149_1_, p_73149_2_) != null; //Thermos Replacement
+        return chunkMap.contains(x, z);
     }
 
     public List func_152380_a() // Vanilla compatibility
     {
-        return this.loadedChunks;
+        return (List) chunkMap.valueCollection();
     }
 
-    public void unloadChunksIfNotNearSpawn(int p_73241_1_, int p_73241_2_)
+    public void unloadChunksIfNotNearSpawn(int x, int z)
     {
         // PaperSpigot start - Asynchronous lighting updates
-        Chunk chunk = this.loadedChunkHashMap_KC.rawThermos().get(p_73241_1_, p_73241_2_); //Thermos replacement
-        // Thermos don't light modded chunks
-        boolean modFlag = false;
-        try { if (chunk.worldObj.isModded == null) chunk.worldObj.isModded = false; modFlag = chunk.worldObj.isModded;} catch(Exception e){}
-        
-        if (chunk != null && (chunk.worldObj.spigotConfig.useAsyncLighting && !modFlag) && (chunk.pendingLightUpdates.get() > 0 || chunk.worldObj.getTotalWorldTime() - chunk.lightUpdateTime < 20)) {
-            return;
+        Chunk chunk = chunkMap.get(x, z);
+        if (chunk != null) {
+            if (chunk.worldObj.isModded == null) {
+                chunk.worldObj.isModded = false;
+            }
+
+            if (chunk.worldObj.spigotConfig.useAsyncLighting && (chunk.pendingLightUpdates.get() > 0 || chunk.worldObj.getTotalWorldTime() - chunk.lightUpdateTime < 20)) {
+                return;
+            }
         }
-        // PaperSpigot end
-        if (this.worldObj.provider.canRespawnHere() && DimensionManager.shouldLoadSpawn(this.worldObj.provider.dimensionId))
-        {
+
+        if (this.worldObj.provider.canRespawnHere() && DimensionManager.shouldLoadSpawn(this.worldObj.provider.dimensionId)) {
             ChunkCoordinates chunkcoordinates = this.worldObj.getSpawnPoint();
-            int k = p_73241_1_ * 16 + 8 - chunkcoordinates.posX;
-            int l = p_73241_2_ * 16 + 8 - chunkcoordinates.posZ;
+            int k = x * 16 + 8 - chunkcoordinates.posX;
+            int l = z * 16 + 8 - chunkcoordinates.posZ;
             short short1 = 128;
 
-            // CraftBukkit start
-            if (k < -short1 || k > short1 || l < -short1 || l > short1)
-            {
-                this.chunksToUnload.add(p_73241_1_, p_73241_2_);
-                Chunk c = (this.loadedChunkHashMap_KC.rawThermos().get(p_73241_1_, p_73241_2_)); //Thermos replacement
-
-                if (c != null)
-                {
-                    c.mustSave = true;
+            if (k < -short1 || k > short1 || l < -short1 || l > short1) {
+                this.chunksToUnload.add(ChunkHash.chunkToKey(x, z));
+                if (chunk != null) {
+                    chunk.mustSave = true;
                 }
-                CauldronHooks.logChunkUnload(this, p_73241_1_, p_73241_2_, "Chunk added to unload queue");
             }
-
-            // CraftBukkit end
-        }
-        else
-        {
-            // CraftBukkit start
-            this.chunksToUnload.add(p_73241_1_, p_73241_2_);
-            Chunk c = (this.loadedChunkHashMap_KC.rawThermos().get(p_73241_1_, p_73241_2_)); //KCauldron replacement
-
-            if (c != null)
-            {
-                c.mustSave = true;
+        } else {
+            this.chunksToUnload.add(ChunkHash.chunkToKey(x, z));
+            if (chunk != null) {
+                chunk.mustSave = true;
             }
-            CauldronHooks.logChunkUnload(this, p_73241_1_, p_73241_2_, "Chunk added to unload queue");
-            // CraftBukkit end
         }
     }
 
     public void unloadAllChunks()
     {
-    	for(Chunk chunk : this.loadedChunkHashMap_KC.rawVanilla().values())
+    	for(Chunk chunk : this.chunkMap.valueCollection())
     	{
     		unloadChunksIfNotNearSpawn(chunk.xPosition, chunk.zPosition);
     	}
     }
 
     public Chunk getChunkIfLoaded(int x, int z) {
-    	return this.loadedChunkHashMap_KC.rawThermos().get(x,z); //Thermos replacement
+    	return chunkMap.get(x, z);
     }
 
-    public Chunk loadChunk(int p_73158_1_, int p_73158_2_)
+    public Chunk loadChunk(int x, int z)
     {
-        return loadChunk(p_73158_1_, p_73158_2_, null);
+        return loadChunk(x, z, null);
     }
 
-    public Chunk loadChunk(int par1, int par2, Runnable runnable)
-    {
-        this.chunksToUnload.remove(par1, par2);
-        Chunk chunk = this.loadedChunkHashMap_KC.rawThermos().get(par1,par2); //Thermos replacement
-        boolean newChunk = false;
+    public Chunk loadChunk(int x, int z, Runnable runnable) {
+        this.chunksToUnload.remove(ChunkHash.chunkToKey(x, z));
+        Chunk chunk = this.chunkMap.get(x, z);
         AnvilChunkLoader loader = null;
 
-        if (this.currentChunkLoader instanceof AnvilChunkLoader)
-        {
+        if (this.currentChunkLoader instanceof AnvilChunkLoader) {
             loader = (AnvilChunkLoader) this.currentChunkLoader;
         }
 
-        CauldronHooks.logChunkLoad(this, "Get", par1, par2, true);
-
         // We can only use the queue for already generated chunks
-        if (chunk == null && loader != null && loader.chunkExists(this.worldObj, par1, par2))
-        {
-            if (runnable != null)
-            {
-                ChunkIOExecutor.queueChunkLoad(this.worldObj, loader, this, par1, par2, runnable);
+        if (chunk == null && loader != null && loader.chunkExists(this.worldObj, x, z)) {
+            if (runnable != null) {
+                ChunkIOExecutor.queueChunkLoad(this.worldObj, loader, this, x, z, runnable);
                 return null;
-            }
-            else
-            {
-                chunk = ChunkIOExecutor.syncChunkLoad(this.worldObj, loader, this, par1, par2);
+            } else {
+                chunk = ChunkIOExecutor.syncChunkLoad(this.worldObj, loader, this, x, z);
             }
         }
-        else if (chunk == null)
-        {
-            chunk = this.originalLoadChunk(par1, par2);
+        else if (chunk == null) {
+            chunk = this.originalLoadChunk(x, z);
         }
 
-        // If we didn't load the chunk async and have a callback run it now
-        if (runnable != null)
-        {
+        if (runnable != null) {
             runnable.run();
         }
 
         return chunk;
     }
 
-    public Chunk originalLoadChunk(int p_73158_1_, int p_73158_2_)
+    public Chunk originalLoadChunk(int x, int z)
     {
-        this.chunksToUnload.remove(p_73158_1_, p_73158_2_);
-        Chunk chunk = this.loadedChunkHashMap_KC.rawThermos().get(p_73158_1_, p_73158_2_); //Thermos replacement
-        boolean newChunk = false; // CraftBukkit
+        this.chunksToUnload.remove(ChunkHash.chunkToKey(x, z));
+        Chunk chunk = this.chunkMap.get(x, z);
+        boolean newChunk = false;
 
-        if (chunk == null)
-        {
-            worldObj.timings.syncChunkLoadTimer.startTiming(); // Spigot
-            boolean added = loadingChunks.add(LongHash.toLong(p_73158_1_, p_73158_2_));
-            if (!added)
-            {
-                cpw.mods.fml.common.FMLLog.bigWarning("There is an attempt to load a chunk (%d,%d) in dimension %d that is already being loaded. This will cause weird chunk breakages.", p_73158_1_, p_73158_2_, worldObj.provider.dimensionId);
-            }
-            chunk = ForgeChunkManager.fetchDormantChunk(LongHash.toLong(p_73158_1_, p_73158_2_), this.worldObj);
-            if (chunk == null)
-            {
-                chunk = this.safeLoadChunk(p_73158_1_, p_73158_2_);
+        if (chunk == null) {
+            worldObj.timings.syncChunkLoadTimer.startTiming();
+            chunk = ForgeChunkManager.fetchDormantChunk(LongHash.toLong(x, z), this.worldObj);
+            if (chunk == null) {
+                chunk = this.safeLoadChunk(x, z);
             }
 
-            if (chunk == null)
-            {
-                if (this.currentChunkProvider == null)
-                {
+            if (chunk == null) {
+                if (this.currentChunkProvider == null) {
                     chunk = this.defaultEmptyChunk;
-                }
-                else
-                {
-                    try
-                    {
-                        chunk = this.currentChunkProvider.provideChunk(p_73158_1_, p_73158_2_);
-                    }
-                    catch (Throwable throwable)
-                    {
+                } else {
+                    try {
+                        chunk = this.currentChunkProvider.provideChunk(x, z);
+                    } catch (Throwable throwable) {
                         CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Exception generating new chunk");
                         CrashReportCategory crashreportcategory = crashreport.makeCategory("Chunk to be generated");
-                        crashreportcategory.addCrashSection("Location", String.format("%d,%d", new Object[] {Integer.valueOf(p_73158_1_), Integer.valueOf(p_73158_2_)}));
-                        crashreportcategory.addCrashSection("Position hash", LongHash.toLong(p_73158_1_, p_73158_2_));
+                        crashreportcategory.addCrashSection("Location", String.format("%d,%d", new Object[] {Integer.valueOf(x), Integer.valueOf(z)}));
+                        crashreportcategory.addCrashSection("Position hash", LongHash.toLong(x, z));
                         crashreportcategory.addCrashSection("Generator", this.currentChunkProvider.makeString());
                         throw new ReportedException(crashreport);
                     }
@@ -273,79 +182,61 @@ public class ChunkProviderServer implements IChunkProvider
                 newChunk = true; // CraftBukkit
             }
 
-            this.loadedChunkHashMap_KC.add(LongHash.toLong(p_73158_1_, p_73158_2_), chunk); // Will pass on to chunkt_TH
-            this.loadedChunks.add(chunk); // Cauldron - vanilla compatibility
-            loadingChunks.remove(LongHash.toLong(p_73158_1_, p_73158_2_)); // Cauldron - LongHash
+            this.chunkMap.put(x, z, chunk);
+            chunk.onChunkLoad();
 
-            if (chunk != null)
-            {
-                chunk.onChunkLoad();
-            }
-            // CraftBukkit start
             Server server = this.worldObj.getServer();
 
-            if (server != null)
-            {
-                /*
-                 * If it's a new world, the first few chunks are generated inside
-                 * the World constructor. We can't reliably alter that, so we have
-                 * no way of creating a CraftWorld/CraftServer at that point.
-                 */
+            if (server != null) {
                 server.getPluginManager().callEvent(new org.bukkit.event.world.ChunkLoadEvent(chunk.bukkitChunk, newChunk));
             }
 
             // Update neighbor counts
-            for (int x = -2; x < 3; x++) {
-                for (int z = -2; z < 3; z++) {
-                    if (x == 0 && z == 0) {
+            for (int xX = -2; xX < 3; xX++) {
+                for (int zZ = -2; zZ < 3; zZ++) {
+                    if (xX == 0 && zZ == 0) {
                         continue;
                     }
 
-                    Chunk neighbor = this.getChunkIfLoaded(chunk.xPosition + x, chunk.zPosition + z);
+                    Chunk neighbor = this.getChunkIfLoaded(chunk.xPosition + xX, chunk.zPosition + zZ);
                     if (neighbor != null) {
-                        neighbor.setNeighborLoaded(-x, -z);
-                        chunk.setNeighborLoaded(x, z);
+                        neighbor.setNeighborLoaded(-xX, -zZ);
+                        chunk.setNeighborLoaded(xX, zZ);
                     }
                 }
             }
             // CraftBukkit end
-            chunk.populateChunk(this, this, p_73158_1_, p_73158_2_);
+            chunk.populateChunk(this, this, x, z);
             worldObj.timings.syncChunkLoadTimer.stopTiming(); // Spigot
         }
 
         return chunk;
     }
 
-    public Chunk provideChunk(int p_73154_1_, int p_73154_2_)
+    public Chunk provideChunk(int x, int z)
     {
 
         // CraftBukkit start
-        Chunk chunk = (Chunk) this.loadedChunkHashMap_KC.rawThermos().get(p_73154_1_, p_73154_2_);
-        chunk = chunk == null ? (shouldLoadChunk() ? this.loadChunk(p_73154_1_, p_73154_2_) : this.defaultEmptyChunk) : chunk; // Cauldron handle forge server tick events and load the chunk within 5 seconds of the world being loaded (for chunk loaders)
+        Chunk chunk = this.chunkMap.get(x, z);
+        chunk = chunk == null ? (shouldLoadChunk() ? this.loadChunk(x, z) : this.defaultEmptyChunk) : chunk; // Cauldron handle forge server tick events and load the chunk within 5 seconds of the world being loaded (for chunk loaders)
 
-        if (chunk == this.defaultEmptyChunk)
-        {
+        if (chunk == this.defaultEmptyChunk) {
             return chunk;
         }
         
-        if (chunk == null)
-        {
-        	logger.error("Provided chunk is null for (" +p_73154_1_ + ", " + p_73154_2_+") !");
+        if (chunk == null) {
+        	logger.error("Provided chunk is null for (" +x + ", " + z+") !");
         	return null;
         }
         
-        try
-        {
+        try {
         	worldObj.isProfilingWorld();
-        }
-        catch (Throwable t)
-        {
+        } catch (Throwable t) {
         	return chunk;
         }
         
-        if ((p_73154_1_ != chunk.xPosition || p_73154_2_ != chunk.zPosition) && !worldObj.isProfilingWorld())
-        {
-            logger.error("Chunk (" + chunk.xPosition + ", " + chunk.zPosition + ") stored at  (" + p_73154_1_ + ", " + p_73154_2_ + ") in world '" + worldObj.getWorld().getName() + "'");
+        if ((x != chunk.xPosition || z != chunk.zPosition) && !worldObj.isProfilingWorld()) {
+            logger.error("Chunk (" + chunk.xPosition + ", " + chunk.zPosition + ") stored at  (" + x + ", " + z + ") in world '" + worldObj.getWorld().getName() + "'");
             logger.error(chunk.getClass().getName());
             Throwable ex = new Throwable();
             ex.fillInStackTrace();
@@ -356,77 +247,52 @@ public class ChunkProviderServer implements IChunkProvider
         // CraftBukkit end
     }
 
-    public Chunk safeLoadChunk(int p_73239_1_, int p_73239_2_) // CraftBukkit - private -> public
+    public Chunk safeLoadChunk(int x, int y) // CraftBukkit - private -> public
     {
-        if (this.currentChunkLoader == null)
-        {
+        if (this.currentChunkLoader == null) {
             return null;
-        }
-        else
-        {
-            try
-            {
-                CauldronHooks.logChunkLoad(this, "Safe Load", p_73239_1_, p_73239_2_, false); // Cauldron
-                Chunk chunk = this.currentChunkLoader.loadChunk(this.worldObj, p_73239_1_, p_73239_2_);
+        } else {
+            try {
+                CauldronHooks.logChunkLoad(this, "Safe Load", x, y, false); // Cauldron
+                Chunk chunk = this.currentChunkLoader.loadChunk(this.worldObj, x, y);
 
-                if (chunk != null)
-                {
+                if (chunk != null) {
                     chunk.lastSaveTime = this.worldObj.getTotalWorldTime();
 
-                    if (this.currentChunkProvider != null)
-                    {
+                    if (this.currentChunkProvider != null) {
                         worldObj.timings.syncChunkLoadStructuresTimer.startTiming(); // Spigot
-                        this.currentChunkProvider.recreateStructures(p_73239_1_, p_73239_2_);
+                        this.currentChunkProvider.recreateStructures(x, y);
                         worldObj.timings.syncChunkLoadStructuresTimer.stopTiming(); // Spigot
                     }
                     chunk.lastAccessedTick = MinecraftServer.getServer().getTickCounter(); // Cauldron
                 }
 
                 return chunk;
-            }
-            catch (Exception exception)
-            {
-                logger.error("Couldn\'t load chunk", exception);
+            } catch (Exception exception) {
+                logger.error("Couldn't load chunk", exception);
                 return null;
             }
         }
     }
 
-    public void safeSaveExtraChunkData(Chunk p_73243_1_)   // CraftBukkit - private -> public
-    {
-        if (this.currentChunkLoader != null)
-        {
-            try
-            {
+    public void safeSaveExtraChunkData(Chunk p_73243_1_) {
+        if (this.currentChunkLoader != null){
+            try {
                 this.currentChunkLoader.saveExtraChunkData(this.worldObj, p_73243_1_);
-            }
-            catch (Exception exception)
-            {
-                logger.error("Couldn\'t save entities", exception);
+            } catch (Exception exception) {
+                logger.error("Couldn't save entities", exception);
             }
         }
     }
 
-    public void safeSaveChunk(Chunk p_73242_1_)   // CraftBukkit - private -> public
-    {
-        if (this.currentChunkLoader != null)
-        {
-            try
-            {
-                p_73242_1_.lastSaveTime = this.worldObj.getTotalWorldTime();
-                this.currentChunkLoader.saveChunk(this.worldObj, p_73242_1_);
-                // CraftBukkit start - IOException to Exception
+    public void safeSaveChunk(Chunk chunk) {
+        if (this.currentChunkLoader != null) {
+            try {
+                chunk.lastSaveTime = this.worldObj.getTotalWorldTime();
+                this.currentChunkLoader.saveChunk(this.worldObj, chunk);
+            } catch (Exception exception) {
+                logger.error("Couldn't save chunk", exception);
             }
-            catch (Exception ioexception)
-            {
-                logger.error("Couldn\'t save chunk", ioexception);
-            }
-            /* Remove extra exception
-            catch (MinecraftException minecraftexception)
-            {
-                logger.error("Couldn\'t save chunk; already in use by another instance of Minecraft?", minecraftexception);
-            }
-            // CraftBukkit end */
         }
     }
 
@@ -478,38 +344,21 @@ public class ChunkProviderServer implements IChunkProvider
         }
     }
 
-    public boolean saveChunks(boolean p_73151_1_, IProgressUpdate p_73151_2_)
-    {
-        try (co.aikar.timings.Timing timed = worldObj.timings.chunkSaveData.startTiming()) { // Paper - Timings //Crucible - Is this right? I think so
-        int i = 0;
-        // Cauldron start - use thread-safe method for iterating loaded chunks
-        Object[] chunks = this.loadedChunks.toArray();
+    public boolean saveChunks(boolean saveExtraData, IProgressUpdate p_73151_2_) {
+        try (Timing ignored = worldObj.timings.chunkSaveData.startTiming()) { // Paper - Timings //Crucible - Is this right? I think so
+            int i = 0;
+            for (Chunk chunk : this.chunkMap.valueCollection()) {
+                if (chunk == null) continue;
+                if (saveExtraData) this.safeSaveExtraChunkData(chunk);
+                if(chunk.needsSaving(saveExtraData)) {
+                    this.safeSaveChunk(chunk);
+                    chunk.isModified = false;
 
-        for (int j = 0; j < chunks.length; ++j)
-        {
-            if (chunks[j] == null) { continue; }
-            Chunk chunk = (Chunk)chunks[j];
-            //Cauldron end
-
-            if (p_73151_1_)
-            {
-                this.safeSaveExtraChunkData(chunk);
-            }
-
-            if (chunk.needsSaving(p_73151_1_))
-            {
-                this.safeSaveChunk(chunk);
-                chunk.isModified = false;
-                ++i;
-
-                if (i == 24 && !p_73151_1_)
-                {
-                    return false;
+                    if (i++ == 24 && !saveExtraData) return false;
                 }
             }
+            return true;
         }
-        } // Paper - Timings
-        return true;
     }
 
     public void saveExtraData()
@@ -524,48 +373,33 @@ public class ChunkProviderServer implements IChunkProvider
     {
         if (!this.worldObj.levelSaving)
         {
-            // Cauldron start - remove any chunk that has a ticket associated with it
             if (!this.chunksToUnload.isEmpty())
             {
                 for (ChunkCoordIntPair forcedChunk : this.worldObj.getPersistentChunks().keySet())
                 {
-                    this.chunksToUnload.remove(forcedChunk.chunkXPos, forcedChunk.chunkZPos);
+                    this.chunksToUnload.remove(ChunkHash.chunkToKey(forcedChunk.chunkXPos, forcedChunk.chunkZPos));
                 }
             }
-            // Cauldron end
-            // CraftBukkit start
+
             Server server = this.worldObj.getServer();
 
-            for (int i = 0; i < 100 && !this.chunksToUnload.isEmpty(); i++)
-            {
-                long chunkcoordinates = this.chunksToUnload.popFirst();
-                Chunk chunk = (Chunk) this.loadedChunkHashMap_KC.getValueByKey(chunkcoordinates);
+            for (int key : this.chunksToUnload) {
+                Chunk chunk = this.chunkMap.get(key);
 
                 if (chunk == null)
                 {
                     continue;
                 }
 
-                // Cauldron static - check if the chunk was accessed recently and keep it loaded if there are players in world
-                if (!shouldUnloadChunk(chunk) && this.worldObj.playerEntities.size() > 0)
-                {
-                    CauldronHooks.logChunkUnload(this, chunk.xPosition, chunk.zPosition, "** Chunk kept from unloading due to recent activity");
-                    continue;
-                }
-                // Cauldron end
-
+                if (this.worldObj.playerEntities.size() > 0 && !shouldUnloadChunk(chunk)) continue;
 
                 ChunkUnloadEvent event = new ChunkUnloadEvent(chunk.bukkitChunk);
                 server.getPluginManager().callEvent(event);
 
-                if (!event.isCancelled())
-                {
-                    CauldronHooks.logChunkUnload(this, chunk.xPosition, chunk.zPosition, "Unloading Chunk at");
-
+                if (!event.isCancelled()) {
                     chunk.onChunkUnload();
                     this.safeSaveChunk(chunk);
                     this.safeSaveExtraChunkData(chunk);
-                    // Update neighbor counts
                     for (int x = -2; x < 3; x++) {
                         for (int z = -2; z < 3; z++) {
                             if (x == 0 && z == 0) {
@@ -579,18 +413,14 @@ public class ChunkProviderServer implements IChunkProvider
                             }
                         }
                     }
-                    this.loadedChunkHashMap_KC.remove(chunkcoordinates); // CraftBukkit, will pass to chunkt_TH
-                    this.loadedChunks.remove(chunk);
-
-                    ForgeChunkManager.putDormantChunk(chunkcoordinates, chunk);
-                    if(this.loadedChunkHashMap_KC.rawThermos().size() == 0 && ForgeChunkManager.getPersistentChunksFor(this.worldObj).size() == 0 && !DimensionManager.shouldLoadSpawn(this.worldObj.provider.dimensionId)){
+                    this.chunkMap.remove(key);
+                    ForgeChunkManager.putDormantChunk(key, chunk);
+                    if(this.chunkMap.size() == 0 && ForgeChunkManager.getPersistentChunksFor(this.worldObj).size() == 0 && !DimensionManager.shouldLoadSpawn(this.worldObj.provider.dimensionId)){
                         DimensionManager.unloadWorld(this.worldObj.provider.dimensionId);
                         return currentChunkProvider.unloadQueuedChunks();
                     }
                 }
             }
-
-            // CraftBukkit end
 
             if (this.currentChunkLoader != null)
             {
@@ -608,7 +438,7 @@ public class ChunkProviderServer implements IChunkProvider
 
     public String makeString()
     {
-        return "ServerChunkCache: " + this.loadedChunkHashMap_KC.rawThermos().size() + " Drop: " + this.chunksToUnload.size(); // Cauldron
+        return "ServerChunkCache: " + this.chunkMap.size() + " Drop: " + this.chunksToUnload.size(); // Cauldron
     }
 
     public List getPossibleCreatures(EnumCreatureType p_73155_1_, int p_73155_2_, int p_73155_3_, int p_73155_4_)
@@ -623,7 +453,7 @@ public class ChunkProviderServer implements IChunkProvider
 
     public int getLoadedChunkCount()
     {
-        return this.loadedChunkHashMap_KC.rawThermos().size(); // Cauldron
+        return this.chunkMap.size(); // Cauldron
     }
 
     public void recreateStructures(int p_82695_1_, int p_82695_2_) {}
@@ -639,7 +469,7 @@ public class ChunkProviderServer implements IChunkProvider
 
     public long lastAccessed(int x, int z)
     {
-        Chunk c = this.loadedChunkHashMap_KC.rawThermos().get(x,z);
+        Chunk c = this.chunkMap.get(x, z);
         if(c == null)return 0;
         else return c.lastAccessedTick;
     }
@@ -649,7 +479,4 @@ public class ChunkProviderServer implements IChunkProvider
         if (chunk == null) return false;
         return MinecraftServer.getServer().getTickCounter() - chunk.lastAccessedTick > CrucibleConfigs.configs.cauldron_settings_chunkGCGracePeriod;
     }
-
-
-    // Cauldron end
 }

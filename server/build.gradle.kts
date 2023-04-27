@@ -54,11 +54,12 @@ dependencies {
     implementation("org.yaml:snakeyaml:1.16")
     implementation("com.lmax:disruptor:3.2.1")
     implementation("org.apache.commons:commons-dbcp2:2.1.1")
-    implementation("com.koloboke:koloboke-api-jdk8:1.0.0")
     implementation("jline:jline:2.13")
-    implementation("com.koloboke:koloboke-impl-jdk8:1.0.0")
     implementation("net.openhft:affinity:3.0.1")
-    implementation("it.unimi.dsi:fastutil:8.2.2")
+    implementation ("it.unimi.dsi:fastutil:8.5.12")
+    implementation ("it.unimi.dsi:dsiutils:2.7.3") {
+        exclude(group = "com.google", module = "guava")
+    }
     implementation("javax.persistence:javax.persistence-api:2.2")
     implementation("org.avaje:ebean:2.7.3")
     implementation("com.googlecode.json-simple:json-simple:1.1")

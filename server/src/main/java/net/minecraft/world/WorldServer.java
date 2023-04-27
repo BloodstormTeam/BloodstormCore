@@ -1,5 +1,6 @@
 package net.minecraft.world;
 
+import com.bloodstorm.core.util.ChunkHash;
 import com.google.common.collect.Lists;
 
 import cpw.mods.fml.relauncher.Side;
@@ -454,7 +455,7 @@ public class WorldServer extends World
             int chunkX = World.keyToX(chunkCoord);
             int chunkZ = World.keyToZ(chunkCoord);
             // If unloaded, or in process of being unloaded, drop it
-            if ((!this.chunkExists(chunkX, chunkZ)) || (this.theChunkProviderServer.chunksToUnload.contains(chunkX, chunkZ)))
+            if ((!this.chunkExists(chunkX, chunkZ)) || (this.theChunkProviderServer.chunksToUnload.contains(ChunkHash.chunkToKey(chunkX, chunkZ))))
             {
                 activeChunkSet.remove(new ChunkCoordIntPair(chunkX, chunkZ)); // Cauldron - vanilla compatibility
                 iter.remove();
@@ -1094,15 +1095,9 @@ public class WorldServer extends World
             this.chunkProvider.saveChunks(p_73044_1_, p_73044_2_);
             timings.worldSaveChunks.stopTiming(); //Crucible
             MinecraftForge.EVENT_BUS.post(new WorldEvent.Save(this));
-            ArrayList arraylist = Lists.newArrayList(this.theChunkProviderServer.func_152380_a());
-            Iterator iterator = arraylist.iterator();
 
-            while (iterator.hasNext())
-            {
-                Chunk chunk = (Chunk)iterator.next();
-
-                if (chunk != null && !this.thePlayerManager.func_152621_a(chunk.xPosition, chunk.zPosition))
-                {
+            for (Chunk chunk : this.theChunkProviderServer.chunkMap.valueCollection()) {
+                if (chunk != null && !this.thePlayerManager.func_152621_a(chunk.xPosition, chunk.zPosition)) {
                     this.theChunkProviderServer.unloadChunksIfNotNearSpawn(chunk.xPosition, chunk.zPosition);
                 }
             }

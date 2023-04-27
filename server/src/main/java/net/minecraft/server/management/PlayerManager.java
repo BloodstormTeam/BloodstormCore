@@ -91,7 +91,7 @@ public class PlayerManager
 
         if (this.players.isEmpty())
         {
-            if (this.theWorldServer.loadedEntityList.size() == 0 || this.theWorldServer.theChunkProviderServer.loadedChunkHashMap_KC.size() == 0)
+            if (this.theWorldServer.loadedEntityList.size() == 0 || this.theWorldServer.theChunkProviderServer.chunkMap.size() == 0)
             {
                 return; // CraftBukkit - Only do unload when we go from non-empty to empty
             }

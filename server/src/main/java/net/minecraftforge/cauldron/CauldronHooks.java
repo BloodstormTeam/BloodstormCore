@@ -1,5 +1,6 @@
 package net.minecraftforge.cauldron;
 
+import com.bloodstorm.core.util.ChunkHash;
 import com.google.gson.stream.JsonWriter;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
@@ -252,7 +253,7 @@ public class CauldronHooks {
         if (world.chunkProvider instanceof ChunkProviderServer) // Thermos - allow the server to tick entities that are in chunks trying to unload
         {
             ChunkProviderServer cps = ((ChunkProviderServer) world.chunkProvider);
-            if (cps.chunksToUnload.contains(cX, cZ)) {
+            if (cps.chunksToUnload.contains(ChunkHash.chunkToKey(cX, cZ))) {
                 Chunk c = cps.getChunkIfLoaded(cX, cZ);
                 if (c != null) {
                     if (c.lastAccessedTick < 2L) {
@@ -289,7 +290,7 @@ public class CauldronHooks {
             if (world.chunkProvider instanceof ChunkProviderServer) // Thermos - allow the server to tick tiles that are trying to unload
             {
                 ChunkProviderServer cps = ((ChunkProviderServer) world.chunkProvider);
-                if (cps.chunksToUnload.contains(tileEntity.xCoord >> 4, tileEntity.zCoord >> 4)) {
+                if (cps.chunksToUnload.contains(ChunkHash.chunkToKey(tileEntity.xCoord >> 4, tileEntity.zCoord >> 4))) {
                     Chunk c = cps.getChunkIfLoaded(tileEntity.xCoord >> 4, tileEntity.zCoord >> 4);
                     if (c != null) {
                         return c.lastAccessedTick < 2L;
@@ -322,7 +323,7 @@ public class CauldronHooks {
                 writer.name("name").value(world.getWorld().getName());
                 writer.name("dimensionId").value(world.provider.dimensionId);
                 writer.name("players").value(world.playerEntities.size());
-                writer.name("loadedChunks").value(world.theChunkProviderServer.loadedChunkHashMap_KC.size());
+                writer.name("loadedChunks").value(world.theChunkProviderServer.chunkMap.size());
                 writer.name("activeChunks").value(world.activeChunkSet.size());
                 writer.name("entities").value(world.loadedEntityList.size());
                 writer.name("tiles").value(world.loadedTileEntityList.size());
