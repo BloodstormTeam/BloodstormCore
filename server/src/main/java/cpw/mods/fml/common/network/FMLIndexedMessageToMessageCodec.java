@@ -10,14 +10,12 @@ import io.netty.handler.codec.MessageToMessageCodec;
 import io.netty.util.AttributeKey;
 import java.lang.ref.WeakReference;
 import java.util.List;
-import org.apache.logging.log4j.Level;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 
 @Sharable
 public abstract class FMLIndexedMessageToMessageCodec<A> extends MessageToMessageCodec<FMLProxyPacket, A> {
-    private TByteObjectHashMap<Class<? extends A>> discriminators = new TByteObjectHashMap<Class<? extends A>>();
-    private TObjectByteHashMap<Class<? extends A>> types = new TObjectByteHashMap<Class<? extends A>>();
+    private final TByteObjectHashMap<Class<? extends A>> discriminators = new TByteObjectHashMap<Class<? extends A>>();
+    private final TObjectByteHashMap<Class<? extends A>> types = new TObjectByteHashMap<Class<? extends A>>();
 
     /**
      * Make this accessible to subclasses
@@ -90,7 +88,6 @@ public abstract class FMLIndexedMessageToMessageCodec<A> extends MessageToMessag
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
     {
-        FMLLog.log(Level.ERROR, cause, "FMLIndexedMessageCodec exception caught");
         super.exceptionCaught(ctx, cause);
     }
 }

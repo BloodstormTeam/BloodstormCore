@@ -13,24 +13,19 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.event.ClickEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 @SideOnly(Side.CLIENT)
-public class ScreenShotHelper
-{
-    private static final Logger logger = LogManager.getLogger();
+public class ScreenShotHelper {
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
     private static IntBuffer pixelBuffer;
     private static int[] pixelValues;
-    private static final String __OBFID = "CL_00000656";
 
     public static IChatComponent saveScreenshot(File p_148260_0_, int p_148260_1_, int p_148260_2_, Framebuffer p_148260_3_)
     {
-        return saveScreenshot(p_148260_0_, (String)null, p_148260_1_, p_148260_2_, p_148260_3_);
+        return saveScreenshot(p_148260_0_, null, p_148260_1_, p_148260_2_, p_148260_3_);
     }
 
     public static IChatComponent saveScreenshot(File p_148259_0_, String p_148259_1_, int p_148259_2_, int p_148259_3_, Framebuffer p_148259_4_)
@@ -105,19 +100,18 @@ public class ScreenShotHelper
             ImageIO.write(bufferedimage, "png", file3);
             ChatComponentText chatcomponenttext = new ChatComponentText(file3.getName());
             chatcomponenttext.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file3.getAbsolutePath()));
-            chatcomponenttext.getChatStyle().setUnderlined(Boolean.valueOf(true));
-            return new ChatComponentTranslation("screenshot.success", new Object[] {chatcomponenttext});
+            chatcomponenttext.getChatStyle().setUnderlined(Boolean.TRUE);
+            return new ChatComponentTranslation("screenshot.success", chatcomponenttext);
         }
         catch (Exception exception)
         {
-            logger.warn("Couldn\'t save screenshot", exception);
-            return new ChatComponentTranslation("screenshot.failure", new Object[] {exception.getMessage()});
+            return new ChatComponentTranslation("screenshot.failure", exception.getMessage());
         }
     }
 
     private static File getTimestampedPNGFileForDirectory(File p_74290_0_)
     {
-        String s = dateFormat.format(new Date()).toString();
+        String s = dateFormat.format(new Date());
         int i = 1;
 
         while (true)

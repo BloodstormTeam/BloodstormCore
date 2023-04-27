@@ -48,7 +48,6 @@ public abstract class ConfigBase {
         try {
             config.save(configFile);
         } catch (IOException ex) {
-            MinecraftServer.getServer().logSevere("Could not save " + configFile);
             ex.printStackTrace();
         }
     }

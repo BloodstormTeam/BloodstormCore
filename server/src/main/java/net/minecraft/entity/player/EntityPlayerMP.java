@@ -99,8 +99,6 @@ import net.minecraft.world.WorldSettings;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import org.apache.commons.io.Charsets;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraftforge.common.ForgeHooks;
@@ -122,9 +120,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 // CraftBukkit end
 
-public class EntityPlayerMP extends EntityPlayer implements ICrafting
-{
-    private static final Logger logger = LogManager.getLogger();
+public class EntityPlayerMP extends EntityPlayer implements ICrafting {
     public String translator = "en_US"; // CraftBukkit - private -> public
     public NetHandlerPlayServer playerNetServerHandler;
     public final MinecraftServer mcServer;
@@ -1041,12 +1037,8 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
                 merchantrecipelist.func_151391_a(packetbuffer);
                 this.playerNetServerHandler.sendPacket(new S3FPacketCustomPayload("MC|TrList", packetbuffer));
             }
-            catch (Exception ioexception)     // CraftBukkit - IOException -> Exception
-            {
-                logger.error("Couldn\'t send trade list", ioexception);
-            }
-            finally
-            {
+            catch (Exception ignored) {}
+            finally {
                 packetbuffer.release();
             }
         }

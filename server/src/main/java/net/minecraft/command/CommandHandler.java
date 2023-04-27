@@ -11,8 +11,6 @@ import java.util.Map.Entry;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CommandEvent;
@@ -22,9 +20,7 @@ import org.bukkit.craftbukkit.command.ModCustomCommand;
 import cpw.mods.fml.common.FMLCommonHandler;
 // Cauldron end
 
-public class CommandHandler implements ICommandManager
-{
-    private static final Logger logger = LogManager.getLogger();
+public class CommandHandler implements ICommandManager {
     private final Map commandMap = new HashMap();
     private final Set commandSet = new HashSet();
     private static final String __OBFID = "CL_00001765";
@@ -128,10 +124,9 @@ public class CommandHandler implements ICommandManager
         }
         catch (Throwable throwable)
         {
-            chatcomponenttranslation = new ChatComponentTranslation("commands.generic.exception", new Object[0]);
+            chatcomponenttranslation = new ChatComponentTranslation("commands.generic.exception");
             chatcomponenttranslation.getChatStyle().setColor(EnumChatFormatting.RED);
             p_71556_1_.addChatMessage(chatcomponenttranslation);
-            logger.error("Couldn\'t process command: \'" + p_71556_2_ + "\'", throwable);
         }
 
         return j;
@@ -160,7 +155,6 @@ public class CommandHandler implements ICommandManager
         if (list != null)
             customCommand.setAliases(list);
         commandMap.register(par1ICommand.getCommandName(), customCommand);
-        LogManager.getLogger().info("Registered command " + par1ICommand.getCommandName() + " with permission node " + permissionNode);
 
         if (list != null)
         {

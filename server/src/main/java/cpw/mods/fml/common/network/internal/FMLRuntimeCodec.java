@@ -3,7 +3,6 @@ package cpw.mods.fml.common.network.internal;
 import com.google.common.base.Splitter;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.FMLIndexedMessageToMessageCodec;
 import cpw.mods.fml.common.network.FMLNetworkException;
@@ -31,13 +30,7 @@ public class FMLRuntimeCodec extends FMLIndexedMessageToMessageCodec<FMLMessage>
     @Override
     protected void testMessageValidity(FMLProxyPacket msg)
     {
-        if (msg.payload().getByte(0) == 0 && msg.payload().readableBytes() > 2)
-        {
-            FMLLog.severe("The connection appears to have sent an invalid FML packet of type 0, this is likely because it think's it's talking to 1.6.4 FML");
-            FMLLog.info("Bad data :");
-            for (String l : Splitter.on('\n').split(ByteBufUtils.getContentDump(msg.payload()))) {
-                FMLLog.info("\t%s",l);
-            }
+        if (msg.payload().getByte(0) == 0 && msg.payload().readableBytes() > 2) {
             throw new FMLNetworkException("Invalid FML packet");
         }
     }

@@ -1,12 +1,9 @@
 package cpw.mods.fml.common.network.simpleimpl;
 
-import org.apache.logging.log4j.Level;
-
 import net.minecraft.network.INetHandler;
 
 import com.google.common.base.Preconditions;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.network.FMLOutboundHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -43,9 +40,7 @@ public class SimpleChannelHandlerWrapper<REQ extends IMessage, REPLY extends IMe
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
-    {
-        FMLLog.log(Level.ERROR, cause, "SimpleChannelHandlerWrapper exception");
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
     }
 }

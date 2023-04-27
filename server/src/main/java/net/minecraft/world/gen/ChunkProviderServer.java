@@ -30,8 +30,6 @@ import net.minecraftforge.cauldron.CauldronHooks;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.chunkio.ChunkIOExecutor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.Server;
 import org.bukkit.craftbukkit.util.LongHash;
 import org.bukkit.craftbukkit.util.LongHashSet;
@@ -41,7 +39,6 @@ import java.util.List;
 import java.util.Random;
 
 public class ChunkProviderServer implements IChunkProvider {
-    private static final Logger logger = LogManager.getLogger();
     public Chunk defaultEmptyChunk;
     public IChunkProvider currentChunkProvider;
     public IChunkLoader currentChunkLoader;
@@ -225,7 +222,6 @@ public class ChunkProviderServer implements IChunkProvider {
         }
         
         if (chunk == null) {
-        	logger.error("Provided chunk is null for (" +x + ", " + z+") !");
         	return null;
         }
         
@@ -236,8 +232,6 @@ public class ChunkProviderServer implements IChunkProvider {
         }
         
         if ((x != chunk.xPosition || z != chunk.zPosition) && !worldObj.isProfilingWorld()) {
-            logger.error("Chunk (" + chunk.xPosition + ", " + chunk.zPosition + ") stored at  (" + x + ", " + z + ") in world '" + worldObj.getWorld().getName() + "'");
-            logger.error(chunk.getClass().getName());
             Throwable ex = new Throwable();
             ex.fillInStackTrace();
             ex.printStackTrace();
@@ -253,7 +247,6 @@ public class ChunkProviderServer implements IChunkProvider {
             return null;
         } else {
             try {
-                CauldronHooks.logChunkLoad(this, "Safe Load", x, y, false); // Cauldron
                 Chunk chunk = this.currentChunkLoader.loadChunk(this.worldObj, x, y);
 
                 if (chunk != null) {
@@ -269,7 +262,6 @@ public class ChunkProviderServer implements IChunkProvider {
 
                 return chunk;
             } catch (Exception exception) {
-                logger.error("Couldn't load chunk", exception);
                 return null;
             }
         }
@@ -279,9 +271,7 @@ public class ChunkProviderServer implements IChunkProvider {
         if (this.currentChunkLoader != null){
             try {
                 this.currentChunkLoader.saveExtraChunkData(this.worldObj, p_73243_1_);
-            } catch (Exception exception) {
-                logger.error("Couldn't save entities", exception);
-            }
+            } catch (Exception ignored) {}
         }
     }
 
@@ -290,9 +280,7 @@ public class ChunkProviderServer implements IChunkProvider {
             try {
                 chunk.lastSaveTime = this.worldObj.getTotalWorldTime();
                 this.currentChunkLoader.saveChunk(this.worldObj, chunk);
-            } catch (Exception exception) {
-                logger.error("Couldn't save chunk", exception);
-            }
+            } catch (Exception ignored) {}
         }
     }
 

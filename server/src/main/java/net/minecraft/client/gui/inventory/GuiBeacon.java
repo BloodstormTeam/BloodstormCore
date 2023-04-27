@@ -18,14 +18,10 @@ import net.minecraft.network.play.client.C17PacketCustomPayload;
 import net.minecraft.potion.Potion;
 import net.minecraft.tileentity.TileEntityBeacon;
 import net.minecraft.util.ResourceLocation;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
-public class GuiBeacon extends GuiContainer
-{
-    private static final Logger logger = LogManager.getLogger();
+public class GuiBeacon extends GuiContainer {
     private static final ResourceLocation beaconGuiTextures = new ResourceLocation("textures/gui/container/beacon.png");
     private TileEntityBeacon tileBeacon;
     private GuiBeacon.ConfirmButton beaconConfirmButton;
@@ -140,12 +136,8 @@ public class GuiBeacon extends GuiContainer
                 bytebuf.writeInt(this.tileBeacon.getSecondaryEffect());
                 this.mc.getNetHandler().addToSendQueue(new C17PacketCustomPayload(s, bytebuf));
             }
-            catch (Exception exception)
-            {
-                logger.error("Couldn\'t send beacon info", exception);
-            }
-            finally
-            {
+            catch (Exception ignored) {}
+            finally {
                 bytebuf.release();
             }
 

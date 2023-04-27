@@ -7,14 +7,10 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.command.server.CommandBlockLogic;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.C17PacketCustomPayload;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 
 @SideOnly(Side.CLIENT)
-public class GuiCommandBlock extends GuiScreen
-{
-    private static final Logger field_146488_a = LogManager.getLogger();
+public class GuiCommandBlock extends GuiScreen {
     private GuiTextField commandTextField;
     private GuiTextField field_146486_g;
     private final CommandBlockLogic localCommandBlock;
@@ -79,10 +75,7 @@ public class GuiCommandBlock extends GuiScreen
                     packetbuffer.writeStringToBuffer(this.commandTextField.getText());
                     this.mc.getNetHandler().addToSendQueue(new C17PacketCustomPayload("MC|AdvCdm", packetbuffer));
                 }
-                catch (Exception exception)
-                {
-                    field_146488_a.error("Couldn\'t send command block info", exception);
-                }
+                catch (Exception ignored) {}
                 finally
                 {
                     packetbuffer.release();

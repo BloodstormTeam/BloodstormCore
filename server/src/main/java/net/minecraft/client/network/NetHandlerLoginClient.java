@@ -26,17 +26,12 @@ import net.minecraft.network.login.client.C01PacketEncryptionResponse;
 import net.minecraft.network.login.server.S00PacketDisconnect;
 import net.minecraft.network.login.server.S01PacketEncryptionRequest;
 import net.minecraft.network.login.server.S02PacketLoginSuccess;
-import net.minecraft.network.play.client.C17PacketCustomPayload;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.CryptManager;
 import net.minecraft.util.IChatComponent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
-public class NetHandlerLoginClient implements INetHandlerLoginClient
-{
-    private static final Logger logger = LogManager.getLogger();
+public class NetHandlerLoginClient implements INetHandlerLoginClient {
     private final Minecraft field_147394_b;
     private final GuiScreen field_147395_c;
     private final NetworkManager field_147393_d;
@@ -81,20 +76,12 @@ public class NetHandlerLoginClient implements INetHandlerLoginClient
         {
             if (flag)
             {
-                this.field_147393_d.closeChannel(new ChatComponentTranslation("disconnect.loginFailedInfo", new Object[] {authenticationexception.getMessage()}));
+                this.field_147393_d.closeChannel(new ChatComponentTranslation("disconnect.loginFailedInfo", authenticationexception.getMessage()));
                 return;
             }
         }
 
-        this.field_147393_d.scheduleOutboundPacket(new C01PacketEncryptionResponse(secretkey, publickey, p_147389_1_.func_149607_e()), new GenericFutureListener[] {new GenericFutureListener()
-        {
-            private static final String __OBFID = "CL_00000877";
-            public void operationComplete(Future p_operationComplete_1_)
-            {
-                NetHandlerLoginClient.this.field_147393_d.enableEncryption(secretkey);
-            }
-        }
-                                                                                                                                                });
+        this.field_147393_d.scheduleOutboundPacket(new C01PacketEncryptionResponse(secretkey, publickey, p_147389_1_.func_149607_e()), p_operationComplete_1_ -> NetHandlerLoginClient.this.field_147393_d.enableEncryption(secretkey));
     }
 
     private MinecraftSessionService func_147391_c()
@@ -112,12 +99,8 @@ public class NetHandlerLoginClient implements INetHandlerLoginClient
         this.field_147394_b.displayGuiScreen(new GuiDisconnected(this.field_147395_c, "connect.failed", p_147231_1_));
     }
 
-    public void onConnectionStateTransition(EnumConnectionState p_147232_1_, EnumConnectionState p_147232_2_)
-    {
-        logger.debug("Switching protocol from " + p_147232_1_ + " to " + p_147232_2_);
-
-        if (p_147232_2_ == EnumConnectionState.PLAY)
-        {
+    public void onConnectionStateTransition(EnumConnectionState p_147232_1_, EnumConnectionState p_147232_2_) {
+        if (p_147232_2_ == EnumConnectionState.PLAY) {
             NetHandlerPlayClient nhpc = new NetHandlerPlayClient(this.field_147394_b, this.field_147395_c, this.field_147393_d);
             this.field_147393_d.setNetHandler(nhpc);
             FMLClientHandler.instance().setPlayClient(nhpc);

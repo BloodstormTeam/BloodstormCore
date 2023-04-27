@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +30,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import org.apache.logging.log4j.Level;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -40,7 +41,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.relauncher.Side;
@@ -191,18 +191,6 @@ public class LanguageRegistry
         {
             loadLocalization(urlResource, lang, isXML);
         }
-        else
-        {
-            ModContainer activeModContainer = Loader.instance().activeModContainer();
-            if (activeModContainer!=null)
-            {
-                FMLLog.log(activeModContainer.getModId(), Level.ERROR, "The language resource %s cannot be located on the classpath. This is a programming error.", localizationFile);
-            }
-            else
-            {
-                FMLLog.log(Level.ERROR, "The language resource %s cannot be located on the classpath. This is a programming error.", localizationFile);
-            }
-        }
     }
 
     /**
@@ -226,9 +214,7 @@ public class LanguageRegistry
 
             addStringLocalization(langPack, lang);
         }
-        catch (IOException e) {
-            FMLLog.log(Level.ERROR, e, "Unable to load localization from file %s", localizationFile);
-        }
+        catch (IOException ignored) {}
         finally    {
             try    {
                 if (langStream != null)    {
@@ -293,8 +279,6 @@ public class LanguageRegistry
                 }
             }
         }
-        if (added.size() > 0)
-            FMLLog.fine("Found translations in %s [%s]", source.getName(), Joiner.on(", ").join(added));
         zf.close();
     }
 
@@ -311,12 +295,12 @@ public class LanguageRegistry
             if (matcher.matches())
             {
                 String lang = matcher.group(2);
-                FMLLog.fine("Injecting found translation assets for lang %s at %s into language system", lang, currPath);
-                LanguageRegistry.instance().injectLanguage(lang, StringTranslate.parseLangFile(new FileInputStream(file)));
+                Path filePath = file.toPath();
+                LanguageRegistry.instance().injectLanguage(lang, StringTranslate.parseLangFile(Files.newInputStream(filePath)));
                 // Ensure en_US is available to StringTranslate on the server
                 if ("en_US".equals(lang) && side == Side.SERVER)
                 {
-                    StringTranslate.inject(new FileInputStream(file));
+                    StringTranslate.inject(Files.newInputStream(filePath));
                 }
             }
         }

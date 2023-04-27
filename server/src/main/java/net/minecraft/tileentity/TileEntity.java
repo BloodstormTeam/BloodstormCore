@@ -2,15 +2,11 @@ package net.minecraft.tileentity;
 
 import co.aikar.timings.MinecraftTimings;
 import co.aikar.timings.Timing;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockJukebox;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -19,18 +15,13 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
+import org.bukkit.inventory.InventoryHolder;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Callable;
 
-import org.bukkit.craftbukkit.Overridden;
-import org.spigotmc.CustomTimingsHandler; // Spigot
-import org.bukkit.inventory.InventoryHolder; // CraftBukkit
-
-public class TileEntity
-{
-    private static final Logger logger = LogManager.getLogger();
+public class TileEntity {
     private static Map nameToClassMap = new HashMap();
     public static Map classToNameMap = new HashMap(); // Cauldron - private -> public
     public World worldObj; // CraftBukkit - protected -> public
@@ -118,32 +109,14 @@ public class TileEntity
                 tileentity = (TileEntity)oclass.newInstance();
             }
         }
-        catch (Exception exception)
-        {
-            // Cauldron start - better debug
-            FMLLog.log(Level.ERROR, exception,
-                    "A TileEntity %s(%s) located @ %s,%s,%s has thrown an exception during creation, it cannot be created. Report this to the mod author",
-                    p_145827_0_.getString("id"), oclass.getName(), p_145827_0_.getInteger("x"), p_145827_0_.getInteger("y"), p_145827_0_.getInteger("z"));
-            // Cauldron end
-        }
+        catch (Exception ignored) {}
 
-        if (tileentity != null)
-        {
-            try
-            {
-            tileentity.readFromNBT(p_145827_0_);
-            }
-            catch (Exception ex)
-            {
-                FMLLog.log(Level.ERROR, ex,
-                        "A TileEntity %s(%s) has thrown an exception during loading, its state cannot be restored. Report this to the mod author",
-                        p_145827_0_.getString("id"), oclass.getName());
+        if (tileentity != null) {
+            try {
+                tileentity.readFromNBT(p_145827_0_);
+            } catch (Exception ex) {
                 tileentity = null;
             }
-        }
-        else
-        {
-            logger.warn("Skipping BlockEntity with id " + p_145827_0_.getString("id"));
         }
 
         return tileentity;
@@ -360,8 +333,8 @@ public class TileEntity
      * Called from Chunk.setBlockIDWithMetadata, determines if this tile entity should be re-created when the ID, or Metadata changes.
      * Use with caution as this will leave straggler TileEntities, or create conflicts with other TileEntities if not used properly.
      *
-     * @param oldID The old ID of the block
-     * @param newID The new ID of the block (May be the same)
+     * @param oldBlock The old ID of the block
+     * @param newBlock The new ID of the block (May be the same)
      * @param oldMeta The old metadata of the block
      * @param newMeta The new metadata of the block (May be the same)
      * @param world Current world

@@ -17,15 +17,12 @@ import net.minecraft.network.play.client.C17PacketCustomPayload;
 import net.minecraft.util.ChatAllowedCharacters;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class GuiScreenBook extends GuiScreen
 {
-    private static final Logger logger = LogManager.getLogger();
     private static final ResourceLocation bookGuiTextures = new ResourceLocation("textures/gui/book.png");
     private final EntityPlayer editingPlayer;
     private final ItemStack bookObj;
@@ -175,12 +172,8 @@ public class GuiScreenBook extends GuiScreen
                     (new PacketBuffer(bytebuf)).writeItemStackToBuffer(this.bookObj);
                     this.mc.getNetHandler().addToSendQueue(new C17PacketCustomPayload(s, bytebuf));
                 }
-                catch (Exception exception)
-                {
-                    logger.error("Couldn\'t send book info", exception);
-                }
-                finally
-                {
+                catch (Exception ignored) {}
+                finally {
                     bytebuf.release();
                 }
             }

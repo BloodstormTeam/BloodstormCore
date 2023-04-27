@@ -7,14 +7,11 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
 public class ThreadLanServerPing extends Thread
 {
     private static final AtomicInteger field_148658_a = new AtomicInteger(0);
-    private static final Logger logger = LogManager.getLogger();
     private final String motd;
     private final DatagramSocket socket;
     private boolean isStopping = true;
@@ -45,7 +42,6 @@ public class ThreadLanServerPing extends Thread
             }
             catch (IOException ioexception)
             {
-                logger.warn("LanServerPinger: " + ioexception.getMessage());
                 break;
             }
 

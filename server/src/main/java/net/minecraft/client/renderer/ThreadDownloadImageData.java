@@ -15,13 +15,9 @@ import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
-public class ThreadDownloadImageData extends SimpleTexture
-{
-    private static final Logger logger = LogManager.getLogger();
+public class ThreadDownloadImageData extends SimpleTexture {
     private static final AtomicInteger threadDownloadCounter = new AtomicInteger(0);
     private final File field_152434_e;
     private final String imageUrl;
@@ -83,8 +79,6 @@ public class ThreadDownloadImageData extends SimpleTexture
         {
             if (this.field_152434_e != null && this.field_152434_e.isFile())
             {
-                logger.debug("Loading http texture from local cache ({})", new Object[] {this.field_152434_e});
-
                 try
                 {
                     this.bufferedImage = ImageIO.read(this.field_152434_e);
@@ -96,7 +90,6 @@ public class ThreadDownloadImageData extends SimpleTexture
                 }
                 catch (IOException ioexception)
                 {
-                    logger.error("Couldn\'t load skin " + this.field_152434_e, ioexception);
                     this.func_152433_a();
                 }
             }
@@ -115,8 +108,6 @@ public class ThreadDownloadImageData extends SimpleTexture
             public void run()
             {
                 HttpURLConnection httpurlconnection = null;
-                ThreadDownloadImageData.logger.debug("Downloading http texture from {} to {}", new Object[] {ThreadDownloadImageData.this.imageUrl, ThreadDownloadImageData.this.field_152434_e});
-
                 try
                 {
                     httpurlconnection = (HttpURLConnection)(new URL(ThreadDownloadImageData.this.imageUrl)).openConnection(Minecraft.getMinecraft().getProxy());
@@ -144,16 +135,10 @@ public class ThreadDownloadImageData extends SimpleTexture
                         }
 
                         ThreadDownloadImageData.this.setBufferedImage(bufferedimage);
-                        return;
                     }
                 }
-                catch (Exception exception)
-                {
-                    ThreadDownloadImageData.logger.error("Couldn\'t download http texture", exception);
-                    return;
-                }
-                finally
-                {
+                catch (Exception ignored) {}
+                finally {
                     if (httpurlconnection != null)
                     {
                         httpurlconnection.disconnect();

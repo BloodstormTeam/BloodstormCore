@@ -20,7 +20,6 @@ import java.security.cert.Certificate;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import org.apache.logging.log4j.Level;
 
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
@@ -32,7 +31,6 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 import cpw.mods.fml.common.patcher.ClassPatchManager;
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
-import cpw.mods.fml.relauncher.FMLRelaunchLog;
 import cpw.mods.fml.relauncher.IFMLCallHook;
 import cpw.mods.fml.relauncher.Side;
 
@@ -49,39 +47,7 @@ public class FMLSanityChecker implements IFMLCallHook
     public Void call() throws Exception
     {
         CodeSource codeSource = getClass().getProtectionDomain().getCodeSource();
-        boolean goodFML = false;
         boolean fmlIsJar = false;
-        if (codeSource.getLocation().getProtocol().equals("jar"))
-        {
-            fmlIsJar = true;
-            Certificate[] certificates = codeSource.getCertificates();
-            if (certificates!=null)
-            {
-
-                for (Certificate cert : certificates)
-                {
-                    String fingerprint = CertificateHelper.getFingerprint(cert);
-                    if (fingerprint.equals(FMLFINGERPRINT))
-                    {
-                        FMLRelaunchLog.info("Found valid fingerprint for FML. Certificate fingerprint %s", fingerprint);
-                        goodFML = true;
-                    }
-                    else if (fingerprint.equals(FORGEFINGERPRINT))
-                    {
-                        FMLRelaunchLog.info("Found valid fingerprint for Minecraft Forge. Certificate fingerprint %s", fingerprint);
-                        goodFML = true;
-                    }
-                    else
-                    {
-                        FMLRelaunchLog.severe("Found invalid fingerprint for FML: %s", fingerprint);
-                    }
-                }
-            }
-        }
-        else
-        {
-            goodFML = true;
-        }
         // Server is not signed, so assume it's good - a deobf env is dev time so it's good too
         boolean goodMC = FMLLaunchHandler.side() == Side.SERVER || !liveEnv;
         int certCount = 0;
@@ -108,68 +74,29 @@ public class FMLSanityChecker implements IFMLCallHook
                 JarEntry cbrEntry = mcJarFile.getJarEntry("net/minecraft/client/ClientBrandRetriever.class");
                 ByteStreams.toByteArray(mcJarFile.getInputStream(cbrEntry));
                 Certificate[] certificates = cbrEntry.getCertificates();
-                certCount = certificates != null ? certificates.length : 0;
                 if (certificates!=null)
                 {
 
                     for (Certificate cert : certificates)
                     {
                         String fingerprint = CertificateHelper.getFingerprint(cert);
+                        assert fingerprint != null;
                         if (fingerprint.equals(MCFINGERPRINT))
                         {
-                            FMLRelaunchLog.info("Found valid fingerprint for Minecraft. Certificate fingerprint %s", fingerprint);
                             goodMC = true;
                         }
                     }
                 }
             }
-            catch (Throwable e)
-            {
-                FMLRelaunchLog.log(Level.ERROR, e, "A critical error occurred trying to read the minecraft jar file");
-            }
-            finally
-            {
-                if (mcJarFile != null)
-                {
-                    try
-                    {
+            catch (Throwable ignored) {}
+            finally {
+                if (mcJarFile != null) {
+                    try {
                         mcJarFile.close();
-                    }
-                    catch (IOException ioe)
-                    {
-                        // Noise
-                    }
+                    } catch (IOException ignored) {}
                 }
             }
         }
-        else
-        {
-            goodMC = true;
-        }
-        if (!goodMC)
-        {
-            FMLRelaunchLog.severe("The minecraft jar %s appears to be corrupt! There has been CRITICAL TAMPERING WITH MINECRAFT, it is highly unlikely minecraft will work! STOP NOW, get a clean copy and try again!",codeSource.getLocation().getFile());
-            if (!Boolean.parseBoolean(System.getProperty("fml.ignoreInvalidMinecraftCertificates","false")))
-            {
-                FMLRelaunchLog.severe("For your safety, FML will not launch minecraft. You will need to fetch a clean version of the minecraft jar file");
-                FMLRelaunchLog.severe("Technical information: The class net.minecraft.client.ClientBrandRetriever should have been associated with the minecraft jar file, " +
-                		"and should have returned us a valid, intact minecraft jar location. This did not work. Either you have modified the minecraft jar file (if so " +
-                		"run the forge installer again), or you are using a base editing jar that is changing this class (and likely others too). If you REALLY " +
-                		"want to run minecraft in this configuration, add the flag -Dfml.ignoreInvalidMinecraftCertificates=true to the 'JVM settings' in your launcher profile.");
-                FMLCommonHandler.instance().exitJava(1, false);
-            }
-            else
-            {
-                FMLRelaunchLog.severe("FML has been ordered to ignore the invalid or missing minecraft certificate. This is very likely to cause a problem!");
-                FMLRelaunchLog.severe("Technical information: ClientBrandRetriever was at %s, there were %d certificates for it", codeSource.getLocation(), certCount);
-            }
-        }
-        // Cauldron start - disable message
-        /*if (!goodFML)
-        {
-            FMLRelaunchLog.severe("FML appears to be missing any signature data. This is not a good thing");
-        }*/
-        // Cauldron end
         return null;
     }
 

@@ -1,6 +1,5 @@
 package net.minecraftforge.common;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.entity.Entity;
@@ -35,11 +34,7 @@ public class ForgeInternalHandler
             }
 
             Item item = stack.getItem();
-            if (item == null)
-            {
-                FMLLog.warning("Attempted to add a EntityItem to the world with a invalid item at " +
-                    "(%2.2f,  %2.2f, %2.2f), this is most likely a config issue between you and the server. Please double check your configs",
-                    entity.posX, entity.posY, entity.posZ);
+            if (item == null) {
                 entity.setDead();
                 event.setCanceled(true);
                 return;

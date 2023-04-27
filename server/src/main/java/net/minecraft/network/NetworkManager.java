@@ -36,19 +36,10 @@ import net.minecraft.util.MessageDeserializer2;
 import net.minecraft.util.MessageSerializer;
 import net.minecraft.util.MessageSerializer2;
 import org.apache.commons.lang3.Validate;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 import com.mojang.authlib.properties.Property;
 import com.google.common.collect.ImmutableSet; // Spigot
 
-public class NetworkManager extends SimpleChannelInboundHandler
-{
-    private static final Logger logger = LogManager.getLogger();
-    public static final Marker logMarkerNetwork = MarkerManager.getMarker("NETWORK");
-    public static final Marker logMarkerPackets = MarkerManager.getMarker("NETWORK_PACKETS", logMarkerNetwork);
-    public static final Marker field_152461_c = MarkerManager.getMarker("NETWORK_STAT", logMarkerNetwork);
+public class NetworkManager extends SimpleChannelInboundHandler {
     public static final AttributeKey attrKeyConnectionState = new AttributeKey("protocol");
     public static final AttributeKey attrKeyReceivable = new AttributeKey("receivable_packets");
     public static final AttributeKey attrKeySendable = new AttributeKey("sendable_packets");
@@ -104,7 +95,6 @@ public class NetworkManager extends SimpleChannelInboundHandler
         this.channel.attr(attrKeyReceivable).set(p_150723_1_.func_150757_a(this.isClientSide));
         this.channel.attr(attrKeySendable).set(p_150723_1_.func_150754_b(this.isClientSide));
         this.channel.config().setAutoRead(true);
-        logger.debug("Enabled auto read");
     }
 
     public void channelInactive(ChannelHandlerContext p_channelInactive_1_)
@@ -146,7 +136,6 @@ public class NetworkManager extends SimpleChannelInboundHandler
     public void setNetHandler(INetHandler p_150719_1_)
     {
         Validate.notNull(p_150719_1_, "packetListener", new Object[0]);
-        logger.debug("Set listener of {} to {}", new Object[] {this, p_150719_1_});
         this.netHandler = p_150719_1_;
     }
 
@@ -171,7 +160,6 @@ public class NetworkManager extends SimpleChannelInboundHandler
 
         if (enumconnectionstate1 != enumconnectionstate && !( p_150732_1_ instanceof FMLProxyPacket))
         {
-            logger.debug("Disabled auto read");
             this.channel.config().setAutoRead(false);
         }
 

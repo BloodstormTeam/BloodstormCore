@@ -5,18 +5,15 @@ import cpw.mods.fml.relauncher.SideOnly;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.AnvilConverterException;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IProgressUpdate;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-public class SaveFormatOld implements ISaveFormat
-{
-    private static final Logger logger = LogManager.getLogger();
+public class SaveFormatOld implements ISaveFormat {
     public final File savesDirectory;
     private static final String __OBFID = "CL_00000586";
 
@@ -75,14 +72,11 @@ public class SaveFormatOld implements ISaveFormat
             {
                 try
                 {
-                    nbttagcompound = CompressedStreamTools.readCompressed(new FileInputStream(file2));
+                    nbttagcompound = CompressedStreamTools.readCompressed(Files.newInputStream(file2.toPath()));
                     nbttagcompound1 = nbttagcompound.getCompoundTag("Data");
                     return new WorldInfo(nbttagcompound1);
                 }
-                catch (Exception exception1)
-                {
-                    logger.error("Exception reading " + file2, exception1);
-                }
+                catch (Exception ignored) {}
             }
 
             file2 = new File(file1, "level.dat_old");
@@ -91,14 +85,11 @@ public class SaveFormatOld implements ISaveFormat
             {
                 try
                 {
-                    nbttagcompound = CompressedStreamTools.readCompressed(new FileInputStream(file2));
+                    nbttagcompound = CompressedStreamTools.readCompressed(Files.newInputStream(file2.toPath()));
                     nbttagcompound1 = nbttagcompound.getCompoundTag("Data");
                     return new WorldInfo(nbttagcompound1);
                 }
-                catch (Exception exception)
-                {
-                    logger.error("Exception reading " + file2, exception);
-                }
+                catch (Exception ignored) {}
             }
 
             return null;
@@ -148,9 +139,7 @@ public class SaveFormatOld implements ISaveFormat
                 file1.delete();
                 return true;
             }
-            catch (Throwable throwable)
-            {
-                logger.warn("Couldn\'t make new level", throwable);
+            catch (Throwable throwable) {
                 return false;
             }
         }
@@ -160,24 +149,14 @@ public class SaveFormatOld implements ISaveFormat
     {
         File file1 = new File(this.savesDirectory, p_75802_1_);
 
-        if (!file1.exists())
-        {
+        if (!file1.exists()) {
             return true;
-        }
-        else
-        {
-            logger.info("Deleting level " + p_75802_1_);
-
-            for (int i = 1; i <= 5; ++i)
-            {
-                logger.info("Attempt " + i + "...");
-
+        } else {
+           for (int i = 1; i <= 5; ++i) {
                 if (deleteFiles(file1.listFiles()))
                 {
                     break;
                 }
-
-                logger.warn("Unsuccessful in deleting contents.");
 
                 if (i < 5)
                 {
@@ -201,17 +180,13 @@ public class SaveFormatOld implements ISaveFormat
         for (int i = 0; i < p_75807_0_.length; ++i)
         {
             File file1 = p_75807_0_[i];
-            logger.debug("Deleting " + file1);
-
             if (file1.isDirectory() && !deleteFiles(file1.listFiles()))
             {
-                logger.warn("Couldn\'t delete directory " + file1);
                 return false;
             }
 
             if (!file1.delete())
             {
-                logger.warn("Couldn\'t delete file " + file1);
                 return false;
             }
         }

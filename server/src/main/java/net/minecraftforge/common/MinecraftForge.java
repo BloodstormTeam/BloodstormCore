@@ -5,7 +5,6 @@ import java.util.concurrent.Callable;
 import com.google.common.collect.ObjectArrays;
 
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.EventBus;
 import cpw.mods.fml.relauncher.Side;
@@ -49,8 +48,6 @@ public class MinecraftForge
     */
    public static void initialize()
    {
-       FMLLog.info("MinecraftForge v%s Initialized", ForgeVersion.getVersion());
-
        OreDictionary.getOreName(0);
 
        //Force these classes to be defined, Should prevent derp error hiding.

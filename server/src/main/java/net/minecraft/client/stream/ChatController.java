@@ -5,8 +5,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tv.twitch.AuthToken;
 import tv.twitch.ErrorCode;
 import tv.twitch.chat.Chat;
@@ -21,9 +19,7 @@ import tv.twitch.chat.IChatCallbacks;
 import tv.twitch.chat.StandardChatAPI;
 
 @SideOnly(Side.CLIENT)
-public class ChatController implements IChatCallbacks
-{
-    private static final Logger field_153018_p = LogManager.getLogger();
+public class ChatController implements IChatCallbacks {
     protected ChatController.ChatListener field_153003_a = null;
     protected String field_153004_b = "";
     protected String field_153005_c = "";
@@ -399,10 +395,7 @@ public class ChatController implements IChatCallbacks
 
     protected void func_152996_t() {}
 
-    protected void func_152995_h(String p_152995_1_)
-    {
-        field_153018_p.error(TwitchStream.field_152949_a, "[Chat controller] {}", new Object[] {p_152995_1_});
-    }
+    protected void func_152995_h(String p_152995_1_) {}
 
     @SideOnly(Side.CLIENT)
     public interface ChatListener

@@ -12,14 +12,11 @@ import net.minecraft.network.play.client.C16PacketClientStatus;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.io.Charsets;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class GuiWinGame extends GuiScreen
 {
-    private static final Logger logger = LogManager.getLogger();
     private static final ResourceLocation field_146576_f = new ResourceLocation("textures/gui/title/minecraft.png");
     private static final ResourceLocation field_146577_g = new ResourceLocation("textures/misc/vignette.png");
     private int field_146581_h;
@@ -106,10 +103,7 @@ public class GuiWinGame extends GuiScreen
 
                 this.field_146579_r = this.field_146582_i.size() * 12;
             }
-            catch (Exception exception)
-            {
-                logger.error("Couldn\'t load credits", exception);
-            }
+            catch (Exception ignored) {}
         }
     }
 

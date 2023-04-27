@@ -27,10 +27,6 @@ import net.minecraft.util.IChatComponent;
 import net.minecraft.util.JsonUtils;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Util;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 import org.lwjgl.opengl.GL11;
 import tv.twitch.AuthToken;
 import tv.twitch.ErrorCode;
@@ -47,10 +43,7 @@ import tv.twitch.chat.ChatUserMode;
 import tv.twitch.chat.ChatUserSubscription;
 
 @SideOnly(Side.CLIENT)
-public class TwitchStream implements BroadcastController.BroadcastListener, ChatController.ChatListener, IngestServerTester.IngestTestListener, IStream
-{
-    private static final Logger field_152950_b = LogManager.getLogger();
-    public static final Marker field_152949_a = MarkerManager.getMarker("STREAM");
+public class TwitchStream implements BroadcastController.BroadcastListener, ChatController.ChatListener, IngestServerTester.IngestTestListener, IStream {
     private final BroadcastController field_152951_c;
     private final ChatController field_152952_d;
     private final Minecraft field_152953_e;
@@ -96,7 +89,6 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
                         if (JsonUtils.getJsonObjectBooleanFieldValue(jsonobject1, "valid"))
                         {
                             String s1 = JsonUtils.getJsonObjectStringFieldValue(jsonobject1, "user_name");
-                            TwitchStream.field_152950_b.debug(TwitchStream.field_152949_a, "Authenticated with twitch; username is {}", new Object[] {s1});
                             AuthToken authtoken = new AuthToken();
                             authtoken.data = p_i1012_2_;
                             TwitchStream.this.field_152951_c.func_152818_a(s1, authtoken);
@@ -115,13 +107,11 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
                         else
                         {
                             TwitchStream.this.field_152964_p = IStream.AuthFailureReason.INVALID_TOKEN;
-                            TwitchStream.field_152950_b.error(TwitchStream.field_152949_a, "Given twitch access token is invalid");
                         }
                     }
                     catch (IOException ioexception)
                     {
                         TwitchStream.this.field_152964_p = IStream.AuthFailureReason.ERROR;
-                        TwitchStream.field_152950_b.error(TwitchStream.field_152949_a, "Could not authenticate with twitch", ioexception);
                     }
                 }
             };
@@ -132,7 +122,6 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
 
     public void func_152923_i()
     {
-        field_152950_b.debug(field_152949_a, "Shutdown streaming");
         this.field_152951_c.func_152851_B();
         this.field_152952_d.func_152993_m();
     }
@@ -146,7 +135,6 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
         {
             if (chatstate == ChatController.ChatState.Connected)
             {
-                field_152950_b.debug(field_152949_a, "Disconnecting from twitch chat per user options");
                 this.field_152952_d.func_153002_l();
             }
         }
@@ -154,7 +142,6 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
         {
             if ((chatstate == ChatController.ChatState.Disconnected || chatstate == ChatController.ChatState.Uninitialized) && this.field_152951_c.func_152849_q())
             {
-                field_152950_b.debug(field_152949_a, "Connecting to twitch chat per user options");
                 this.func_152942_I();
             }
         }
@@ -162,12 +149,10 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
         {
             if ((chatstate == ChatController.ChatState.Disconnected || chatstate == ChatController.ChatState.Uninitialized) && this.func_152934_n())
             {
-                field_152950_b.debug(field_152949_a, "Connecting to twitch chat as user is streaming");
                 this.func_152942_I();
             }
             else if (chatstate == ChatController.ChatState.Connected && !this.func_152934_n())
             {
-                field_152950_b.debug(field_152949_a, "Disconnecting from twitch chat as user is no longer streaming");
                 this.field_152952_d.func_153002_l();
             }
         }
@@ -190,10 +175,6 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
         {
             this.field_152952_d.func_152986_d(s);
         }
-        else
-        {
-            field_152950_b.warn("Invalid twitch chat state {}", new Object[] {chatstate});
-        }
     }
 
     public void func_152922_k()
@@ -201,7 +182,7 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
         if (this.field_152951_c.func_152850_m() && !this.field_152951_c.func_152839_p())
         {
             long i = System.nanoTime();
-            long j = (long)(1000000000 / this.field_152958_j);
+            long j = 1000000000 / this.field_152958_j;
             long k = i - this.field_152959_k;
             boolean flag = k >= j;
 
@@ -267,19 +248,7 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
 
     public void func_152911_a(Metadata p_152911_1_, long p_152911_2_)
     {
-        if (this.func_152934_n() && this.field_152957_i)
-        {
-            long j = this.field_152951_c.func_152844_x();
-
-            if (!this.field_152951_c.func_152840_a(p_152911_1_.func_152810_c(), j + p_152911_2_, p_152911_1_.func_152809_a(), p_152911_1_.func_152806_b()))
-            {
-                field_152950_b.warn(field_152949_a, "Couldn\'t send stream metadata action at {}: {}", new Object[] {Long.valueOf(j + p_152911_2_), p_152911_1_});
-            }
-            else
-            {
-                field_152950_b.debug(field_152949_a, "Sent stream metadata action at {}: {}", new Object[] {Long.valueOf(j + p_152911_2_), p_152911_1_});
-            }
-        }
+        this.func_152934_n();
     }
 
     public boolean func_152919_o()
@@ -287,17 +256,7 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
         return this.field_152951_c.func_152839_p();
     }
 
-    public void func_152931_p()
-    {
-        if (this.field_152951_c.func_152830_D())
-        {
-            field_152950_b.debug(field_152949_a, "Requested commercial from Twitch");
-        }
-        else
-        {
-            field_152950_b.warn(field_152949_a, "Could not request commercial from Twitch");
-        }
-    }
+    public void func_152931_p() {}
 
     public void func_152916_q()
     {
@@ -370,78 +329,41 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
         this.field_152958_j = videoparams.targetFps;
         this.field_152957_i = gamesettings.field_152406_P;
         this.field_152951_c.func_152836_a(videoparams);
-        field_152950_b.info(field_152949_a, "Streaming at {}/{} at {} kbps to {}", new Object[] {Integer.valueOf(videoparams.outputWidth), Integer.valueOf(videoparams.outputHeight), Integer.valueOf(videoparams.maxKbps), this.field_152951_c.func_152833_s().serverUrl});
         this.field_152951_c.func_152828_a((String)null, "Minecraft", (String)null);
     }
 
-    public void func_152914_u()
-    {
-        if (this.field_152951_c.func_152819_E())
-        {
-            field_152950_b.info(field_152949_a, "Stopped streaming to Twitch");
-        }
-        else
-        {
-            field_152950_b.warn(field_152949_a, "Could not stop streaming to Twitch");
-        }
-    }
+    public void func_152914_u() {}
 
     public void func_152900_a(ErrorCode p_152900_1_, AuthToken p_152900_2_) {}
 
-    public void func_152897_a(ErrorCode p_152897_1_)
-    {
-        if (ErrorCode.succeeded(p_152897_1_))
-        {
-            field_152950_b.debug(field_152949_a, "Login attempt successful");
-            this.field_152961_m = true;
-        }
-        else
-        {
-            field_152950_b.warn(field_152949_a, "Login attempt unsuccessful: {} (error code {})", new Object[] {ErrorCode.getString(p_152897_1_), Integer.valueOf(p_152897_1_.getValue())});
-            this.field_152961_m = false;
-        }
-    }
+    public void func_152897_a(ErrorCode p_152897_1_) {}
 
     public void func_152898_a(ErrorCode p_152898_1_, GameInfo[] p_152898_2_) {}
 
     public void func_152891_a(BroadcastController.BroadcastState p_152891_1_)
     {
-        field_152950_b.debug(field_152949_a, "Broadcast state changed to {}", new Object[] {p_152891_1_});
-
         if (p_152891_1_ == BroadcastController.BroadcastState.Initialized)
         {
             this.field_152951_c.func_152827_a(BroadcastController.BroadcastState.Authenticated);
         }
     }
 
-    public void func_152895_a()
-    {
-        field_152950_b.info(field_152949_a, "Logged out of twitch");
-    }
+    public void func_152895_a() {}
 
-    public void func_152894_a(StreamInfo p_152894_1_)
-    {
-        field_152950_b.debug(field_152949_a, "Stream info updated; {} viewers on stream ID {}", new Object[] {Integer.valueOf(p_152894_1_.viewers), Long.valueOf(p_152894_1_.streamId)});
-    }
+    public void func_152894_a(StreamInfo p_152894_1_) {}
 
     public void func_152896_a(IngestList p_152896_1_) {}
 
-    public void func_152893_b(ErrorCode p_152893_1_)
-    {
-        field_152950_b.warn(field_152949_a, "Issue submitting frame: {} (Error code {})", new Object[] {ErrorCode.getString(p_152893_1_), Integer.valueOf(p_152893_1_.getValue())});
+    public void func_152893_b(ErrorCode p_152893_1_) {
         this.field_152953_e.ingameGUI.getChatGUI().printChatMessageWithOptionalDeletion(new ChatComponentText("Issue streaming frame: " + p_152893_1_ + " (" + ErrorCode.getString(p_152893_1_) + ")"), 2);
     }
 
     public void func_152899_b()
     {
         this.func_152915_s();
-        field_152950_b.info(field_152949_a, "Broadcast to Twitch has started");
     }
 
-    public void func_152901_c()
-    {
-        field_152950_b.info(field_152949_a, "Broadcast to Twitch has stopped");
-    }
+    public void func_152901_c() {}
 
     public void func_152892_c(ErrorCode p_152892_1_)
     {
@@ -464,63 +386,50 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
         }
     }
 
-    public void func_152907_a(IngestServerTester p_152907_1_, IngestServerTester.IngestTestState p_152907_2_)
-    {
-        field_152950_b.debug(field_152949_a, "Ingest test state changed to {}", new Object[] {p_152907_2_});
-
+    public void func_152907_a(IngestServerTester p_152907_1_, IngestServerTester.IngestTestState p_152907_2_) {
         if (p_152907_2_ == IngestServerTester.IngestTestState.Finished)
         {
             this.field_152960_l = true;
         }
     }
 
-    public static int func_152948_a(float p_152948_0_)
-    {
+    public static int func_152948_a(float p_152948_0_) {
         return MathHelper.floor_float(10.0F + p_152948_0_ * 50.0F);
     }
 
-    public static int func_152946_b(float p_152946_0_)
-    {
+    public static int func_152946_b(float p_152946_0_) {
         return MathHelper.floor_float(230.0F + p_152946_0_ * 3270.0F);
     }
 
-    public static float func_152947_c(float p_152947_0_)
-    {
+    public static float func_152947_c(float p_152947_0_) {
         return 0.1F + p_152947_0_ * 0.1F;
     }
 
-    public IngestServer[] func_152925_v()
-    {
+    public IngestServer[] func_152925_v() {
         return this.field_152951_c.func_152855_t().getServers();
     }
 
-    public void func_152909_x()
-    {
+    public void func_152909_x() {
         IngestServerTester ingestservertester = this.field_152951_c.func_152838_J();
 
-        if (ingestservertester != null)
-        {
+        if (ingestservertester != null) {
             ingestservertester.func_153042_a(this);
         }
     }
 
-    public IngestServerTester func_152932_y()
-    {
+    public IngestServerTester func_152932_y() {
         return this.field_152951_c.func_152856_w();
     }
 
-    public boolean func_152908_z()
-    {
+    public boolean func_152908_z() {
         return this.field_152951_c.func_152825_o();
     }
 
-    public int func_152920_A()
-    {
+    public int func_152920_A() {
         return this.func_152934_n() ? this.field_152951_c.func_152816_j().viewers : 0;
     }
 
-    public void func_152903_a(ChatMessage[] p_152903_1_)
-    {
+    public void func_152903_a(ChatMessage[] p_152903_1_) {
         ChatMessage[] achatmessage1 = p_152903_1_;
         int i = p_152903_1_.length;
 
@@ -611,14 +520,9 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
         }
     }
 
-    public void func_152906_d()
-    {
-        field_152950_b.debug(field_152949_a, "Chat connected");
-    }
+    public void func_152906_d() {}
 
-    public void func_152905_e()
-    {
-        field_152950_b.debug(field_152949_a, "Chat disconnected");
+    public void func_152905_e() {
         this.field_152955_g.clear();
     }
 

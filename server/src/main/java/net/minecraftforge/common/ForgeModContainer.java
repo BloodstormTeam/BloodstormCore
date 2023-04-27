@@ -41,7 +41,6 @@ import cpw.mods.fml.client.FMLFolderResourcePack;
 import cpw.mods.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import cpw.mods.fml.common.DummyModContainer;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModMetadata;
@@ -165,21 +164,11 @@ public class ForgeModContainer extends DummyModContainer implements WorldAccessC
         removeErroringEntities = prop.getBoolean(false);
         propOrder.add(prop.getName());
 
-        if (removeErroringEntities)
-        {
-            FMLLog.warning("Enabling removal of erroring Entities - USE AT YOUR OWN RISK");
-        }
-
         prop = config.get(Configuration.CATEGORY_GENERAL, "removeErroringTileEntities", false);
         prop.comment = "Set this to true to remove any TileEntity that throws an error in its update method instead of closing the server and reporting a crash log. BE WARNED THIS COULD SCREW UP EVERYTHING USE SPARINGLY WE ARE NOT RESPONSIBLE FOR DAMAGES.";
         prop.setLanguageKey("forge.configgui.removeErroringTileEntities").setRequiresWorldRestart(true);
         removeErroringTileEntities = prop.getBoolean(false);
         propOrder.add(prop.getName());
-
-        if (removeErroringTileEntities)
-        {
-            FMLLog.warning("Enabling removal of erroring Tile Entities - USE AT YOUR OWN RISK");
-        }
 
         //prop = config.get(Configuration.CATEGORY_GENERAL, "disableStitchedFileSaving", true);
         //prop.comment = "Set this to just disable the texture stitcher from writing the 'debug.stitched_{name}.png file to disc. Just a small performance tweak. Default: true";

@@ -10,12 +10,10 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.C17PacketCustomPayload;
 import net.minecraft.network.play.server.S3FPacketCustomPayload;
-import org.apache.logging.log4j.Level;
 import com.google.common.collect.ConcurrentHashMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multiset.Entry;
 import com.google.common.collect.Multisets;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.network.FMLNetworkException;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
@@ -76,27 +74,12 @@ public class FMLProxyPacket extends Packet {
                 if (internalChannel.writeInbound(this))
                 {
                     badPackets.add(this.channel);
-                    if (badPackets.size() % packetCountWarning == 0)
-                    {
-                        FMLLog.severe("Detected ongoing potential memory leak. %d packets have leaked. Top offenders", badPackets.size());
-                        int i = 0;
-                        for (Entry<String> s  : Multisets.copyHighestCountFirst(badPackets).entrySet())
-                        {
-                            if (i++ > 10) break;
-                            FMLLog.severe("\t %s : %d", s.getElement(), s.getCount());
-                        }
-                    }
                 }
                 internalChannel.inboundMessages().clear();
             }
-            catch (FMLNetworkException ne)
-            {
-                FMLLog.log(Level.ERROR, ne, "There was a network exception handling a packet on channel %s", channel);
+            catch (FMLNetworkException ne) {
                 dispatcher.rejectHandshake(ne.getMessage());
-            }
-            catch (Throwable t)
-            {
-                FMLLog.log(Level.ERROR, t, "There was a critical exception handling a packet on channel %s", channel);
+            } catch (Throwable t) {
                 dispatcher.rejectHandshake("A fatal error has occured, this connection is terminated");
             }
         }

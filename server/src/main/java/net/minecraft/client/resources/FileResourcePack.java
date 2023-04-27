@@ -95,11 +95,7 @@ public class FileResourcePack extends AbstractResourcePack implements Closeable
                 {
                     String s1 = (String)arraylist.get(1);
 
-                    if (!s1.equals(s1.toLowerCase()))
-                    {
-                        this.logNameNotLowercase(s1);
-                    }
-                    else
+                    if (s1.equals(s1.toLowerCase()))
                     {
                         hashset.add(s1);
                     }

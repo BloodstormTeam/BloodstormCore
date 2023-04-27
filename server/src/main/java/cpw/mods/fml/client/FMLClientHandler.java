@@ -15,6 +15,7 @@ package cpw.mods.fml.client;
 import java.io.File;
 import java.io.FileInputStream;
 import java.lang.ref.WeakReference;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,11 +42,8 @@ import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.network.OldServerPinger;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.resources.AbstractResourcePack;
-import net.minecraft.client.resources.FallbackResourceManager;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourcePack;
-import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -62,9 +60,6 @@ import net.minecraft.util.StringUtils;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.storage.SaveFormatOld;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.LWJGLUtil;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -91,8 +86,6 @@ import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.DummyModContainer;
 import cpw.mods.fml.common.DuplicateModsFoundException;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLContainerHolder;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.IFMLSidedHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.LoaderException;
@@ -197,7 +190,6 @@ public class FMLClientHandler implements IFMLSidedHandler
         this.resourcePackMap = Maps.newHashMap();
         if (minecraft.isDemo())
         {
-            FMLLog.severe("DEMO MODE DETECTED, FML will not work. Finishing now.");
             haltGame("FML will not run in demo mode", new RuntimeException());
             return;
         }
@@ -225,7 +217,6 @@ public class FMLClientHandler implements IFMLSidedHandler
         }
         catch (CustomModLoadingErrorDisplayException custom)
         {
-            FMLLog.log(Level.ERROR, custom, "A custom exception was thrown by a mod, the game will now halt");
             customError = custom;
         }
         catch (LoaderException le)
@@ -244,7 +235,6 @@ public class FMLClientHandler implements IFMLSidedHandler
         }
         catch (CustomModLoadingErrorDisplayException custom)
         {
-            FMLLog.log(Level.ERROR, custom, "A custom exception was thrown by a mod, the game will now halt");
             customError = custom;
         }
         catch (LoaderException le)
@@ -278,7 +268,6 @@ public class FMLClientHandler implements IFMLSidedHandler
             Map<String,Object> dummyOptifineMeta = ImmutableMap.<String,Object>builder().put("name", "Optifine").put("version", optifineVersion).build();
             ModMetadata optifineMetadata = MetadataCollection.from(getClass().getResourceAsStream("optifinemod.info"),"optifine").getMetadataForId("optifine", dummyOptifineMeta);
             optifineContainer = new DummyModContainer(optifineMetadata);
-            FMLLog.info("Forge Mod Loader has detected optifine %s, enabling compatibility features",optifineContainer.getVersion());
         }
         catch (Exception e)
         {
@@ -312,7 +301,6 @@ public class FMLClientHandler implements IFMLSidedHandler
         }
         catch (CustomModLoadingErrorDisplayException custom)
         {
-            FMLLog.log(Level.ERROR, custom, "A custom exception was thrown by a mod, the game will now halt");
             customError = custom;
             SplashProgress.finish();
             return;
@@ -341,10 +329,7 @@ public class FMLClientHandler implements IFMLSidedHandler
                 IModGuiFactory guiFactory = guiClassFactory.newInstance();
                 guiFactory.initialize(client);
                 guiFactories.put(mc, guiFactory);
-            } catch (Exception e)
-            {
-                FMLLog.log(Level.ERROR, e, "A critical error occurred instantiating the gui factory for mod %s", mc.getModId());
-            }
+            } catch (Exception ignored) {}
         }
         loading = false;
         client.gameSettings.loadOptions(); //Reload options to load any mod added keybindings.
@@ -404,7 +389,6 @@ public class FMLClientHandler implements IFMLSidedHandler
             Loader.instance().loadingComplete();
             SplashProgress.finish();
         }
-        logMissingTextureErrors();
     }
     /**
      * Get the server instance
@@ -598,14 +582,8 @@ public class FMLClientHandler implements IFMLSidedHandler
                 resourcePackList.add(pack);
                 resourcePackMap.put(container.getModId(), pack);
             }
-            catch (NoSuchMethodException e)
-            {
-                FMLLog.log(Level.ERROR, "The container %s (type %s) returned an invalid class for it's resource pack.", container.getName(), container.getClass().getName());
-                return;
-            }
-            catch (Exception e)
-            {
-                FMLLog.log(Level.ERROR, e, "An unexpected exception occurred constructing the custom resource pack for %s", container.getName());
+            catch (NoSuchMethodException ignored) {}
+            catch (Exception e) {
                 throw Throwables.propagate(e);
             }
         }
@@ -676,11 +654,10 @@ public class FMLClientHandler implements IFMLSidedHandler
         {
             try
             {
-                leveldat = CompressedStreamTools.readCompressed(new FileInputStream(new File(dir, "level.dat_old")));
+                leveldat = CompressedStreamTools.readCompressed(Files.newInputStream(new File(dir, "level.dat_old").toPath()));
             }
             catch (Exception e1)
             {
-                FMLLog.warning("There appears to be a problem loading the save %s, both level files are unreadable.", dirName);
                 return;
             }
         }
@@ -924,81 +901,6 @@ public class FMLClientHandler implements IFMLSidedHandler
             brokenTextures.put(resourceLocation.getResourceDomain(), error, badType);
         }
         badType.add(resourceLocation);
-    }
-
-    public void logMissingTextureErrors()
-    {
-        if (missingTextures.isEmpty() && brokenTextures.isEmpty())
-        {
-            return;
-        }
-        Logger logger = LogManager.getLogger("TEXTURE ERRORS");
-        logger.error(Strings.repeat("+=", 25));
-        logger.error("The following texture errors were found.");
-        Map<String,FallbackResourceManager> resManagers = ObfuscationReflectionHelper.getPrivateValue(SimpleReloadableResourceManager.class, (SimpleReloadableResourceManager)Minecraft.getMinecraft().getResourceManager(), "domainResourceManagers", "field_110548"+"_a");
-        for (String resourceDomain : missingTextures.keySet())
-        {
-            Set<ResourceLocation> missing = missingTextures.get(resourceDomain);
-            logger.error(Strings.repeat("=", 50));
-            logger.error("  DOMAIN {}", resourceDomain);
-            logger.error(Strings.repeat("-", 50));
-            logger.error("  domain {} is missing {} texture{}",resourceDomain, missing.size(),missing.size()!=1 ? "s" : "");
-            FallbackResourceManager fallbackResourceManager = resManagers.get(resourceDomain);
-            if (fallbackResourceManager == null)
-            {
-                logger.error("    domain {} is missing a resource manager - it is probably a side-effect of automatic texture processing", resourceDomain);
-            }
-            else
-            {
-                List<IResourcePack> resPacks = ObfuscationReflectionHelper.getPrivateValue(FallbackResourceManager.class, fallbackResourceManager, "resourcePacks","field_110540"+"_a");
-                logger.error("    domain {} has {} location{}:",resourceDomain, resPacks.size(), resPacks.size() != 1 ? "s" :"");
-                for (IResourcePack resPack : resPacks)
-                {
-                    if (resPack instanceof FMLContainerHolder) {
-                        FMLContainerHolder containerHolder = (FMLContainerHolder) resPack;
-                        ModContainer fmlContainer = containerHolder.getFMLContainer();
-                        logger.error("      mod {} resources at {}", fmlContainer.getModId(), fmlContainer.getSource().getPath());
-                    }
-                    else if (resPack instanceof AbstractResourcePack)
-                    {
-                        AbstractResourcePack resourcePack = (AbstractResourcePack) resPack;
-                        File resPath = ObfuscationReflectionHelper.getPrivateValue(AbstractResourcePack.class, resourcePack, "resourcePackFile","field_110597"+"_b");
-                        logger.error("      resource pack at path {}",resPath.getPath());
-                    }
-                    else
-                    {
-                        logger.error("      unknown resourcepack type {} : {}", resPack.getClass().getName(), resPack.getPackName());
-                    }
-                }
-            }
-            logger.error(Strings.repeat("-", 25));
-            logger.error("    The missing resources for domain {} are:",resourceDomain);
-            for (ResourceLocation rl : missing)
-            {
-                logger.error("      {}",rl.getResourcePath());
-            }
-            logger.error(Strings.repeat("-", 25));
-            if (!brokenTextures.containsRow(resourceDomain))
-            {
-                logger.error("    No other errors exist for domain {}", resourceDomain);
-            }
-            else
-            {
-                logger.error("    The following other errors were reported for domain {}:",resourceDomain);
-                Map<String, Set<ResourceLocation>> resourceErrs = brokenTextures.row(resourceDomain);
-                for (String error: resourceErrs.keySet())
-                {
-                    logger.error(Strings.repeat("-", 25));
-                    logger.error("    Problem: {}", error);
-                    for (ResourceLocation rl : resourceErrs.get(error))
-                    {
-                        logger.error("      {}",rl.getResourcePath());
-                    }
-                }
-            }
-            logger.error(Strings.repeat("=", 50));
-        }
-        logger.error(Strings.repeat("+=", 25));
     }
 
     @Override

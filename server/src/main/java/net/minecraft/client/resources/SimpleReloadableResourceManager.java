@@ -16,13 +16,9 @@ import java.util.Map;
 import java.util.Set;
 import net.minecraft.client.resources.data.IMetadataSerializer;
 import net.minecraft.util.ResourceLocation;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
-public class SimpleReloadableResourceManager implements IReloadableResourceManager
-{
-    private static final Logger logger = LogManager.getLogger();
+public class SimpleReloadableResourceManager implements IReloadableResourceManager {
     private static final Joiner joinerResourcePacks = Joiner.on(", ");
     private final Map domainResourceManagers = Maps.newHashMap();
     private final List reloadListeners = Lists.newArrayList();
@@ -96,18 +92,6 @@ public class SimpleReloadableResourceManager implements IReloadableResourceManag
     {
         this.clearResources();
         cpw.mods.fml.common.ProgressManager.ProgressBar resReload = cpw.mods.fml.common.ProgressManager.push("Loading Resources", p_110541_1_.size()+1, true);
-        logger.info("Reloading ResourceManager: " + joinerResourcePacks.join(Iterables.transform(p_110541_1_, new Function()
-        {
-            private static final String __OBFID = "CL_00001092";
-            public String apply(IResourcePack p_apply_1_)
-            {
-                return p_apply_1_.getPackName();
-            }
-            public Object apply(Object p_apply_1_)
-            {
-                return this.apply((IResourcePack)p_apply_1_);
-            }
-        })));
         Iterator iterator = p_110541_1_.iterator();
 
         while (iterator.hasNext())

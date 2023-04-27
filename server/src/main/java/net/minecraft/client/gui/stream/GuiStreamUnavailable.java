@@ -19,16 +19,12 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Session;
 import net.minecraft.util.Util;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 import tv.twitch.ErrorCode;
 
 @SideOnly(Side.CLIENT)
-public class GuiStreamUnavailable extends GuiScreen
-{
-    private static final Logger field_152322_a = LogManager.getLogger();
+public class GuiStreamUnavailable extends GuiScreen {
     private final IChatComponent field_152324_f;
     private final GuiScreen field_152325_g;
     private final GuiStreamUnavailable.Reason field_152326_h;
@@ -134,10 +130,7 @@ public class GuiStreamUnavailable extends GuiScreen
             Object object = oclass.getMethod("getDesktop", new Class[0]).invoke((Object)null, new Object[0]);
             oclass.getMethod("browse", new Class[] {URI.class}).invoke(object, new Object[] {new URI(p_152320_1_)});
         }
-        catch (Throwable throwable)
-        {
-            field_152322_a.error("Couldn\'t open link", throwable);
-        }
+        catch (Throwable ignored) {}
     }
 
     public static void func_152321_a(GuiScreen p_152321_0_)

@@ -10,13 +10,9 @@ import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.data.PackMetadataSection;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
-public class ResourcePackListEntryDefault extends ResourcePackListEntry
-{
-    private static final Logger logger = LogManager.getLogger();
+public class ResourcePackListEntryDefault extends ResourcePackListEntry {
     private final IResourcePack field_148320_d;
     private final ResourceLocation field_148321_e;
     private static final String __OBFID = "CL_00000822";
@@ -50,14 +46,7 @@ public class ResourcePackListEntryDefault extends ResourcePackListEntry
                 return packmetadatasection.func_152805_a().getFormattedText();
             }
         }
-        catch (JsonParseException jsonparseexception)
-        {
-            logger.error("Couldn\'t load metadata info", jsonparseexception);
-        }
-        catch (IOException ioexception)
-        {
-            logger.error("Couldn\'t load metadata info", ioexception);
-        }
+        catch (JsonParseException | IOException ignored) {}
 
         return EnumChatFormatting.RED + "Missing " + "pack.mcmeta" + " :(";
     }

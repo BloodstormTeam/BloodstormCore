@@ -1,6 +1,5 @@
 package org.bukkit.craftbukkit.block;
 
-import cpw.mods.fml.common.FMLLog;
 import io.github.crucible.CrucibleConfigs;
 import net.minecraft.block.BlockCocoa;
 import net.minecraft.block.BlockRedstoneWire;
@@ -9,7 +8,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySkull;
 import net.minecraft.world.EnumSkyBlock;
@@ -199,21 +197,6 @@ public class CraftBlock implements Block {
             if (BIOME_MAPPING[i] != null) {  /* Build reverse mapping for setBiome */
                 BIOMEBASE_MAPPING[BIOME_MAPPING[i].ordinal()] = BiomeGenBase.getBiome(i);
             }
-        }
-    }
-
-    // Cauldron start - if cauldron.dump-materials is true, dump all materials with their corresponding id's
-    public static void dumpMaterials() {
-        if (CrucibleConfigs.configs.cauldron_settings_dumpMaterials) {
-            FMLLog.info("Cauldron Dump Materials is ENABLED. Starting dump...");
-            for (int i = 0; i < 32000; i++) {
-                Material material = Material.getMaterial(i);
-                if (material != null) {
-                    FMLLog.info("Found material " + material + " with ID " + i);
-                }
-            }
-            FMLLog.info("Cauldron Dump Materials complete.");
-            FMLLog.info("To disable these dumps, set cauldron.dump-materials to false in bukkit.yml.");
         }
     }
 

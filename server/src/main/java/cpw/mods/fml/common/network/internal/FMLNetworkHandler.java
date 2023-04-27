@@ -32,7 +32,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLContainer;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.network.FMLEmbeddedChannel;
@@ -50,7 +49,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.craftbukkit.inventory.CraftInventoryView;
@@ -127,11 +125,6 @@ public class FMLNetworkHandler
             Object guiContainer = NetworkRegistry.INSTANCE.getLocalGuiContainer(mc, entityPlayer, modGuiId, world, x, y, z);
             FMLCommonHandler.instance().showGuiScreen(guiContainer);
         }
-        else
-        {
-            FMLLog.fine("Invalid attempt to open a local GUI on a dedicated server. This is likely a bug. GUIID: %s,%d", mc.getModId(), modGuiId);
-        }
-
     }
 
     public static void makeEntitySpawnAdjustment(Entity entity, EntityPlayerMP player, int serverX, int serverY, int serverZ)
@@ -179,14 +172,10 @@ public class FMLNetworkHandler
         if (rejects.isEmpty())
         {
             if(!hackpacks.isEmpty()) {
-                FMLLog.info("[Thermos] Rejecting hacker %s: %s", side, hackpacks);
                 return String.format("Hack rejections %s",hackpacks);
             }
             return null;
-        }
-        else
-        {
-            FMLLog.info("Rejecting connection %s: %s", side, rejects);
+        } else {
             return String.format("Mod rejections %s",rejects);
         }
     }

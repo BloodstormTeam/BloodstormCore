@@ -198,13 +198,9 @@ import net.minecraft.world.storage.MapData;
 import net.minecraft.world.storage.MapStorage;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.MinecraftForge;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
-public class NetHandlerPlayClient implements INetHandlerPlayClient
-{
-    private static final Logger logger = LogManager.getLogger();
+public class NetHandlerPlayClient implements INetHandlerPlayClient {
     private final NetworkManager netManager;
     private Minecraft gameController;
     private WorldClient clientWorldController;
@@ -744,7 +740,6 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
         EntityLivingBase entitylivingbase = (EntityLivingBase)EntityList.createEntityByID(p_147281_1_.func_149025_e(), this.gameController.theWorld);
         if (entitylivingbase == null)
         {
-            cpw.mods.fml.common.FMLLog.info("Server attempted to spawn an unknown entity using ID: {0} at ({1}, {2}, {3}) Skipping!", p_147281_1_.func_149025_e(), d0, d1, d2);
             return;
         }
         entitylivingbase.serverPosX = p_147281_1_.func_149023_f();
@@ -1429,12 +1424,8 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
                     imerchant.setRecipes(merchantrecipelist);
                 }
             }
-            catch (IOException ioexception)
-            {
-                logger.error("Couldn\'t load trade info", ioexception);
-            }
-            finally
-            {
+            catch (IOException ignored) {}
+            finally {
                 bytebuf.release();
             }
         }

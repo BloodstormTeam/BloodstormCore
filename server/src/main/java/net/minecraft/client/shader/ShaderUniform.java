@@ -6,14 +6,10 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import javax.vecmath.Matrix4f;
 import net.minecraft.client.renderer.OpenGlHelper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
 
 @SideOnly(Side.CLIENT)
-public class ShaderUniform
-{
-    private static final Logger logger = LogManager.getLogger();
+public class ShaderUniform {
     private int field_148102_b;
     private final int field_148103_c;
     private final int field_148100_d;
@@ -188,12 +184,7 @@ public class ShaderUniform
 
     public void func_148097_a(float[] p_148097_1_)
     {
-        if (p_148097_1_.length < this.field_148103_c)
-        {
-            logger.warn("Uniform.set called with a too-small value array (expected " + this.field_148103_c + ", got " + p_148097_1_.length + "). Ignoring.");
-        }
-        else
-        {
+        if (p_148097_1_.length > this.field_148103_c) {
             this.field_148098_f.position(0);
             this.field_148098_f.put(p_148097_1_);
             this.field_148098_f.position(0);
@@ -249,7 +240,6 @@ public class ShaderUniform
         {
             if (this.field_148100_d > 10)
             {
-                logger.warn("Uniform.upload called, but type value (" + this.field_148100_d + ") is not " + "a valid type. Ignoring.");
                 return;
             }
 
@@ -274,7 +264,7 @@ public class ShaderUniform
                 OpenGlHelper.func_153162_d(this.field_148102_b, this.field_148101_e);
                 break;
             default:
-                logger.warn("Uniform.upload called, but count value (" + this.field_148103_c + ") is " + " not in the range of 1 to 4. Ignoring.");
+                break;
         }
     }
 
@@ -295,7 +285,7 @@ public class ShaderUniform
                 OpenGlHelper.func_153159_d(this.field_148102_b, this.field_148098_f);
                 break;
             default:
-                logger.warn("Uniform.upload called, but count value (" + this.field_148103_c + ") is " + "not in the range of 1 to 4. Ignoring.");
+                break;
         }
     }
 

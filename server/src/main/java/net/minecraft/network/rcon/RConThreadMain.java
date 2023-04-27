@@ -34,7 +34,6 @@ public class RConThreadMain extends RConThreadBase
         if (0 == this.rconPort)
         {
             this.rconPort = this.serverPort + 10;
-            this.logInfo("Setting default rcon port to " + this.rconPort);
             p_i1538_1_.setProperty("rcon.port", Integer.valueOf(this.rconPort));
 
             if (0 == this.rconPassword.length())
@@ -74,34 +73,19 @@ public class RConThreadMain extends RConThreadBase
         }
     }
 
-    public void run()
-    {
-        this.logInfo("RCON running on " + this.hostname + ":" + this.rconPort);
-
-        try
-        {
-            while (this.running)
-            {
-                try
-                {
+    public void run() {
+        try {
+            while (this.running) {
+                try {
                     Socket socket = this.serverSocket.accept();
                     socket.setSoTimeout(500);
                     RConThreadClient rconthreadclient = new RConThreadClient(this.server, socket);
                     rconthreadclient.startThread();
                     this.clientThreads.put(socket.getRemoteSocketAddress(), rconthreadclient);
                     this.cleanClientThreadsMap();
-                }
-                catch (SocketTimeoutException sockettimeoutexception)
-                {
+                } catch (SocketTimeoutException sockettimeoutexception) {
                     this.cleanClientThreadsMap();
-                }
-                catch (IOException ioexception)
-                {
-                    if (this.running)
-                    {
-                        this.logInfo("IO: " + ioexception.getMessage());
-                    }
-                }
+                } catch (IOException ignored) {}
             }
         }
         finally
@@ -112,11 +96,7 @@ public class RConThreadMain extends RConThreadBase
 
     public void startThread()
     {
-        if (0 == this.rconPassword.length())
-        {
-            this.logWarning("No rcon password set in \'" + this.server.getSettingsFilename() + "\', rcon disabled!");
-        }
-        else if (0 < this.rconPort && 65535 >= this.rconPort)
+        if (0 < this.rconPort && 65535 >= this.rconPort)
         {
             if (!this.running)
             {
@@ -126,15 +106,8 @@ public class RConThreadMain extends RConThreadBase
                     this.serverSocket.setSoTimeout(500);
                     super.startThread();
                 }
-                catch (IOException ioexception)
-                {
-                    this.logWarning("Unable to initialise rcon on " + this.hostname + ":" + this.rconPort + " : " + ioexception.getMessage());
-                }
+                catch (IOException ignored) {}
             }
-        }
-        else
-        {
-            this.logWarning("Invalid rcon port " + this.rconPort + " found in \'" + this.server.getSettingsFilename() + "\', rcon disabled!");
         }
     }
 }

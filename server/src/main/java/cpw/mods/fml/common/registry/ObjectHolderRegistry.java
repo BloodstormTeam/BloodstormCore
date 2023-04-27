@@ -8,7 +8,6 @@ import java.util.Set;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import cpw.mods.fml.common.registry.GameRegistry.ObjectHolder;
@@ -22,9 +21,7 @@ public enum ObjectHolderRegistry {
     INSTANCE;
     private List<ObjectHolderRef> objectHolders = Lists.newArrayList();
 
-    public void findObjectHolders(ASMDataTable table)
-    {
-        FMLLog.info("Processing ObjectHolder annotations");
+    public void findObjectHolders(ASMDataTable table) {
         Set<ASMData> allObjectHolders = table.getAll(GameRegistry.ObjectHolder.class.getName());
         Map<String, String> classModIds = Maps.newHashMap();
         Map<String, Class<?>> classCache = Maps.newHashMap();
@@ -53,7 +50,6 @@ public enum ObjectHolderRegistry {
         }
         scanTarget(classModIds, classCache, "net.minecraft.init.Blocks", null, "minecraft", true, true);
         scanTarget(classModIds, classCache, "net.minecraft.init.Items", null, "minecraft", true, true);
-        FMLLog.info("Found %d ObjectHolder annotations", objectHolders.size());
     }
 
     private void scanTarget(Map<String, String> classModIds, Map<String, Class<?>> classCache, String className, String annotationTarget, String value, boolean isClass, boolean extractFromValue)
@@ -87,7 +83,6 @@ public enum ObjectHolderRegistry {
                 String prefix = classModIds.get(className);
                 if (prefix == null)
                 {
-                    FMLLog.warning("Found an unqualified ObjectHolder annotation (%s) without a modid context at %s.%s, ignoring", value, className, annotationTarget);
                     throw new IllegalStateException("Unqualified reference to ObjectHolder");
                 }
                 value = prefix + ":" + value;
@@ -130,12 +125,9 @@ public enum ObjectHolderRegistry {
 
     public void applyObjectHolders()
     {
-        FMLLog.info("Applying holder lookups");
         for (ObjectHolderRef ohr : objectHolders)
         {
             ohr.apply();
         }
-        FMLLog.info("Holder lookups applied");
     }
-
 }

@@ -10,13 +10,9 @@ import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.data.TextureMetadataSection;
 import net.minecraft.util.ResourceLocation;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
-public class SimpleTexture extends AbstractTexture
-{
-    private static final Logger logger = LogManager.getLogger();
+public class SimpleTexture extends AbstractTexture {
     protected final ResourceLocation textureLocation;
     private static final String __OBFID = "CL_00001052";
 
@@ -50,10 +46,7 @@ public class SimpleTexture extends AbstractTexture
                         flag1 = texturemetadatasection.getTextureClamp();
                     }
                 }
-                catch (RuntimeException runtimeexception)
-                {
-                    logger.warn("Failed reading metadata of: " + this.textureLocation, runtimeexception);
-                }
+                catch (RuntimeException ignored) {}
             }
 
             TextureUtil.uploadTextureImageAllocate(this.getGlTextureId(), bufferedimage, flag, flag1);

@@ -3,8 +3,6 @@ package net.minecraftforge.common.network;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.logging.log4j.Level;
-
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 
@@ -12,7 +10,6 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Sets;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 
@@ -76,16 +73,11 @@ public abstract class ForgeMessage {
             }
             // do we have a defaults list?
 
-            if (bytes.isReadable())
-            {
-                for (int i = 0; i < listSize; i++)
-                {
+            if (bytes.isReadable()) {
+                for (int i = 0; i < listSize; i++) {
                     defaultFluids.add(ByteBufUtils.readUTF8String(bytes));
                 }
-            }
-            else
-            {
-                FMLLog.getLogger().log(Level.INFO, "Legacy server message contains no default fluid list - there may be problems with fluids");
+            } else {
                 defaultFluids.clear();
             }
         }

@@ -4,8 +4,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.logging.log4j.Level;
-
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -21,11 +19,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.eventhandler.Event;
-import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.registry.RegistryDelegate;
 
 /**
@@ -85,7 +81,6 @@ public abstract class FluidRegistry
     /**
      * Called by forge to load default fluid IDs from the world or from server -> client for syncing
      * DO NOT call this and expect useful behaviour.
-     * @param newfluidIDs
      */
     private static void loadFluidDefaults(BiMap<Fluid, Integer> localFluidIDs, Set<String> defaultNames)
     {
@@ -101,13 +96,10 @@ public abstract class FluidRegistry
                 String derivedName = defaultName.split(":",2)[1];
                 String localDefault = defaultFluidName.get(derivedName);
                 if (localDefault == null) {
-                    FMLLog.getLogger().log(Level.ERROR, "The fluid {} (specified as {}) is missing from this instance - it will be removed", derivedName, defaultName);
                     continue;
                 }
                 fluid = masterFluidReference.get(localDefault);
-                FMLLog.getLogger().log(Level.ERROR, "The fluid {} specified as default is not present - it will be reverted to default {}", defaultName, localDefault);
             }
-            FMLLog.getLogger().log(Level.DEBUG, "The fluid {} has been selected as the default fluid for {}", defaultName, fluid.getName());
             Fluid oldFluid = localFluids.put(fluid.getName(), fluid);
             Integer id = localFluidIDs.remove(oldFluid);
             localFluidIDs.put(fluid, id);
@@ -293,7 +285,6 @@ public abstract class FluidRegistry
     {
         String name = masterFluidReference.inverse().get(key);
         if (Strings.isNullOrEmpty(name)) {
-            FMLLog.getLogger().log(Level.ERROR, "The fluid registry is corrupted. A fluid {} {} is not properly registered. The mod that registered this is broken", key.getClass().getName(), key.getName());
             throw new IllegalStateException("The fluid registry is corrupted");
         }
         return name;
@@ -304,16 +295,11 @@ public abstract class FluidRegistry
         Set<String> defaults = Sets.newHashSet();
         if (tag.hasKey("DefaultFluidList",9))
         {
-            FMLLog.getLogger().log(Level.DEBUG, "Loading persistent fluid defaults from world");
             NBTTagList tl = tag.getTagList("DefaultFluidList", 8);
             for (int i = 0; i < tl.tagCount(); i++)
             {
                 defaults.add(tl.getStringTagAt(i));
             }
-        }
-        else
-        {
-            FMLLog.getLogger().log(Level.DEBUG, "World is missing persistent fluid defaults - using local defaults");
         }
         loadFluidDefaults(HashBiMap.create(fluidIDs), defaults);
     }
@@ -343,13 +329,6 @@ public abstract class FluidRegistry
 
         if (!illegalFluids.isEmpty())
         {
-            FMLLog.getLogger().log(Level.FATAL, "The fluid registry is corrupted. Something has inserted a fluid without registering it");
-            FMLLog.getLogger().log(Level.FATAL, "There is {} unregistered fluids", illegalFluids.size());
-            for (Fluid f: illegalFluids)
-            {
-                FMLLog.getLogger().log(Level.FATAL, "  Fluid name : {}, type: {}", f.getName(), f.getClass().getName());
-            }
-            FMLLog.getLogger().log(Level.FATAL, "The mods that own these fluids need to register them properly");
             throw new IllegalStateException("The fluid map contains fluids unknown to the master fluid registry");
         }
     }

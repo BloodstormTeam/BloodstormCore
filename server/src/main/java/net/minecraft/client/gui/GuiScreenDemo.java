@@ -6,14 +6,10 @@ import java.net.URI;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.ResourceLocation;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
-public class GuiScreenDemo extends GuiScreen
-{
-    private static final Logger logger = LogManager.getLogger();
+public class GuiScreenDemo extends GuiScreen {
     private static final ResourceLocation field_146348_f = new ResourceLocation("textures/gui/demo_background.png");
     private static final String __OBFID = "CL_00000691";
 
@@ -38,14 +34,11 @@ public class GuiScreenDemo extends GuiScreen
                     Object object = oclass.getMethod("getDesktop", new Class[0]).invoke((Object)null, new Object[0]);
                     oclass.getMethod("browse", new Class[] {URI.class}).invoke(object, new Object[] {new URI("http://www.minecraft.net/store?source=demo")});
                 }
-                catch (Throwable throwable)
-                {
-                    logger.error("Couldn\'t open link", throwable);
-                }
+                catch (Throwable ignored) {}
 
                 break;
             case 2:
-                this.mc.displayGuiScreen((GuiScreen)null);
+                this.mc.displayGuiScreen(null);
                 this.mc.setIngameFocus();
         }
     }

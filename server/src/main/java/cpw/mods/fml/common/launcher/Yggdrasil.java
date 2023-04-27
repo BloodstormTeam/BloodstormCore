@@ -3,8 +3,6 @@ package cpw.mods.fml.common.launcher;
 import java.net.Proxy;
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-
 import com.google.common.base.Throwables;
 import com.mojang.authlib.Agent;
 import com.mojang.authlib.exceptions.AuthenticationException;
@@ -30,9 +28,8 @@ public class Yggdrasil
         }
         catch (AuthenticationException e)
         {
-            LogManager.getLogger("FMLTWEAK").error("-- Login failed!  " + e.getMessage());
-            Throwables.propagate(e);
-            return; // dont set other variables
+            Throwables.throwIfUnchecked(e);
+            return; // don't set other variables
         }
 
         args.put("--username",       auth.getSelectedProfile().getName());

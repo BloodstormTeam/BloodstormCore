@@ -157,8 +157,6 @@ import net.minecraft.world.storage.ISaveFormat;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 import org.apache.commons.lang3.Validate;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
@@ -178,11 +176,9 @@ import com.google.common.collect.MapDifference;
 @SideOnly(Side.CLIENT)
 public class Minecraft implements IPlayerUsage
 {
-    private static final Logger logger = LogManager.getLogger();
     private static final ResourceLocation locationMojangPng = new ResourceLocation("textures/gui/title/mojang.png");
     public static final boolean isRunningOnMac = Util.getOSType() == Util.EnumOS.OSX;
-    public static byte[] memoryReserve = new byte[10485760];
-    private static final List macDisplayModes = Lists.newArrayList(new DisplayMode[] {new DisplayMode(2560, 1600), new DisplayMode(2880, 1800)});
+    private static final List macDisplayModes = Lists.newArrayList(new DisplayMode(2560, 1600), new DisplayMode(2880, 1800));
     private final File fileResourcepacks;
     private final Multimap field_152356_J;
     private ServerData currentServerData;
@@ -276,7 +272,6 @@ public class Minecraft implements IPlayerUsage
         this.field_152355_az = (new YggdrasilAuthenticationService(p_i1103_9_, UUID.randomUUID().toString())).createMinecraftSessionService();
         this.startTimerHackThread();
         this.session = p_i1103_1_;
-        logger.info("Setting user: " + p_i1103_1_.getUsername());
         this.isDemo = p_i1103_5_;
         this.displayWidth = p_i1103_2_;
         this.displayHeight = p_i1103_3_;
@@ -407,7 +402,6 @@ public class Minecraft implements IPlayerUsage
 
         Display.setResizable(true);
         Display.setTitle("Minecraft 1.7.10");
-        logger.info("LWJGL Version: " + Sys.getVersion());
         Util.EnumOS enumos = Util.getOSType();
 
         if (enumos != Util.EnumOS.OSX)
@@ -422,28 +416,18 @@ public class Minecraft implements IPlayerUsage
                     Display.setIcon(new ByteBuffer[] {this.func_152340_a(inputstream), this.func_152340_a(inputstream1)});
                 }
             }
-            catch (IOException ioexception)
-            {
-                logger.error("Couldn\'t set icon", ioexception);
-            }
+            catch (IOException ignored) {}
         }
 
         try
         {
             net.minecraftforge.client.ForgeHooksClient.createDisplay();
         }
-        catch (LWJGLException lwjglexception)
-        {
-            logger.error("Couldn\'t set pixel format", lwjglexception);
+        catch (LWJGLException lwjglexception) {
 
-            try
-            {
+            try {
                 Thread.sleep(1000L);
-            }
-            catch (InterruptedException interruptedexception)
-            {
-                ;
-            }
+            } catch (InterruptedException ignored) {}
 
             if (this.fullscreen)
             {
@@ -462,7 +446,6 @@ public class Minecraft implements IPlayerUsage
         catch (Throwable throwable)
         {
             this.field_152353_at = new NullStream(throwable);
-            logger.error("Couldn\'t initialize twitch stream");
         }
 
         this.framebufferMc = new Framebuffer(this.displayWidth, this.displayHeight, true);
@@ -505,24 +488,18 @@ public class Minecraft implements IPlayerUsage
         bar.step("Loading Entity Renderer");
         this.entityRenderer = new EntityRenderer(this, this.mcResourceManager);
         this.mcResourceManager.registerReloadListener(this.entityRenderer);
-        AchievementList.openInventory.setStatStringFormatter(new IStatStringFormat()
-        {
-            private static final String __OBFID = "CL_00000639";
-            public String formatString(String p_74535_1_)
+        AchievementList.openInventory.setStatStringFormatter(p_74535_1_ -> {
+            try
             {
-                try
-                {
-                    return String.format(p_74535_1_, new Object[] {GameSettings.getKeyDisplayString(Minecraft.this.gameSettings.keyBindInventory.getKeyCode())});
-                }
-                catch (Exception exception)
-                {
-                    return "Error: " + exception.getLocalizedMessage();
-                }
+                return String.format(p_74535_1_, GameSettings.getKeyDisplayString(Minecraft.this.gameSettings.keyBindInventory.getKeyCode()));
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.getLocalizedMessage();
             }
         });
         bar.step("Loading GL properties");
         this.mouseHelper = new MouseHelper();
-        this.checkGLError("Pre startup");
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glShadeModel(GL11.GL_SMOOTH);
         GL11.glClearDepth(1.0D);
@@ -534,7 +511,6 @@ public class Minecraft implements IPlayerUsage
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glLoadIdentity();
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
-        this.checkGLError("Startup");
         bar.step("Render Global instance");
         this.renderGlobal = new RenderGlobal(this);
         bar.step("Building Blocks Texture");
@@ -551,7 +527,6 @@ public class Minecraft implements IPlayerUsage
         this.effectRenderer = new EffectRenderer(this.theWorld, this.renderEngine);
         cpw.mods.fml.common.ProgressManager.pop(bar);
         FMLClientHandler.instance().finishMinecraftLoading();
-        this.checkGLError("Post startup");
         this.ingameGUI = new net.minecraftforge.client.GuiIngameForge(this);
 
         if (this.serverName != null)
@@ -611,7 +586,6 @@ public class Minecraft implements IPlayerUsage
         }
         catch (RuntimeException runtimeexception)
         {
-            logger.info("Caught error stitching, removing all assigned resourcepacks", runtimeexception);
             arraylist.clear();
             arraylist.addAll(this.defaultResourcePacks);
             this.mcResourcePackRepository.func_148527_a(Collections.emptyList());
@@ -724,10 +698,7 @@ public class Minecraft implements IPlayerUsage
             this.field_152354_ay = this.renderEngine.getDynamicTextureLocation("logo", new DynamicTexture(ImageIO.read(this.mcDefaultResourcePack.getInputStream(locationMojangPng))));
             this.renderEngine.bindTexture(this.field_152354_ay);
         }
-        catch (IOException ioexception)
-        {
-            logger.error("Unable to load logo: " + locationMojangPng, ioexception);
-        }
+        catch (IOException ignored) {}
 
         Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawingQuads();
@@ -816,25 +787,11 @@ public class Minecraft implements IPlayerUsage
         }
     }
 
-    private void checkGLError(String p_71361_1_)
-    {
-        int i = GL11.glGetError();
-
-        if (i != 0)
-        {
-            String s1 = GLU.gluErrorString(i);
-            logger.error("########## GL ERROR ##########");
-            logger.error("@ " + p_71361_1_);
-            logger.error(i + ": " + s1);
-        }
-    }
-
     public void shutdownMinecraftApplet()
     {
         try
         {
             this.field_152353_at.func_152923_i();
-            logger.info("Stopping!");
 
             try
             {
@@ -912,22 +869,17 @@ public class Minecraft implements IPlayerUsage
                     return;
                 }
             }
-            catch (MinecraftError minecrafterror)
-            {
-                ;
-            }
+            catch (MinecraftError ignored) {}
             catch (ReportedException reportedexception)
             {
                 this.addGraphicsAndWorldToCrashReport(reportedexception.getCrashReport());
                 this.freeMemory();
-                logger.fatal("Reported exception thrown!", reportedexception);
                 this.displayCrashReport(reportedexception.getCrashReport());
             }
             catch (Throwable throwable1)
             {
                 crashreport = this.addGraphicsAndWorldToCrashReport(new CrashReport("Unexpected error", throwable1));
                 this.freeMemory();
-                logger.fatal("Unreported exception thrown!", throwable1);
                 this.displayCrashReport(crashreport);
             }
             finally
@@ -975,7 +927,6 @@ public class Minecraft implements IPlayerUsage
 
         this.mcProfiler.endStartSection("preRenderErrors");
         long k = System.nanoTime() - j;
-        this.checkGLError("Pre render");
         RenderBlocks.fancyGrass = this.gameSettings.fancyGraphics;
         this.mcProfiler.endStartSection("sound");
         this.mcSoundHandler.setListener(this.thePlayer, this.timer.renderPartialTicks);
@@ -1046,7 +997,6 @@ public class Minecraft implements IPlayerUsage
         this.field_152353_at.func_152922_k();
         this.mcProfiler.endSection();
         this.mcProfiler.endSection();
-        this.checkGLError("Post render");
         ++this.fpsCounter;
         this.isGamePaused = this.isSingleplayer() && this.currentScreen != null && this.currentScreen.doesGuiPauseGame() && !this.theIntegratedServer.getPublic();
 
@@ -1103,46 +1053,16 @@ public class Minecraft implements IPlayerUsage
 
     public int getLimitFramerate()
     {
-        return this.theWorld == null && this.currentScreen != null ? 30 : this.gameSettings.limitFramerate;
+        return this.theWorld == null && this.currentScreen != null ? 60 : this.gameSettings.limitFramerate;
     }
 
     public boolean isFramerateLimitBelowMax()
     {
-        return (float)this.getLimitFramerate() < GameSettings.Options.FRAMERATE_LIMIT.getValueMax();
+        return (float) this.getLimitFramerate() < GameSettings.Options.FRAMERATE_LIMIT.getValueMax();
     }
 
-    public void freeMemory()
-    {
-        try
-        {
-            memoryReserve = new byte[0];
-            this.renderGlobal.deleteAllDisplayLists();
-        }
-        catch (Throwable throwable2)
-        {
-            ;
-        }
-
-        try
-        {
-            System.gc();
-        }
-        catch (Throwable throwable1)
-        {
-            ;
-        }
-
-        try
-        {
-            System.gc();
-            this.loadWorld((WorldClient)null);
-        }
-        catch (Throwable throwable)
-        {
-            ;
-        }
-
-        System.gc();
+    public void freeMemory() {
+        this.renderGlobal.deleteAllDisplayLists();
     }
 
     private void updateDebugProfilerName(int p_71383_1_)
@@ -1370,25 +1290,16 @@ public class Minecraft implements IPlayerUsage
         }
     }
 
-    private void func_147116_af()
-    {
-        if (this.leftClickCounter <= 0)
-        {
+    private void func_147116_af() {
+        if (this.leftClickCounter <= 0) {
             this.thePlayer.swingItem();
 
-            if (this.objectMouseOver == null)
-            {
-                logger.error("Null returned as \'hitResult\', this shouldn\'t happen!");
-
-                if (this.playerController.isNotCreative())
-                {
+            if (this.objectMouseOver == null) {
+                if (this.playerController.isNotCreative()) {
                     this.leftClickCounter = 10;
                 }
-            }
-            else
-            {
-                switch (Minecraft.SwitchMovingObjectType.field_152390_a[this.objectMouseOver.typeOfHit.ordinal()])
-                {
+            } else {
+                switch (Minecraft.SwitchMovingObjectType.field_152390_a[this.objectMouseOver.typeOfHit.ordinal()]) {
                     case 1:
                         this.playerController.attackEntity(this.thePlayer, this.objectMouseOver.entityHit);
                         break;
@@ -1397,15 +1308,11 @@ public class Minecraft implements IPlayerUsage
                         int j = this.objectMouseOver.blockY;
                         int k = this.objectMouseOver.blockZ;
 
-                        if (this.theWorld.getBlock(i, j, k).getMaterial() == Material.air)
-                        {
-                            if (this.playerController.isNotCreative())
-                            {
+                        if (this.theWorld.getBlock(i, j, k).getMaterial() == Material.air) {
+                            if (this.playerController.isNotCreative()) {
                                 this.leftClickCounter = 10;
                             }
-                        }
-                        else
-                        {
+                        } else {
                             this.playerController.clickBlock(i, j, k, this.objectMouseOver.sideHit);
                         }
                 }
@@ -1419,11 +1326,7 @@ public class Minecraft implements IPlayerUsage
         boolean flag = true;
         ItemStack itemstack = this.thePlayer.inventory.getCurrentItem();
 
-        if (this.objectMouseOver == null)
-        {
-            logger.warn("Null returned as \'hitResult\', this shouldn\'t happen!");
-        }
-        else
+        if (this.objectMouseOver != null)
         {
             switch (Minecraft.SwitchMovingObjectType.field_152390_a[this.objectMouseOver.typeOfHit.ordinal()])
             {
@@ -1531,10 +1434,7 @@ public class Minecraft implements IPlayerUsage
             Display.setVSyncEnabled(this.gameSettings.enableVsync);
             this.func_147120_f();
         }
-        catch (Exception exception)
-        {
-            logger.error("Couldn\'t toggle fullscreen", exception);
-        }
+        catch (Exception ignored) {}
     }
 
     public void resize(int p_71370_1_, int p_71370_2_)

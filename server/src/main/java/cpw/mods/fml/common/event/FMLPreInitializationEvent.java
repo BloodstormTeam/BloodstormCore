@@ -17,9 +17,6 @@ import java.security.CodeSource;
 import java.security.cert.Certificate;
 import java.util.Properties;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import cpw.mods.fml.common.LoaderState.ModState;
 import cpw.mods.fml.common.FMLModContainer;
 import cpw.mods.fml.common.ModContainer;
@@ -90,43 +87,5 @@ public class FMLPreInitializationEvent extends FMLStateEvent
         }
 
         return null;
-    }
-
-    /**
-     * Get a logger instance configured to write to the FML Log as a parent, identified by modid. Handy for mod logging!
-     * Configurations can be applied through the <code>config/logging.properties</code> file, specifying logging levels
-     * for your ModID. Use this!
-     *
-     * @return A logger
-     */
-    public Logger getModLog()
-    {
-        Logger log = LogManager.getLogger(modContainer.getModId());
-        return log;
-    }
-
-
-    /**
-     * Retrieve the FML signing certificates, if any. Validate these against the
-     * published FML certificates in your mod, if you wish.
-     *
-     * Deprecated because mods should <b>NOT</b> trust this code. Rather
-     * they should copy this, or something like this, into their own mods.
-     *
-     * @return Certificates used to sign FML and Forge
-     */
-    @Deprecated
-    public Certificate[] getFMLSigningCertificates()
-    {
-        CodeSource codeSource = getClass().getClassLoader().getParent().getClass().getProtectionDomain().getCodeSource();
-        Certificate[] certs = codeSource.getCertificates();
-        if (certs == null)
-        {
-            return new Certificate[0];
-        }
-        else
-        {
-            return certs;
-        }
     }
 }

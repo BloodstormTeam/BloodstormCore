@@ -3,7 +3,6 @@ package net.minecraftforge.common.util;
 import java.lang.reflect.*;
 import java.util.*;
 
-import cpw.mods.fml.common.FMLLog;
 import net.minecraft.block.BlockPressurePlate.Sensitivity;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnumEnchantmentType;
@@ -24,16 +23,11 @@ import net.minecraftforge.classloading.FMLForgePlugin;
 // Cauldron start
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.inventory.InventoryType;
 // Cauldron end
@@ -46,7 +40,6 @@ public class EnumHelper
     private static Method newFieldAccessor       = null;
     private static Method fieldAccessorSet       = null;
     private static boolean isSetup               = false;
-    private static final Logger logger = LogManager.getLogger();
 
     //Some enums are decompiled with extra arguments, so lets check for that
     @SuppressWarnings("rawtypes")
@@ -125,11 +118,6 @@ public class EnumHelper
         } 
         catch (Throwable e) 
         {
-            if (MinecraftServer.getServer().tileEntityConfig.enableTEInventoryWarning.getValue())
-            {
-                logger.log(Level.WARN, "Could not create inventory type " + tileentity.getClass().getName() + " Exception: " + e.toString());
-                logger.log(Level.WARN, "Could not determine default inventory size for type " + tileentity.getClass().getName() + " using size of 9");
-            }
             return addEnum(org.bukkit.event.inventory.InventoryType.class, id, new Class[]{Integer.TYPE, String.class}, new Object[]{9, id});
         }
     }
@@ -336,15 +324,6 @@ public class EnumHelper
 
         if (valuesField == null)
         {
-            FMLLog.severe("Could not find $VALUES field for enum: %s", enumType.getName());
-            FMLLog.severe("Runtime Deobf: %s", FMLForgePlugin.RUNTIME_DEOBF);
-            FMLLog.severe("Flags: %s", String.format("%16s", Integer.toBinaryString(flags)).replace(' ', '0'));
-            FMLLog.severe("Fields:");
-            for (Field field : fields)
-            {
-                String mods = String.format("%16s", Integer.toBinaryString(field.getModifiers())).replace(' ', '0');
-                FMLLog.severe("       %s %s: %s", mods, field.getName(), field.getType().getName());
-            }
             return null;
         }
 
@@ -408,22 +387,13 @@ public class EnumHelper
 
         if (valuesField == null)
         {
-            FMLLog.severe("Could not find $VALUES field for enum: %s", enumType.getName());
-            FMLLog.severe("Runtime Deobf: %s", FMLForgePlugin.RUNTIME_DEOBF);
-            FMLLog.severe("Flags: %s", String.format("%16s", Integer.toBinaryString(flags)).replace(' ', '0'));
-            FMLLog.severe("Fields:");
-            for (Field field : fields)
-            {
-                String mods = String.format("%16s", Integer.toBinaryString(field.getModifiers())).replace(' ', '0');
-                FMLLog.severe("       %s %s: %s", mods, field.getName(), field.getType().getName());
-            }
             return null;
         }
 
         valuesField.setAccessible(true);
         try
         {
-            Enum[] previousValues = (Enum[])(Enum[])valuesField.get(enumType);
+            Enum[] previousValues = (Enum[]) valuesField.get(enumType);
             Enum[] newValues = new Enum[previousValues.length];
             Enum newValue = null;
             for (Enum enumValue : previousValues)

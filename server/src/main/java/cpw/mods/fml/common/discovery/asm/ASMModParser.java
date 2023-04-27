@@ -12,24 +12,18 @@
 
 package cpw.mods.fml.common.discovery.asm;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.apache.logging.log4j.Level;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.Type;
-
-import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.LoaderException;
 import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ModCandidate;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Type;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ASMModParser
 {
@@ -40,21 +34,15 @@ public class ASMModParser
     private LinkedList<ModAnnotation> annotations = Lists.newLinkedList();
     private String baseModProperties;
 
-    static enum AnnotationType
-    {
+    enum AnnotationType {
         CLASS, FIELD, METHOD, SUBTYPE;
     }
 
-    public ASMModParser(InputStream stream) throws IOException
-    {
-        try
-        {
+    public ASMModParser(InputStream stream) throws IOException {
+        try {
             ClassReader reader = new ClassReader(stream);
             reader.accept(new ModClassVisitor(this), 0);
-        }
-        catch (Exception ex)
-        {
-            FMLLog.log(Level.ERROR, ex, "Unable to read a class file correctly");
+        } catch (Exception ex) {
             throw new LoaderException(ex);
         }
     }
@@ -114,7 +102,7 @@ public class ASMModParser
 
     public boolean isBaseMod(List<String> rememberedTypes)
     {
-        return getASMSuperType().equals(Type.getType("LBaseMod;")) || getASMSuperType().equals(Type.getType("Lnet/minecraft/src/BaseMod;"))|| rememberedTypes.contains(getASMSuperType().getClassName());
+        return false;
     }
 
     public void setBaseModProperties(String foundProperties)

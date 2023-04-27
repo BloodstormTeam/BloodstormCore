@@ -32,13 +32,10 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.IResourcePack;
 import net.minecraft.util.ResourceLocation;
-
-import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Strings;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.ModContainer.Disableable;
@@ -121,10 +118,7 @@ public class GuiModList extends GuiScreen
                         GuiScreen newScreen = guiFactory.mainConfigGuiClass().getConstructor(GuiScreen.class).newInstance(this);
                         this.mc.displayGuiScreen(newScreen);
                     }
-                    catch (Exception e)
-                    {
-                        FMLLog.log(Level.ERROR, e, "There was a critical issue trying to build the config GUI for %s", selectedMod.getModId());
-                    }
+                    catch (Exception ignored) {}
                     return;
             }
         }

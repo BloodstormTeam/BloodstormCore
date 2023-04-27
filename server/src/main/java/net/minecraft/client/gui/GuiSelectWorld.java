@@ -17,13 +17,9 @@ import net.minecraft.world.storage.ISaveFormat;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.SaveFormatComparator;
 import net.minecraft.world.storage.WorldInfo;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
-public class GuiSelectWorld extends GuiScreen implements GuiYesNoCallback
-{
-    private static final Logger logger = LogManager.getLogger();
+public class GuiSelectWorld extends GuiScreen implements GuiYesNoCallback {
     private final DateFormat field_146633_h = new SimpleDateFormat();
     protected GuiScreen field_146632_a;
     protected String field_146628_f = "Select world";
@@ -46,17 +42,13 @@ public class GuiSelectWorld extends GuiScreen implements GuiYesNoCallback
         this.field_146632_a = p_i1054_1_;
     }
 
-    public void initGui()
-    {
+    public void initGui() {
         this.field_146628_f = I18n.format("selectWorld.title", new Object[0]);
 
-        try
-        {
+        try {
             this.func_146627_h();
         }
-        catch (AnvilConverterException anvilconverterexception)
-        {
-            logger.error("Couldn\'t load level list", anvilconverterexception);
+        catch (AnvilConverterException anvilconverterexception) {
             this.mc.displayGuiScreen(new GuiErrorScreen("Unable to load worlds", anvilconverterexception.getMessage()));
             return;
         }
@@ -197,14 +189,10 @@ public class GuiSelectWorld extends GuiScreen implements GuiYesNoCallback
                 isaveformat.flushCache();
                 isaveformat.deleteWorldDirectory(this.func_146621_a(p_73878_2_));
 
-                try
-                {
+                try {
                     this.func_146627_h();
                 }
-                catch (AnvilConverterException anvilconverterexception)
-                {
-                    logger.error("Couldn\'t load level list", anvilconverterexception);
-                }
+                catch (AnvilConverterException ignored) {}
             }
 
             this.mc.displayGuiScreen(this);

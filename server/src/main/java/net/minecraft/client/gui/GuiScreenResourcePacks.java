@@ -16,14 +16,10 @@ import net.minecraft.client.resources.ResourcePackListEntryDefault;
 import net.minecraft.client.resources.ResourcePackListEntryFound;
 import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.util.Util;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.Sys;
 
 @SideOnly(Side.CLIENT)
-public class GuiScreenResourcePacks extends GuiScreen
-{
-    private static final Logger logger = LogManager.getLogger();
+public class GuiScreenResourcePacks extends GuiScreen {
     private GuiScreen field_146965_f;
     private List field_146966_g;
     private List field_146969_h;
@@ -105,28 +101,21 @@ public class GuiScreenResourcePacks extends GuiScreen
                 {
                     try
                     {
-                        logger.info(s);
                         Runtime.getRuntime().exec(new String[] {"/usr/bin/open", s});
                         return;
                     }
-                    catch (IOException ioexception1)
-                    {
-                        logger.error("Couldn\'t open file", ioexception1);
-                    }
+                    catch (IOException ignored) {}
                 }
                 else if (Util.getOSType() == Util.EnumOS.WINDOWS)
                 {
-                    String s1 = String.format("cmd.exe /C start \"Open file\" \"%s\"", new Object[] {s});
+                    String s1 = String.format("cmd.exe /C start \"Open file\" \"%s\"", s);
 
                     try
                     {
                         Runtime.getRuntime().exec(s1);
                         return;
                     }
-                    catch (IOException ioexception)
-                    {
-                        logger.error("Couldn\'t open file", ioexception);
-                    }
+                    catch (IOException ignored) {}
                 }
 
                 boolean flag = false;
@@ -139,13 +128,11 @@ public class GuiScreenResourcePacks extends GuiScreen
                 }
                 catch (Throwable throwable)
                 {
-                    logger.error("Couldn\'t open link", throwable);
                     flag = true;
                 }
 
                 if (flag)
                 {
-                    logger.info("Opening via system class!");
                     Sys.openURL("file://" + s);
                 }
             }

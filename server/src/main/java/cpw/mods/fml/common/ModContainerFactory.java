@@ -16,8 +16,6 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import org.apache.logging.log4j.Level;
 import org.objectweb.asm.Type;
 
 import com.google.common.base.Throwables;
@@ -47,26 +45,18 @@ public class ModContainerFactory
             Constructor<? extends ModContainer> constructor = container.getConstructor(new Class<?>[] { String.class, ModCandidate.class, Map.class });
             modTypes.put(type, constructor);
         } catch (Exception e) {
-            FMLLog.log(Level.ERROR, e, "Critical error : cannot register mod container type %s, it has an invalid constructor");
-            Throwables.propagate(e);
+            Throwables.throwIfUnchecked(e);
         }
     }
     public ModContainer build(ASMModParser modParser, File modSource, ModCandidate container)
     {
         String className = modParser.getASMType().getClassName();
-        if (modParser.isBaseMod(container.getRememberedBaseMods()) && modClass.matcher(className).find())
+        if (modClass.matcher(className).find())
         {
-            FMLLog.severe("Found a BaseMod type mod %s", className);
-            FMLLog.severe("This will not be loaded and will be ignored. ModLoader mechanisms are no longer available.");
-        }
-        else if (modClass.matcher(className).find())
-        {
-            FMLLog.fine("Identified a class %s following modloader naming convention but not directly a BaseMod or currently seen subclass", className);
             container.rememberModCandidateType(modParser);
         }
         else if (modParser.isBaseMod(container.getRememberedBaseMods()))
         {
-            FMLLog.fine("Found a basemod %s of non-standard naming format", className);
             container.rememberBaseModType(className);
         }
 
@@ -74,11 +64,9 @@ public class ModContainerFactory
         {
             if (modTypes.containsKey(ann.getASMType()))
             {
-                FMLLog.fine("Identified a mod of type %s (%s) - loading", ann.getASMType(), className);
                 try {
                     return modTypes.get(ann.getASMType()).newInstance(className, container, ann.getValues());
                 } catch (Exception e) {
-                    FMLLog.log(Level.ERROR, e, "Unable to construct %s container", ann.getASMType().getClassName());
                     return null;
                 }
             }

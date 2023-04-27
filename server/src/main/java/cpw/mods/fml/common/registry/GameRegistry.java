@@ -41,8 +41,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
 
-import org.apache.logging.log4j.Level;
-
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
@@ -53,7 +51,6 @@ import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.IFuelHandler;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.Loader;
@@ -234,10 +231,6 @@ public class GameRegistry
      */
     public static Block registerBlock(Block block, Class<? extends ItemBlock> itemclass, String name, Object... itemCtorArgs)
     {
-        if (Loader.instance().isInState(LoaderState.CONSTRUCTING))
-        {
-            FMLLog.warning("The mod %s is attempting to register a block whilst it it being constructed. This is bad modding practice - please use a proper mod lifecycle event.", Loader.instance().activeModContainer());
-        }
         try
         {
             assert block != null : "registerBlock: block cannot be null";
@@ -263,7 +256,6 @@ public class GameRegistry
         }
         catch (Exception e)
         {
-            FMLLog.log(Level.ERROR, e, "Caught an exception during block registration");
             throw new LoaderException(e);
         }
     }
@@ -552,7 +544,6 @@ public class GameRegistry
         if (itemName == null) throw new IllegalArgumentException("The itemName cannot be null");
         Item item = GameData.getItemRegistry().getObject(itemName);
         if (item == null) {
-            FMLLog.getLogger().log(Level.TRACE, "Unable to find item with name {}", itemName);
             return null;
         }
         ItemStack is = new ItemStack(item,1,meta);
@@ -561,13 +552,10 @@ public class GameRegistry
             try
             {
                 nbttag = JsonToNBT.func_150315_a(nbtString);
-            } catch (NBTException e)
-            {
-                FMLLog.getLogger().log(Level.WARN, "Encountered an exception parsing ItemStack NBT string {}", nbtString, e);
-                throw Throwables.propagate(e);
+            } catch (NBTException e) {
+                Throwables.throwIfUnchecked(e);
             }
             if (!(nbttag instanceof NBTTagCompound)) {
-                FMLLog.getLogger().log(Level.WARN, "Unexpected NBT string - multiple values {}", nbtString);
                 throw new RuntimeException("Invalid NBT JSON");
             } else {
                 is.setTagCompound((NBTTagCompound) nbttag);

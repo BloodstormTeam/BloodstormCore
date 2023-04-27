@@ -25,12 +25,8 @@ import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.SaveFormatComparator;
 import net.minecraft.world.storage.SaveFormatOld;
 import net.minecraft.world.storage.WorldInfo;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-public class AnvilSaveConverter extends SaveFormatOld
-{
-    private static final Logger logger = LogManager.getLogger();
+public class AnvilSaveConverter extends SaveFormatOld {
     private static final String __OBFID = "CL_00000582";
 
     public AnvilSaveConverter(File p_i2144_1_)
@@ -124,7 +120,6 @@ public class AnvilSaveConverter extends SaveFormatOld
         File file1 = new File(this.savesDirectory, p_75805_1_);
         File file2 = new File(file1, "DIM-1");
         File file3 = new File(file1, "DIM1");
-        logger.info("Scanning folders...");
         this.addRegionFilesToCollection(file1, arraylist);
 
         if (file2.exists())
@@ -138,7 +133,6 @@ public class AnvilSaveConverter extends SaveFormatOld
         }
 
         int i = arraylist.size() + arraylist1.size() + arraylist2.size();
-        logger.info("Total conversion count is " + i);
         WorldInfo worldinfo = this.getWorldInfo(p_75805_1_);
         Object object = null;
 
@@ -171,26 +165,13 @@ public class AnvilSaveConverter extends SaveFormatOld
     {
         File file1 = new File(this.savesDirectory, p_75809_1_);
 
-        if (!file1.exists())
-        {
-            logger.warn("Unable to create level.dat_mcr backup");
-        }
-        else
-        {
+        if (file1.exists()) {
             File file2 = new File(file1, "level.dat");
 
-            if (!file2.exists())
-            {
-                logger.warn("Unable to create level.dat_mcr backup");
-            }
-            else
+            if (file2.exists())
             {
                 File file3 = new File(file1, "level.dat_mcr");
-
-                if (!file2.renameTo(file3))
-                {
-                    logger.warn("Unable to create level.dat_mcr backup");
-                }
+                file2.renameTo(file3);
             }
         }
     }
@@ -227,12 +208,7 @@ public class AnvilSaveConverter extends SaveFormatOld
                     {
                         DataInputStream datainputstream = regionfile.getChunkDataInputStream(k, l);
 
-                        if (datainputstream == null)
-                        {
-                            logger.warn("Failed to fetch input stream");
-                        }
-                        else
-                        {
+                        if (datainputstream != null) {
                             NBTTagCompound nbttagcompound = CompressedStreamTools.read(datainputstream);
                             datainputstream.close();
                             NBTTagCompound nbttagcompound1 = nbttagcompound.getCompoundTag("Level");

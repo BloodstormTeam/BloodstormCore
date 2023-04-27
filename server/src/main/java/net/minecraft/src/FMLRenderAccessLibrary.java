@@ -12,15 +12,10 @@
 
 package net.minecraft.src;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.world.IBlockAccess;
 import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.common.FMLLog;
 
 /**
  *
@@ -29,24 +24,7 @@ import cpw.mods.fml.common.FMLLog;
  * @author cpw
  *
  */
-public class FMLRenderAccessLibrary
-{
-    public static Logger getLogger()
-    {
-        Logger l = LogManager.getLogger("FMLRenderAccessLibrary");
-        return l;
-    }
-
-    public static void log(Level level, String message)
-    {
-        FMLLog.log("FMLRenderAccessLibrary", level, message);
-    }
-
-    public static void log(Level level, String message, Throwable throwable)
-    {
-        FMLLog.log(level, throwable, message);
-    }
-
+public class FMLRenderAccessLibrary {
     @SuppressWarnings("deprecation")
     public static boolean renderWorldBlock(RenderBlocks renderer, IBlockAccess world, int x, int y, int z, Block block, int modelId)
     {

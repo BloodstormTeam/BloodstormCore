@@ -8,7 +8,6 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.MapMaker;
 import com.mojang.authlib.GameProfile;
-import cpw.mods.fml.common.FMLLog;
 import io.github.crucible.CrucibleConfigs;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
@@ -22,7 +21,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedPlayerList;
 import net.minecraft.server.management.UserListEntry;
 import net.minecraft.world.WorldSettings;
-import net.minecraft.world.storage.SaveHandler;
 import net.minecraftforge.cauldron.apiimpl.CauldronPluginInterface;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
@@ -149,7 +147,7 @@ public final class CraftServer implements Server {
                 return player.getBukkitEntity();
             }
         }));
-        this.serverVersion = CraftServer.class.getPackage().getImplementationVersion();
+        this.serverVersion = "1.7.10";
         online.value = console.getPropertyManager().getBooleanProperty("online-mode", true);
 
         Bukkit.setServer(this);
@@ -990,10 +988,7 @@ public final class CraftServer implements Server {
                 handle.flush();
                 WorldSaveEvent event = new WorldSaveEvent(handle.getWorld());
                 getPluginManager().callEvent(event);
-            } catch (net.minecraft.world.MinecraftException ex) {
-                getLogger().log(Level.SEVERE, null, ex);
-                FMLLog.log(org.apache.logging.log4j.Level.ERROR, ex, "Failed to save world " + handle.getWorld().getName() + " while unloading it.");
-            }
+            } catch (net.minecraft.world.MinecraftException ignored) {}
         }
         MinecraftForge.EVENT_BUS.post(new WorldEvent.Unload(handle)); // Cauldron - fire unload event before removing world
         worlds.remove(world.getName().toLowerCase());

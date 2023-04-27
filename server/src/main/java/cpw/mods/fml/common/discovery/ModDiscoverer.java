@@ -17,20 +17,16 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.logging.log4j.Level;
-
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.ObjectArrays;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.LoaderException;
 import cpw.mods.fml.common.ModClassLoader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.relauncher.CoreModManager;
 import cpw.mods.fml.relauncher.FileListHelper;
-import cpw.mods.fml.relauncher.ModListHelper;
 
 public class ModDiscoverer
 {
@@ -53,30 +49,15 @@ public class ModDiscoverer
                 .addAll(CoreModManager.getReparseableCoremods())
                 .build();
         File[] minecraftSources = modClassLoader.getParentSources();
-        if (minecraftSources.length == 1 && minecraftSources[0].isFile())
-        {
-            FMLLog.fine("Minecraft is a file at %s, loading", minecraftSources[0].getAbsolutePath());
+        if (minecraftSources.length == 1 && minecraftSources[0].isFile()) {
             candidates.add(new ModCandidate(minecraftSources[0], minecraftSources[0], ContainerType.JAR, true, true));
-        }
-        else
-        {
-            for (int i = 0; i < minecraftSources.length; i++)
-            {
-                if (minecraftSources[i].isFile())
-                {
-                    if (knownLibraries.contains(minecraftSources[i].getName()))
-                    {
-                        FMLLog.finer("Skipping known library file %s", minecraftSources[i].getAbsolutePath());
-                    }
-                    else
-                    {
-                        FMLLog.fine("Found a minecraft related file at %s, examining for mod candidates", minecraftSources[i].getAbsolutePath());
+        } else {
+            for (int i = 0; i < minecraftSources.length; i++) {
+                if (minecraftSources[i].isFile()) {
+                    if (!knownLibraries.contains(minecraftSources[i].getName())) {
                         candidates.add(new ModCandidate(minecraftSources[i], minecraftSources[i], ContainerType.JAR, i==0, true));
                     }
-                }
-                else if (minecraftSources[i].isDirectory())
-                {
-                    FMLLog.fine("Found a minecraft related directory at %s, examining for mod candidates", minecraftSources[i].getAbsolutePath());
+                } else if (minecraftSources[i].isDirectory()) {
                     candidates.add(new ModCandidate(minecraftSources[i], minecraftSources[i], ContainerType.DIR, i==0, true));
                 }
             }
@@ -96,27 +77,16 @@ public class ModDiscoverer
         for (File modFile : modList)
         {
             // skip loaded coremods
-            if (CoreModManager.getLoadedCoremods().contains(modFile.getName()))
+            if (!CoreModManager.getLoadedCoremods().contains(modFile.getName()))
             {
-                FMLLog.finer("Skipping already parsed coremod or tweaker %s", modFile.getName());
-            }
-            else if (modFile.isDirectory())
-            {
-                FMLLog.fine("Found a candidate mod directory %s", modFile.getName());
-                candidates.add(new ModCandidate(modFile, modFile, ContainerType.DIR));
-            }
-            else
-            {
+                if (modFile.isDirectory()) {
+                    candidates.add(new ModCandidate(modFile, modFile, ContainerType.DIR));
+                }
                 Matcher matcher = zipJar.matcher(modFile.getName());
 
                 if (matcher.matches())
                 {
-                    FMLLog.fine("Found a candidate zip or jar file %s", matcher.group(0));
                     candidates.add(new ModCandidate(modFile, modFile, ContainerType.JAR));
-                }
-                else
-                {
-                    FMLLog.fine("Ignoring unknown file %s in mods directory", modFile.getName());
                 }
             }
         }
@@ -140,25 +110,14 @@ public class ModDiscoverer
                     modList.addAll(mods);
                 }
             }
-            catch (LoaderException le)
-            {
-                FMLLog.log(Level.WARN, le, "Identified a problem with the mod candidate %s, ignoring this source", candidate.getModContainer());
-            }
-            catch (Throwable t)
-            {
-                Throwables.propagate(t);
+            catch (LoaderException ignored) {}
+            catch (Throwable t) {
+                Throwables.throwIfUnchecked(t);
             }
         }
 
         if (!"false".equals(System.getProperty("thermos.fastcraft.disable", "true"))) {
-            java.util.Iterator<ModContainer> iterator = modList.iterator();
-            while(iterator.hasNext()) {
-                ModContainer container = iterator.next();
-                if ("FastCraft".equals(container.getModId())) {
-                    FMLLog.log(Level.WARN, "[Thermos] Sorry, the FastCraft mod will not be loaded due to Thermos compatibility issues. If you still wish to enable it, add \"-thermos.fastcraft.disable=false\" to your server launch script.");
-                    iterator.remove();
-                }
-            }
+            modList.removeIf(container -> "FastCraft".equals(container.getModId()));
         }
 
         return modList;

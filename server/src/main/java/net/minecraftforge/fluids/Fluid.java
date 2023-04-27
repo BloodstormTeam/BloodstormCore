@@ -1,17 +1,11 @@
 package net.minecraftforge.fluids;
 
 import java.util.Locale;
-import java.util.Map;
-
-import com.google.common.collect.Maps;
 
 import net.minecraft.block.Block;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeModContainer;
-import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.common.LoaderException;
 import net.minecraft.item.EnumRarity;
 
 /**
@@ -119,11 +113,6 @@ public class Fluid
         if (this.block == null || this.block == block)
         {
             this.block = block;
-        }
-        else
-        {
-            FMLLog.warning("A mod has attempted to assign Block " + block + " to the Fluid '" + fluidName + "' but this Fluid has already been linked to the Block "
-                    + this.block + ". You may have duplicate Fluid Blocks as a result. It *may* be possible to configure your mods to avoid this.");
         }
         return this;
     }

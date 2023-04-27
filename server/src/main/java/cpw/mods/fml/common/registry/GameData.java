@@ -32,8 +32,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
-import org.apache.logging.log4j.Level;
-
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Joiner.MapJoiner;
@@ -50,7 +48,6 @@ import com.google.common.collect.Table;
 import com.google.common.io.Files;
 
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.StartupQuery;
@@ -172,15 +169,9 @@ public class GameData {
 
             File f = new File(minecraftDir, "itemStackRegistry.csv");
             MapJoiner mapJoiner = Joiner.on("\n").withKeyValueSeparator(",");
-            try
-            {
+            try {
                 Files.write(mapJoiner.join(builder.build().entries()), f, Charsets.UTF_8);
-                FMLLog.log(Level.INFO, "Dumped item registry data to %s", f.getAbsolutePath());
-            }
-            catch (IOException e)
-            {
-                FMLLog.log(Level.ERROR, e, "Failed to write registry data to %s", f.getAbsolutePath());
-            }
+            } catch (IOException ignored) {}
         }
     }
 
@@ -293,7 +284,6 @@ public class GameData {
                 if (item == null) // item no longer available
                 {
                     // can't fix items without reliably checking if they are ItemBlocks
-                    FMLLog.warning("Item %s (old id %d) is no longer available and thus can't be fixed.", realName, oldId);
                     itemsToRemove.add(itemName);
                     blockThisId = true;
                 }
@@ -306,7 +296,6 @@ public class GameData {
                         if (blockId != oldId) // mis-located ItemBlock
                         {
                             // relocate to the matching block
-                            FMLLog.warning("ItemBlock %s (old id %d) doesn't have the same id as its block (%d).", realName, oldId, blockId);
                             itemsToRelocate.put(entry.getKey(), blockId);
                             blockThisId = true;
                         }
@@ -318,7 +307,6 @@ public class GameData {
                     else // the item hasn't been an ItemBlock before, but it's now
                     {
                         // can't fix these, drop them
-                        FMLLog.warning("Item %s (old id %d) has been migrated to an ItemBlock and can't be fixed.", realName, oldId);
                         itemsToRemove.add(itemName);
                         blockThisId = true;
                     }
@@ -326,7 +314,6 @@ public class GameData {
                 else if (availabilityMap.get(oldId)) // normal item, id is already occupied
                 {
                     // remove the item mapping
-                    FMLLog.warning("Item %s (old id %d) is conflicting with another block/item and can't be fixed.", realName, oldId);
                     itemsToRemove.add(itemName);
                 }
                 else // intact Item
@@ -396,11 +383,6 @@ public class GameData {
             {
                 ZipperUtil.backupWorld();
             }
-            else
-            {
-                for (int x = 0; x < 10; x++)
-                    FMLLog.severe("!!!!!!!!!! UPDATING WORLD WITHOUT DOING BACKUP !!!!!!!!!!!!!!!!");
-            }
         }
         catch (IOException e)
         {
@@ -411,9 +393,7 @@ public class GameData {
         // apply fix
         for (String itemName : itemsToRemove)
         {
-            int id = dataList.remove(itemName);
-
-            FMLLog.warning("Removed Item %s, old id %d.", itemName.substring(1), id);
+            dataList.remove(itemName);
         }
 
         for (Map.Entry<String, Integer> entry : itemsToRelocate.entrySet())
@@ -421,9 +401,7 @@ public class GameData {
             String itemName = entry.getKey();
             int newId = entry.getValue();
 
-            int oldId = dataList.put(itemName, newId);
-
-            FMLLog.warning("Remapped Item %s to id %d, old id %d.", itemName.substring(1), newId, oldId);
+            dataList.put(itemName, newId);
         }
 
         blockedIds.addAll(newBlockedIds);
@@ -431,12 +409,11 @@ public class GameData {
 
     public static List<String> injectWorldIDMap(Map<String, Integer> dataList, Set<String> blockSubstitutions, Set<String> itemSubstitutions, boolean injectFrozenData, boolean isLocalWorld)
     {
-        return injectWorldIDMap(dataList, new HashSet<Integer>(), new HashMap<String, String>(), new HashMap<String, String>(), blockSubstitutions, itemSubstitutions, injectFrozenData, isLocalWorld);
+        return injectWorldIDMap(dataList, new HashSet<>(), new HashMap<>(), new HashMap<>(), blockSubstitutions, itemSubstitutions, injectFrozenData, isLocalWorld);
     }
 
     public static List<String> injectWorldIDMap(Map<String, Integer> dataList, Set<Integer> blockedIds, Map<String, String> blockAliases, Map<String, String> itemAliases, Set<String> blockSubstitutions, Set<String> itemSubstitutions, boolean injectFrozenData, boolean isLocalWorld)
     {
-        FMLLog.info("Injecting existing block and item data into this %s instance", FMLCommonHandler.instance().getEffectiveSide().isServer() ? "server" : "client");
         Map<String, Integer[]> remaps = Maps.newHashMap();
         LinkedHashMap<String, Integer> missingMappings = new LinkedHashMap<String, Integer>();
         getMain().testConsistency();
@@ -505,13 +482,11 @@ public class GameData {
 
                 if (currId == -1)
                 {
-                    FMLLog.info("Found a missing id from the world %s", itemName);
                     missingMappings.put(entry.getKey(), newId);
                     continue; // no block/item -> nothing to add
                 }
                 else if (currId != newId)
                 {
-                    FMLLog.fine("Fixed %s id mismatch %s: %d (init) -> %d (map).", isBlock ? "block" : "item", itemName, currId, newId);
                     remaps.put(itemName, new Integer[] { currId, newId });
                 }
 
@@ -549,8 +524,6 @@ public class GameData {
 
             if (!missingBlocks.isEmpty() || !missingItems.isEmpty())
             {
-                FMLLog.info("Injecting new block and item data into this server instance.");
-
                 for (int pass = 0; pass < 2; pass++)
                 {
                     boolean isBlock = pass == 0;
@@ -570,8 +543,6 @@ public class GameData {
                         {
                             newId = newData.registerItem(frozen.iItemRegistry.getRaw(itemName), itemName, currId);
                         }
-
-                        FMLLog.info("Injected new block/item %s: %d (init) -> %d (map).", itemName, currId, newId);
 
                         if (newId != currId) // a new id was assigned
                         {
@@ -614,8 +585,6 @@ public class GameData {
                 {
                     currId = getMain().iBlockRegistry.getId((Block) remap.getTarget());
                     newName = getMain().iBlockRegistry.getNameForObject(remap.getTarget());
-                    FMLLog.fine("The Block %s is being remapped to %s.", remap.name, newName);
-
                     newId = gameData.registerBlock((Block) remap.getTarget(), newName, remap.id);
                     gameData.iBlockRegistry.addAlias(remap.name, newName);
                 }
@@ -623,8 +592,6 @@ public class GameData {
                 {
                     currId = getMain().iItemRegistry.getId((Item) remap.getTarget());
                     newName = getMain().iItemRegistry.getNameForObject(remap.getTarget());
-                    FMLLog.fine("The Item %s is being remapped to %s.", remap.name, newName);
-
                     newId = gameData.registerItem((Item) remap.getTarget(), newName, remap.id);
                     gameData.iItemRegistry.addAlias(remap.name, newName);
                 }
@@ -633,7 +600,6 @@ public class GameData {
 
                 if (currId != newId)
                 {
-                    FMLLog.info("Fixed %s id mismatch %s: %d (init) -> %d (map).", remap.type == Type.BLOCK ? "block" : "item", newName, currId, newId);
                     remaps.put(newName, new Integer[] { currId, newId });
                 }
             }
@@ -641,10 +607,7 @@ public class GameData {
             {
                 // Pulled out specifically so the block doesn't get reassigned a new ID just because it's
                 // Item block has gone away
-                FMLLog.fine("The ItemBlock %s is no longer present in the game. The residual block will remain", remap.name);
-            }
-            else
-            {
+            } else {
                 // block item missing, warn as requested and block the id
                 if (action == FMLMissingMappingsEvent.Action.DEFAULT)
                 {
@@ -683,14 +646,9 @@ public class GameData {
             try
             {
                 String skip = System.getProperty("fml.doNotBackup");
-                if (skip == null || !"true".equals(skip))
+                if (!"true".equals(skip))
                 {
                     ZipperUtil.backupWorld();
-                }
-                else
-                {
-                    for (int x = 0; x < 10; x++)
-                        FMLLog.severe("!!!!!!!!!! UPDATING WORLD WITHOUT DOING BACKUP !!!!!!!!!!!!!!!!");
                 }
             }
             catch (IOException e)
@@ -703,25 +661,17 @@ public class GameData {
         }
         if (!failed.isEmpty())
         {
-            FMLLog.severe("This world contains blocks and items that refuse to be remapped. The world will not be loaded");
             return failed;
         }
         if (!warned.isEmpty())
         {
-            FMLLog.severe("This world contains block and item mappings that may cause world breakage");
             return failed;
-        }
-        else if (!ignored.isEmpty())
-        {
-            FMLLog.fine("There were %d missing mappings that have been ignored", ignored.size());
         }
         return failed;
     }
 
     public static void freezeData()
     {
-        FMLLog.fine("Freezing block and item id maps");
-
         getMain().testConsistency();
         frozen = new GameData(getMain());
         frozen.testConsistency();
@@ -729,14 +679,8 @@ public class GameData {
 
     public static void revertToFrozen()
     {
-        if (frozen == null)
+        if (frozen != null)
         {
-            FMLLog.warning("Can't revert to frozen GameData state without freezing first.");
-        }
-        else
-        {
-            FMLLog.fine("Reverting to frozen data state.");
-
             getMain().set(frozen);
         }
         // the id mapping has reverted, fire remap events for those that care about id changes
@@ -808,9 +752,6 @@ public class GameData {
 
     int registerItem(Item item, String name) // from GameRegistry
     {
-        int index = name.indexOf(':');
-        if (name.indexOf(':') != -1) FMLLog.bigWarning("Illegal extra prefix %s for name %s, invalid registry invocation/invalid name?", name.substring(0, index), name);
-
         name = addPrefix(name);
         return registerItem(item, name, -1);
     }
@@ -832,7 +773,6 @@ public class GameData {
                 {
                     id = availabilityMap.nextClearBit(MIN_BLOCK_ID); // find suitable id here, iItemRegistry would search from MIN_ITEM_ID
                     if (id > MAX_BLOCK_ID) throw new RuntimeException(String.format("Invalid id %d - maximum id range exceeded.", id));
-                    FMLLog.fine("Allocated id %d for ItemBlock %s in the block id range, original id requested: %d.", id, name, idHint);
                 }
                 else // idHint is suitable without changes
                 {
@@ -841,8 +781,6 @@ public class GameData {
             }
             else // ItemBlock after its Block
             {
-                if (FMLControlledNamespacedRegistry.DEBUG)
-                    FMLLog.fine("Found matching Block %s for ItemBlock %s at id %d, original id requested: %d", block, item, id, idHint);
                 freeSlot(id, item); // temporarily free the slot occupied by the Block for the item registration
             }
 
@@ -865,9 +803,6 @@ public class GameData {
 
     int registerBlock(Block block, String name) // from GameRegistry
     {
-        int index = name.indexOf(':');
-        if (name.indexOf(':') != -1) FMLLog.bigWarning("Illegal extra prefix %s for name %s, invalid registry invocation/invalid name?", name.substring(0, index), name);
-
         name = addPrefix(name);
         return registerBlock(block, name, -1);
     }
@@ -889,7 +824,6 @@ public class GameData {
         if (itemBlock != null) // has ItemBlock, adjust id and clear the slot already occupied by the corresponding item
         {
             idHint = iItemRegistry.getId(itemBlock);
-            FMLLog.fine("Found matching ItemBlock %s for Block %s at id %d", itemBlock, block, idHint);
             freeSlot(idHint, block); // temporarily free the slot occupied by the Item for the block registration
         }
 
@@ -979,16 +913,7 @@ public class GameData {
         return name;
     }
 
-    private void verifyItemBlockName(ItemBlock item)
-    {
-        String blockName = iBlockRegistry.getNameForObject(item.field_150939_a);
-        String itemName = iItemRegistry.getNameForObject(item);
-
-        if (blockName != null && !blockName.equals(itemName))
-        {
-            FMLLog.bigWarning("Block <-> ItemBlock name mismatch, block name %s, item name %s", blockName, itemName);
-        }
-    }
+    private void verifyItemBlockName(ItemBlock item) {}
 
     private void testConsistency() {
         // test if there's an entry for every set bit in availabilityMap
@@ -1007,8 +932,6 @@ public class GameData {
             FMLControlledNamespacedRegistry<?> registry = isBlock ? iBlockRegistry : iItemRegistry;
             registry.validateContent((isBlock ? MAX_BLOCK_ID : MAX_ITEM_ID), type, availabilityMap, blockedIds, iBlockRegistry);
         }
-
-        FMLLog.fine("Registry consistency check successful");
     }
 
     void registerSubstitutionAlias(String nameToSubstitute, Type type, Object toReplace) throws ExistingSubstitutionException
@@ -1058,11 +981,7 @@ public class GameData {
         {
             Item item = itemRegistry.getRaw(id);
             // inject item materials into Bukkit for FML
-            org.bukkit.Material material = org.bukkit.Material.addMaterial(id, itemRegistry.getNameForObject(item), false);
-            if (material != null)
-            {
-                if (CrucibleConfigs.configs.crucible_logging_logMaterialInjection) FMLLog.info("Injected new Forge item material %s with ID %d.", material.name(), material.getId());
-            }
+            org.bukkit.Material.addMaterial(id, itemRegistry.getNameForObject(item), false);
         }
     }
 
@@ -1083,11 +1002,7 @@ public class GameData {
         {
             Block block = blockRegistry.getRaw(id);
             // inject block materials into Bukkit for FML
-            org.bukkit.Material material = org.bukkit.Material.addMaterial(id, blockRegistry.getNameForObject(block), true);
-            if (material != null)
-            {
-                if (CrucibleConfigs.configs.crucible_logging_logMaterialInjection) FMLLog.info("Injected new Forge block material %s with ID %d.", material.name(), material.getId());
-            }
+            org.bukkit.Material.addMaterial(id, blockRegistry.getNameForObject(block), true);
         }
     }
     // Cauldron end

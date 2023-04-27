@@ -55,8 +55,6 @@ import com.google.common.io.CharSource;
 import com.google.common.io.LineProcessor;
 import com.google.common.io.Resources;
 
-import cpw.mods.fml.relauncher.FMLRelaunchLog;
-
 public class AccessTransformer implements IClassTransformer
 {
     private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("fml.debugAccessTransformer", "false"));
@@ -118,7 +116,7 @@ public class AccessTransformer implements IClassTransformer
             rulesResource = Resources.getResource(rulesFile);
         }
         processATFile(Resources.asCharSource(rulesResource, Charsets.UTF_8));
-        FMLRelaunchLog.fine("Loaded %d rules from AccessTransformer config file %s", modifiers.size(), rulesFile);
+
     }
     protected void processATFile(CharSource rulesResource) throws IOException
     {
@@ -176,11 +174,6 @@ public class AccessTransformer implements IClassTransformer
     public byte[] transform(String name, String transformedName, byte[] bytes)
     {
         if (bytes == null) { return null; }
-
-        if (DEBUG)
-        {
-            FMLRelaunchLog.fine("Considering all methods and fields on %s (%s)\n", transformedName, name);
-        }
         if (!modifiers.containsKey(transformedName)) { return bytes; }
 
         ClassNode classNode = new ClassNode();

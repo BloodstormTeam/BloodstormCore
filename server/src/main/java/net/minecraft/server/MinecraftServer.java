@@ -27,6 +27,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.Proxy;
+import java.net.UnknownHostException;
 import java.security.KeyPair;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ import java.util.concurrent.Callable;
 
 import javax.imageio.ImageIO;
 
+import jline.console.ConsoleReader;
 import net.minecraft.command.ICommandManager;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.ServerCommandManager;
@@ -81,17 +83,11 @@ import net.minecraft.world.storage.ISaveFormat;
 import net.minecraft.world.storage.WorldInfo;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
 import net.openhft.affinity.AffinityLock;
-
-// CraftBukkit start
-
-import jline.console.ConsoleReader;
 import joptsimple.OptionSet;
 import net.minecraft.world.chunk.storage.AnvilSaveHandler;
 
@@ -100,10 +96,6 @@ import org.bukkit.craftbukkit.util.Waitable;
 import org.bukkit.event.server.RemoteServerCommandEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.spigotmc.WatchdogThread;
-
-// CraftBukkit end
-// Cauldron start
-
 import joptsimple.OptionParser;
 import net.minecraft.command.ServerCommand;
 import net.minecraft.tileentity.TileEntity;
@@ -118,9 +110,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.block.CraftBlock;
 // Cauldron end
 
-public abstract class MinecraftServer implements ICommandSender, Runnable, IPlayerUsage
-{
-    private static final Logger logger = LogManager.getLogger();
+public abstract class MinecraftServer implements ICommandSender, Runnable, IPlayerUsage {
     public static final File field_152367_a = new File("usercache.json");
     private static MinecraftServer mcServer;
     public ISaveFormat anvilConverterForAnvilFile; // CraftBukkit - private final -> public
@@ -274,10 +264,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
                 this.reader = new ConsoleReader(System.in, System.out);
                 this.reader.setExpandEvents(false);
             }
-            catch (IOException ex)
-            {
-                logger.warn((String) null, ex);
-            }
+            catch (IOException ignored) {}
         }
         net.minecraftforge.cauldron.CauldronHooks.enableThreadContentionMonitoring();
         Runtime.getRuntime().addShutdownHook(new org.bukkit.craftbukkit.util.ServerShutdownThread(this));
@@ -293,7 +280,6 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
     {
         if (this.getActiveAnvilConverter().isOldMapFormat(p_71237_1_))
         {
-            logger.info("Converting map!");
             this.setUserMessage("menu.convertingLevel");
             this.getActiveAnvilConverter().convertMapFormat(p_71237_1_, new IProgressUpdate()
             {
@@ -305,7 +291,6 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
                     if (System.currentTimeMillis() - this.field_96245_b >= 1000L)
                     {
                         this.field_96245_b = System.currentTimeMillis();
-                        MinecraftServer.logger.info("Converting... " + p_73718_1_ + "%");
                     }
                 }
                 
@@ -445,8 +430,6 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
         }
         this.func_147139_a(this.func_147135_j());
         this.initialWorldChunkLoad();
-        CraftBlock.dumpMaterials();
-        // Cauldron end
     }
 
     protected void initialWorldChunkLoad()
@@ -459,7 +442,6 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
         this.setUserMessage("menu.generatingTerrain");
         byte b0 = 0;
         // Cauldron start - we now handle CraftBukkit's keepSpawnInMemory logic in DimensionManager. Prevents crashes with mods such as DivineRPG and speeds up server startup time by a ton.
-        logger.info("Preparing start region for level " + b0);
         WorldServer worldserver = this.worldServers[b0];
         ChunkCoordinates chunkcoordinates = worldserver.getSpawnPoint();
         boolean before = worldserver.theChunkProviderServer.loadChunkOnProvideRequest;
@@ -503,7 +485,6 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
     {
         this.currentTask = p_71216_1_;
         this.percentDone = p_71216_2_;
-        logger.info(p_71216_1_ + ": " + p_71216_2_ + "%");
     }
 
     protected void clearCurrentTask()
@@ -525,11 +506,6 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
                 if (worldserver != null)
                 {
                     worldserver.timings.worldSave.startTiming(); //Crucible
-                    if (!p_71267_1_)
-                    {
-                        logger.info("Saving chunks for level \'" + worldserver.getWorldInfo().getWorldName() + "\'/" + worldserver.provider.getDimensionName());
-                    }
-
                     worldserver.saveAllChunks(true, (IProgressUpdate) null);
                     worldserver.timings.worldIOFlush.startTiming();
                     worldserver.flush();
@@ -547,7 +523,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
                     }
                     if (worldserver.sushchestvoConfig != null)
                     {
-                    	worldserver.sushchestvoConfig.save();
+                        worldserver.sushchestvoConfig.save();
                     }
                     // Cauldron end
                     worldserver.timings.worldSave.stopTiming(); //Crucible
@@ -562,8 +538,6 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
     {
         if (!this.worldIsBeingDeleted && Loader.instance().hasReachedState(LoaderState.SERVER_STARTED) && !serverStopped) // make sure the save is valid and we don't save twice
         {
-            logger.info("Stopping server");
-
             // CraftBukkit start
             if (this.server != null)
             {
@@ -579,26 +553,19 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
 
             if (this.serverConfigManager != null)
             {
-                logger.info("Saving players");
                 this.serverConfigManager.saveAllPlayerData();
                 this.serverConfigManager.removeAllPlayers();
             }
 
             if (this.worldServers != null)
             {
-                logger.info("Saving worlds");
-                try
-                {
+                try {
                     this.saveAllWorlds(false);
-                }
-                catch (MinecraftException e)
-                {
+                } catch (MinecraftException e) {
                     e.printStackTrace();
                 }
 
-                for (int i = 0; i < this.worldServers.length; ++i)
-                {
-                    WorldServer worldserver = this.worldServers[i];
+                for (WorldServer worldserver : this.worldServers) {
                     MinecraftForge.EVENT_BUS.post(new WorldEvent.Unload(worldserver));
                     worldserver.flush();
                 }
@@ -634,75 +601,46 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
     }
     // Spigot End
 
-    public void run()
-    {
-        try
-        {
-            if (this.startServer())
-            {
+    public void run() {
+        try {
+            if (this.startServer()) {
                 FMLCommonHandler.instance().handleServerStarted();
-                long i = getSystemTimeMillis();
-                long l = 0L;
                 this.field_147147_p.func_151315_a(new ChatComponentText(this.motd));
                 this.field_147147_p.func_151321_a(new ServerStatusResponse.MinecraftProtocolVersionIdentifier("1.7.10", 5));
                 this.func_147138_a(this.field_147147_p);
-                DedicatedServer.allowPlayerLogins = true; // Cauldron - server is ready, allow player logins
-                // Spigot start
+                DedicatedServer.allowPlayerLogins = true;
                 Arrays.fill(recentTps, 20);
                 long lastTick = 0, catchupTime = 0, curTime, wait;
-                AffinityLock al = null;
-                if(CrucibleConfigs.configs.cauldron_optimization_affinityLocking)
-                {
-                	al = AffinityLock.acquireCore();
-                	if(al.isAllocated())
-                		logger.log(org.apache.logging.log4j.Level.INFO, "[Thermos] We're locked in! " + AffinityLock.dumpLocks());
-                	else logger.log(org.apache.logging.log4j.Level.WARN, "[Thermos] Couldn't bind to a CPU core!");
-                }
-                else
-                {
-                	logger.log(org.apache.logging.log4j.Level.INFO, "[Thermos] Refusing to lock affinity, disabled in Crucible.yml");
-                }
                 try {
-                    serverStarted = true; //Crucible
-                while (this.serverRunning)
-                {
-                    curTime = System.nanoTime();
-                    //wait = TICK_TIME - (curTime - lastTick) - catchupTime;
-                    wait = CrucibleConfigs.configs.getTickTime() - (curTime - lastTick) - catchupTime;
-                    if (wait > 0)
-                    {
-                        Thread.sleep(wait / 1000000);
-                        catchupTime = 0;
-                        continue;
-                    }
-                    else
-                    {
-                        catchupTime = Math.min(1000000000, Math.abs(wait));
-                    }
+                    serverStarted = true;
+                    while (this.serverRunning) {
+                        curTime = System.nanoTime();
+                        wait = CrucibleConfigs.configs.getTickTime() - (curTime - lastTick) - catchupTime;
+                        if (wait > 0) {
+                            Thread.sleep(wait / 1000000);
+                            catchupTime = 0;
+                            continue;
+                        }
+                        else {
+                            catchupTime = Math.min(1000000000, Math.abs(wait));
+                        }
 
-                    if (MinecraftServer.currentTick++ % 100 == 0)
-                    {
-                        currentTps = 1E9 / (curTime - lastTick);
-                        recentTps[0] = calcTps(recentTps[0], 0.92, currentTps);   // 1/exp(5sec/1min)
-                        recentTps[1] = calcTps(recentTps[1], 0.9835, currentTps);   // 1/exp(5sec/5min)
-                        recentTps[2] = calcTps(recentTps[2], 0.9945, currentTps);   // 1/exp(5sec/15min)
+                        if (MinecraftServer.currentTick++ % 100 == 0) {
+                            currentTps = 1E9 / (curTime - lastTick);
+                            recentTps[0] = calcTps(recentTps[0], 0.92, currentTps);   // 1/exp(5sec/1min)
+                            recentTps[1] = calcTps(recentTps[1], 0.9835, currentTps);   // 1/exp(5sec/5min)
+                            recentTps[2] = calcTps(recentTps[2], 0.9945, currentTps);   // 1/exp(5sec/15min)
+                        }
+                        lastTick = curTime;
+                        this.tick();
+                        this.serverIsRunning = true;
                     }
-
-                    lastTick = curTime;
-                    this.tick();
-                    this.serverIsRunning = true;
-                }
-                }
-                finally { if(al != null) { al.release(); } }
-
-                // Spigot end
+                } catch (Exception ignored) {};
                 FMLCommonHandler.instance().handleServerStopping();
                 FMLCommonHandler.instance().expectServerStopped(); // has to come before finalTick to avoid race conditions
-            }
-            else
-            {
+            } else {
                 FMLCommonHandler.instance().expectServerStopped(); // has to come before finalTick to avoid race conditions
-                this.finalTick((CrashReport)null);
+                this.finalTick(null);
             }
         }
         catch (StartupQuery.AbortedException e)
@@ -710,19 +648,8 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
             // ignore silently
             FMLCommonHandler.instance().expectServerStopped(); // has to come before finalTick to avoid race conditions
         }
-        catch (Throwable throwable1)
-        {
-            logger.error("Encountered an unexpected exception", throwable1);
-
-            // Spigot Start
-            if (throwable1.getCause() != null)
-            {
-                logger.error("\tCause of unexpected exception was", throwable1.getCause());
-            }
-
-            // Spigot End
-            CrashReport crashreport = null;
-
+        catch (Throwable throwable1) {
+            CrashReport crashreport;
             if (throwable1 instanceof ReportedException)
             {
                 crashreport = this.addServerInfoToCrashReport(((ReportedException)throwable1).getCrashReport());
@@ -733,41 +660,20 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
             }
 
             File file1 = new File(new File(this.getDataDirectory(), "crash-reports"), "crash-" + (new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss")).format(new Date()) + "-server.txt");
-
-            if (crashreport.saveToFile(file1))
-            {
-                logger.error("This crash report has been saved to: " + file1.getAbsolutePath());
-            }
-            else
-            {
-                logger.error("We were unable to save this crash report to disk.");
-            }
-
+            crashreport.saveToFile(file1);
+            System.out.println("Game has been crashed!");
             FMLCommonHandler.instance().expectServerStopped(); // has to come before finalTick to avoid race conditions
             this.finalTick(crashreport);
-        }
-        finally
-        {
-            try
-            {
+        } finally {
+            try {
                 org.spigotmc.WatchdogThread.doStop(); // Spigot
                 this.stopServer();
                 this.serverStopped = true;
-            }
-            catch (Throwable throwable)
-            {
-                logger.error("Exception stopping the server", throwable);
-            }
-            finally
-            {
-                // CraftBukkit start - Restore terminal to original settings
-                try
-                {
+            } catch (Throwable ignored) {}
+            finally {
+                try {
                     this.reader.getTerminal().restore();
-                }
-                catch (Exception e)
-                {
-                }
+                } catch (Exception ignored) {}
 
                 // CraftBukkit end
                 FMLCommonHandler.instance().handleServerStopped();
@@ -780,12 +686,6 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
     private void func_147138_a(ServerStatusResponse p_147138_1_)
     {
         File file1 = this.getFile("server-icon.png");
-
-        if (!file1.isFile())
-        {
-        	System.out.println("Hey, you don't have a server icon! Try out one of Thermos' Icon Generators at https://github.com/CyberdyneCC/ThermosIconGenerators !");
-        }
-
         if (file1.isFile())
         {
             ByteBuf bytebuf = Unpooled.buffer();
@@ -799,10 +699,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
                 ByteBuf bytebuf1 = Base64.encode(bytebuf);
                 p_147138_1_.func_151320_a("data:image/png;base64," + bytebuf1.toString(Charsets.UTF_8));
             }
-            catch (Exception exception)
-            {
-                logger.error("Couldn\'t load server icon", exception);
-            }
+            catch (Exception ignored) {}
             finally
             {
                 bytebuf.release();
@@ -1061,11 +958,6 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
         return new File(this.getDataDirectory(), p_71209_1_);
     }
 
-    public void logWarning(String p_71236_1_)
-    {
-        logger.warn(p_71236_1_);
-    }
-
     public WorldServer worldServerForDimension(int p_71218_1_)
     {
         // Cauldron start - this is required for MystCraft agebooks to teleport correctly
@@ -1206,10 +1098,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
         return "Server";
     }
 
-    public void addChatMessage(IChatComponent p_145747_1_)
-    {
-        logger.info(p_145747_1_.getUnformattedText());
-    }
+    public void addChatMessage(IChatComponent p_145747_1_) {}
 
     public boolean canCommandSenderUseCommand(int p_70003_1_, String p_70003_2_)
     {
@@ -1748,19 +1637,8 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
             }
 
             dedicatedserver.primaryThread.start();
-            // Runtime.getRuntime().addShutdownHook(new ThreadShutdown("Server Shutdown Thread", dedicatedserver));
-            // CraftBukkit end
         }
-        catch (Exception exception)
-        {
-            logger.fatal("Failed to start the minecraft server", exception);
-        }
-    }
-
-    @SideOnly(Side.SERVER)
-    public void logInfo(String p_71244_1_)
-    {
-        logger.info(p_71244_1_);
+        catch (Exception ignored) {}
     }
 
     @SideOnly(Side.SERVER)
@@ -1854,21 +1732,6 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
     public boolean isDebuggingEnabled()
     {
         return false;
-    }
-
-    @SideOnly(Side.SERVER)
-    public void logSevere(String p_71201_1_)
-    {
-        logger.error(p_71201_1_);
-    }
-
-    @SideOnly(Side.SERVER)
-    public void logDebug(String p_71198_1_)
-    {
-        if (this.isDebuggingEnabled())
-        {
-            logger.info(p_71198_1_);
-        }
     }
 
     @SideOnly(Side.SERVER)
@@ -1998,16 +1861,12 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
 
         try {
             options = parser.parse(args);
-        } catch (joptsimple.OptionException ex) {
-            logger.log(org.apache.logging.log4j.Level.ERROR, ex.getLocalizedMessage());
-        }
+        } catch (joptsimple.OptionException ignored) {}
 
         if ((options == null) || (options.has("?"))) {
             try {
                 parser.printHelpOn(System.out);
-            } catch (IOException ex) {
-                logger.log(org.apache.logging.log4j.Level.ERROR, ex);
-            }
+            } catch (IOException ignored) {}
         } else {
             try {
                 // This trick bypasses Maven Shade's clever rewriting of our getProperty call when using String literals
@@ -2043,9 +1902,8 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
                 }
                 try {
                     configuration.save(configFile);
-                    } catch (IOException ex) {
-                        logger.log(org.apache.logging.log4j.Level.ERROR, "Could not save " + configFile, ex);
-                }
+                } catch (IOException ignored) {}
+
                 if (commandFile.isFile()) {
                     legacyAlias = null;
                 }
@@ -2054,9 +1912,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
                 commandsConfiguration.setDefaults(YamlConfiguration.loadConfiguration(MinecraftServer.class.getClassLoader().getResourceAsStream("configurations/commands.yml")));
                 try {
                     commandsConfiguration.save(commandFile);
-                    } catch (IOException ex) {
-                        logger.log(org.apache.logging.log4j.Level.ERROR, "Could not save " + commandFile, ex);
-                }
+                } catch (IOException ignored) {}
 
                 // Migrate aliases from old file and add previously implicit $1- to pass all arguments
                 if (legacyAlias != null) {
@@ -2078,9 +1934,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
 
                 try {
                     commandsConfiguration.save(commandFile);
-                    } catch (IOException ex) {
-                        logger.log(org.apache.logging.log4j.Level.ERROR, "Could not save " + commandFile, ex);
-                }
+                } catch (IOException ignored) {}
 
                 return options;
                 // Cauldron end
@@ -2096,11 +1950,4 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
     {
         this.isGamemodeForced = p_104055_1_;
     }
-
-    // CraftBukkit start
-    public static Logger getLogger()
-    {
-        return logger;
-    }
-    // CraftBukkit end
 }

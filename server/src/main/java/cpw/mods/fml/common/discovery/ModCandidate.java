@@ -19,7 +19,6 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.discovery.asm.ASMModParser;
 
@@ -69,9 +68,7 @@ public class ModCandidate
     {
         this.table = table;
         this.mods = sourceType.findMods(this, table);
-        if (!baseModCandidateTypes.isEmpty())
-        {
-            FMLLog.info("Attempting to reparse the mod container %s", getModContainer().getName());
+        if (!baseModCandidateTypes.isEmpty()) {
             this.mods = sourceType.findMods(this, table);
         }
         return this.mods;

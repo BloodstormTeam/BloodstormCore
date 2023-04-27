@@ -161,10 +161,6 @@ public class PluginClassLoader extends URLClassLoader {
 
         // Load inheritance map
         if ((flags & F_GLOBAL_INHERIT) != 0) {
-            if (debug) {
-                System.out.println("Enabling global inheritance remapping");
-                //ClassLoaderProvider.verbose = debug; // TODO: changed in https://github.com/md-5/SpecialSource/commit/132584eda4f0860c9d14f4c142e684a027a128b8#L3L48
-            }
             jarMapping.setInheritanceMap(loader.getGlobalInheritanceMap());
             jarMapping.setFallbackInheritanceProvider(new ClassLoaderProvider(this));
         }

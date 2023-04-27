@@ -3,12 +3,8 @@ package net.minecraft.network;
 import com.google.common.collect.BiMap;
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-public abstract class Packet
-{
-    private static final Logger logger = LogManager.getLogger();
+public abstract class Packet {
     public final long timestamp = System.currentTimeMillis(); // CraftBukkit
     private static final String __OBFID = "CL_00001272";
 
@@ -16,12 +12,9 @@ public abstract class Packet
     {
         try
         {
-            Class oclass = (Class)p_148839_0_.get(Integer.valueOf(p_148839_1_));
+            Class oclass = (Class)p_148839_0_.get(p_148839_1_);
             return oclass == null ? null : (Packet)oclass.newInstance();
-        }
-        catch (Exception exception)
-        {
-            logger.error("Couldn\'t create packet " + p_148839_1_, exception);
+        } catch (Exception exception) {
             return null;
         }
     }

@@ -14,16 +14,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import org.bukkit.craftbukkit.inventory.CraftInventoryView; // CraftBukkit
 
-public class ContainerRepair extends Container
-{
-    private static final Logger logger = LogManager.getLogger();
-    private IInventory outputSlot = new InventoryCraftResult();
-    private IInventory inputSlots = new ContainerRepairInventory(this, "Repair", true, 2);
+public class ContainerRepair extends Container {
+    private final IInventory outputSlot = new InventoryCraftResult();
+    private final IInventory inputSlots = new ContainerRepairInventory(this, "Repair", true, 2);
     private World theWorld;
     private int field_82861_i;
     private int field_82858_j;

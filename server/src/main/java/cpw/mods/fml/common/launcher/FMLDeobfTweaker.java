@@ -6,7 +6,6 @@ import java.util.List;
 
 import cpw.mods.fml.relauncher.CoreModManager;
 import cpw.mods.fml.relauncher.FMLInjectionData;
-import cpw.mods.fml.relauncher.FMLRelaunchLog;
 
 import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.Launch;
@@ -35,13 +34,11 @@ public class FMLDeobfTweaker implements ITweaker {
         classLoader.registerTransformer("cpw.mods.fml.common.asm.transformers.ItemStackTransformer");
         try
         {
-            FMLRelaunchLog.fine("Validating minecraft");
             Class<?> loaderClazz = Class.forName("cpw.mods.fml.common.Loader", true, classLoader);
             Method m = loaderClazz.getMethod("injectData", Object[].class);
             m.invoke(null, (Object)FMLInjectionData.data());
             m = loaderClazz.getMethod("instance");
             m.invoke(null);
-            FMLRelaunchLog.fine("Minecraft validated, launching...");
         }
         catch (Exception e)
         {

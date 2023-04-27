@@ -4,7 +4,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 import java.util.List;
-import org.apache.logging.log4j.Level;
 
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -15,7 +14,6 @@ import net.minecraft.world.World;
 import com.google.common.base.Throwables;
 
 import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.network.internal.FMLMessage.EntityAdjustMessage;
@@ -42,17 +40,11 @@ public class EntitySpawnHandler extends SimpleChannelInboundHandler<FMLMessage.E
     private void adjustEntity(EntityAdjustMessage msg)
     {
         Entity ent = FMLClientHandler.instance().getWorldClient().getEntityByID(msg.entityId);
-        if (ent != null)
-        {
+        if (ent != null) {
             ent.serverPosX = msg.serverX;
             ent.serverPosY = msg.serverY;
             ent.serverPosZ = msg.serverZ;
         }
-        else
-        {
-            FMLLog.fine("Attempted to adjust the position of entity %d which is not present on the client", msg.entityId);
-        }
-
     }
 
     private void spawnEntity(FMLMessage.EntitySpawnMessage spawnMsg)
@@ -84,12 +76,11 @@ public class EntitySpawnHandler extends SimpleChannelInboundHandler<FMLMessage.E
                     ((EntityLiving) entity).rotationYawHead = spawnMsg.scaledHeadYaw;
                 }
 
-                Entity parts[] = entity.getParts();
+                Entity[] parts = entity.getParts();
                 if (parts != null)
                 {
-                    for (int j = 0; j < parts.length; j++)
-                    {
-                        parts[j].setEntityId(parts[j].getEntityId() + offset);
+                    for (Entity part : parts) {
+                        part.setEntityId(part.getEntityId() + offset);
                     }
                 }
             }
@@ -120,17 +111,13 @@ public class EntitySpawnHandler extends SimpleChannelInboundHandler<FMLMessage.E
                 ((IEntityAdditionalSpawnData) entity).readSpawnData(spawnMsg.dataStream);
             }
             wc.addEntityToWorld(spawnMsg.entityId, entity);
-        } catch (Exception e)
-        {
-            FMLLog.log(Level.ERROR, e, "A severe problem occurred during the spawning of an entity at ( " + spawnMsg.scaledX + "," + spawnMsg.scaledY + ", " + spawnMsg.scaledZ +")");
-            throw Throwables.propagate(e);
+        } catch (Exception e) {
+            Throwables.throwIfUnchecked(e);
         }
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
-    {
-        FMLLog.log(Level.ERROR, cause, "EntitySpawnHandler exception");
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
     }
 }

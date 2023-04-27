@@ -1,6 +1,5 @@
 package net.minecraft.world.chunk.storage;
 
-import cpw.mods.fml.common.FMLLog;
 import io.github.crucible.CrucibleConfigs;
 import io.github.crucible.CrucibleModContainer;
 import net.minecraft.server.MinecraftServer;
@@ -88,8 +87,7 @@ public class RegionFile {
                         // Spigot end
                         this.sectorFree.set((offset >> 8) + l, false);
                     }
-                } else if (length > 0)
-                    FMLLog.warning("Invalid chunk: (%s, %s) Offset: %s Length: %s runs off end file. %s", i % 32, i / 32, offset >> 8, length, fileNameIn);
+                }
             }
             for (int i = 0; i < 1024; ++i) {
                 int timestamp = this.dataFile.readInt();
@@ -179,7 +177,6 @@ public class RegionFile {
             int sectorsNeeded = (length + 5) / 4096 + 1;
 
             if (sectorsNeeded >= 256) { //crucible - info: chunk has a limit of 255 sectors
-                CrucibleModContainer.logger.warn("[Crucible] Oversized Chunk at ({}, {})", x, z);
                 if (!FORGE_ENABLE_EXTENDED_SAVE) {
                     return;
                 }

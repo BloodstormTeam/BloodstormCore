@@ -14,8 +14,6 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.ColorizerGrass;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 // CraftBukkit start
 import org.bukkit.block.BlockState;
@@ -23,9 +21,7 @@ import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 // CraftBukkit end
 
-public class BlockGrass extends Block implements IGrowable
-{
-    private static final Logger logger = LogManager.getLogger();
+public class BlockGrass extends Block implements IGrowable {
     @SideOnly(Side.CLIENT)
     private IIcon field_149991_b;
     @SideOnly(Side.CLIENT)

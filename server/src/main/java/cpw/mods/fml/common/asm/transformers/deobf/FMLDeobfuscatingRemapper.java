@@ -23,7 +23,6 @@ import java.util.Set;
 
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
-import org.apache.logging.log4j.Level;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.tree.ClassNode;
@@ -45,7 +44,6 @@ import com.google.common.collect.Sets;
 import com.google.common.io.CharSource;
 
 import cpw.mods.fml.common.patcher.ClassPatchManager;
-import cpw.mods.fml.relauncher.FMLRelaunchLog;
 
 public class FMLDeobfuscatingRemapper extends Remapper {
     public static final FMLDeobfuscatingRemapper INSTANCE = new FMLDeobfuscatingRemapper();
@@ -101,10 +99,7 @@ public class FMLDeobfuscatingRemapper extends Remapper {
             }
             classNameBiMap = builder.build();
         }
-        catch (IOException ioe)
-        {
-            FMLRelaunchLog.log(Level.ERROR, "An error occurred loading the deobfuscation map data", ioe);
-        }
+        catch (IOException ignored) {}
         methodNameMaps = Maps.newHashMapWithExpectedSize(rawMethodMaps.size());
         fieldNameMaps = Maps.newHashMapWithExpectedSize(rawFieldMaps.size());
 
@@ -141,10 +136,7 @@ public class FMLDeobfuscatingRemapper extends Remapper {
             }
             classNameBiMap = builder.build();
         }
-        catch (IOException ioe)
-        {
-            FMLRelaunchLog.log(Level.ERROR, ioe, "An error occurred loading the deobfuscation map data");
-        }
+        catch (IOException ignored) {}
         methodNameMaps = Maps.newHashMapWithExpectedSize(rawMethodMaps.size());
         fieldNameMaps = Maps.newHashMapWithExpectedSize(rawFieldMaps.size());
     }
@@ -199,16 +191,13 @@ public class FMLDeobfuscatingRemapper extends Remapper {
                 ClassNode classNode = new ClassNode();
                 cr.accept(classNode, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
                 Map<String,String> resMap = Maps.newHashMap();
-                for (FieldNode fieldNode : (List<FieldNode>) classNode.fields) {
+                for (FieldNode fieldNode : classNode.fields) {
                     resMap.put(fieldNode.name, fieldNode.desc);
                 }
                 fieldDescriptions.put(owner, resMap);
                 return resMap.get(name);
             }
-            catch (IOException e)
-            {
-                FMLRelaunchLog.log(Level.ERROR,e, "A critical exception occured reading a class file %s", owner);
-            }
+            catch (IOException ignored) {}
             return null;
         }
     }
@@ -306,11 +295,6 @@ public class FMLDeobfuscatingRemapper extends Remapper {
             {
                 negativeCacheFields.add(className);
             }
-
-            if (DUMP_FIELD_MAPS)
-            {
-                FMLRelaunchLog.finer("Field map for %s : %s", className, fieldNameMaps.get(className));
-            }
         }
         return fieldNameMaps.get(className);
     }
@@ -324,11 +308,6 @@ public class FMLDeobfuscatingRemapper extends Remapper {
             {
                 negativeCacheMethods.add(className);
             }
-            if (DUMP_METHOD_MAPS)
-            {
-                FMLRelaunchLog.finer("Method map for %s : %s", className, methodNameMaps.get(className));
-            }
-
         }
         return methodNameMaps.get(className);
     }

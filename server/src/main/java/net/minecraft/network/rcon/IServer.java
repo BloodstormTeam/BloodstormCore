@@ -35,14 +35,4 @@ public interface IServer
     String getPlugins();
 
     String handleRConCommand(String p_71252_1_);
-
-    boolean isDebuggingEnabled();
-
-    void logInfo(String p_71244_1_);
-
-    void logWarning(String p_71236_1_);
-
-    void logSevere(String p_71201_1_);
-
-    void logDebug(String p_71198_1_);
 }

@@ -26,12 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-public class UserList
-{
-    protected static final Logger field_152693_a = LogManager.getLogger();
+public class UserList {
     protected final Gson field_152694_b;
     private final File field_152695_c;
     private final Map field_152696_d = Maps.newHashMap();
@@ -80,10 +75,7 @@ public class UserList
         {
             this.func_152678_f();
         }
-        catch (IOException ioexception)
-        {
-            field_152693_a.warn("Could not save the list after adding a user.", ioexception);
-        }
+        catch (IOException ignored) {}
     }
 
     public UserListEntry func_152683_b(Object p_152683_1_)
@@ -100,10 +92,7 @@ public class UserList
         {
             this.func_152678_f();
         }
-        catch (IOException ioexception)
-        {
-            field_152693_a.warn("Could not save the list after removing a user.", ioexception);
-        }
+        catch (IOException ignored) {}
     }
 
     @SideOnly(Side.SERVER)

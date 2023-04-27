@@ -29,8 +29,6 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -39,8 +37,7 @@ import tv.twitch.chat.ChatUserInfo;
 @SideOnly(Side.CLIENT)
 public class GuiChat extends GuiScreen implements GuiYesNoCallback
 {
-    private static final Set field_152175_f = Sets.newHashSet(new String[] {"http", "https"});
-    private static final Logger logger = LogManager.getLogger();
+    private static final Set field_152175_f = Sets.newHashSet("http", "https");
     private String field_146410_g = "";
     private int sentHistoryCursor = -1;
     private boolean field_146417_i;
@@ -209,10 +206,7 @@ public class GuiChat extends GuiScreen implements GuiYesNoCallback
                                     this.func_146407_a(uri);
                                 }
                             }
-                            catch (URISyntaxException urisyntaxexception)
-                            {
-                                logger.error("Can\'t open url for " + clickevent, urisyntaxexception);
-                            }
+                            catch (URISyntaxException ignored) {}
                         }
                         else if (clickevent.getAction() == ClickEvent.Action.OPEN_FILE)
                         {
@@ -235,14 +229,6 @@ public class GuiChat extends GuiScreen implements GuiYesNoCallback
                             {
                                 this.mc.displayGuiScreen(new GuiTwitchUserMode(this.mc.func_152346_Z(), chatuserinfo));
                             }
-                            else
-                            {
-                                logger.error("Tried to handle twitch user but couldn\'t find them!");
-                            }
-                        }
-                        else
-                        {
-                            logger.error("Don\'t know how to handle " + clickevent);
                         }
                     }
 
@@ -277,10 +263,7 @@ public class GuiChat extends GuiScreen implements GuiYesNoCallback
             Object object = oclass.getMethod("getDesktop", new Class[0]).invoke((Object)null, new Object[0]);
             oclass.getMethod("browse", new Class[] {URI.class}).invoke(object, new Object[] {p_146407_1_});
         }
-        catch (Throwable throwable)
-        {
-            logger.error("Couldn\'t open link", throwable);
-        }
+        catch (Throwable ignored) {}
     }
 
     public void func_146404_p_()

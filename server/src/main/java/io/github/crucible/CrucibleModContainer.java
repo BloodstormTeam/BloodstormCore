@@ -12,8 +12,6 @@ import cpw.mods.fml.common.ModMetadata;
 import cpw.mods.fml.common.event.*;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import net.minecraft.server.MinecraftServer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
@@ -31,7 +29,6 @@ import java.util.regex.Pattern;
 
 @SuppressWarnings("UnstableApiUsage")
 public class CrucibleModContainer extends DummyModContainer implements Plugin {
-    public static Logger logger = LogManager.getLogger("Crucible");  //Crucible - note: use it only after forge configured the logger!
     public static CrucibleModContainer instance;
     public static Metrics metrics;
     private PluginLoader dummyPluginLoader;
@@ -61,7 +58,6 @@ public class CrucibleModContainer extends DummyModContainer implements Plugin {
     @Subscribe
     public void modConstruction(FMLConstructionEvent evt) {
         NetworkRegistry.INSTANCE.register(this, this.getClass(), "*", evt.getASMHarvestedData());
-        logger.info("Crucible DummyMod injected successfully!");
     }
 
     @Subscribe

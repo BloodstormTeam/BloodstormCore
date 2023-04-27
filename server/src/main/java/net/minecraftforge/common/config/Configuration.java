@@ -37,7 +37,6 @@ import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableSet;
 
 import cpw.mods.fml.client.config.GuiConfigEntries.IConfigEntry;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.relauncher.FMLInjectionData;
 
@@ -112,8 +111,6 @@ public class Configuration
             {
                 File fileBak = new File(file.getAbsolutePath() + "_" + 
                         new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".errored");
-                FMLLog.severe("An exception occurred while loading config file %s. This file will be renamed to %s " +
-                		"and a new config file will be generated.", file.getName(), fileBak.getName());
                 e.printStackTrace();
                 
                 file.renameTo(fileBak);

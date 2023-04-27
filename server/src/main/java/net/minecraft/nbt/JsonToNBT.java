@@ -3,13 +3,8 @@ package net.minecraft.nbt;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Stack;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class JsonToNBT
 {
-    private static final Logger logger = LogManager.getLogger();
-    private static final String __OBFID = "CL_00001232";
 
     public static NBTBase func_150315_a(String p_150315_0_) throws NBTException
     {
@@ -188,10 +183,6 @@ public class JsonToNBT
                         }
 
                         p_150316_1_ = p_150316_1_.substring(s2.length() + 1);
-                    }
-                    else
-                    {
-                        logger.debug(p_150316_1_);
                     }
                 }
 

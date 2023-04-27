@@ -5,7 +5,6 @@ import static org.objectweb.asm.Opcodes.*;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
-import org.apache.logging.log4j.ThreadContext;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -37,25 +36,12 @@ public class ASMEventHandler implements IEventListener
     }
 
     @Override
-    public void invoke(Event event)
-    {
-        if (owner != null && GETCONTEXT)
-        {
-            ThreadContext.put("mod", owner.getName());
-        }
-        else if (GETCONTEXT)
-        {
-            ThreadContext.put("mod", "");
-        }
-        if (handler != null)
-        {
-            if (!event.isCancelable() || !event.isCanceled() || subInfo.receiveCanceled())
-            {
+    public void invoke(Event event) {
+        if (handler != null) {
+            if (!event.isCancelable() || !event.isCanceled() || subInfo.receiveCanceled()) {
                 handler.invoke(event);
             }
         }
-        if (GETCONTEXT)
-            ThreadContext.remove("mod");
     }
 
     public EventPriority getPriority()

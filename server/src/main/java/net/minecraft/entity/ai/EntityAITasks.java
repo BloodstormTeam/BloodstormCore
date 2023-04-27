@@ -4,12 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import net.minecraft.profiler.Profiler;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-public class EntityAITasks
-{
-    private static final Logger logger = LogManager.getLogger();
+public class EntityAITasks {
     public List taskEntries = new ArrayList();
     private List executingTaskEntries = new ArrayList();
     private final Profiler theProfiler;

@@ -101,7 +101,6 @@ import net.minecraft.network.status.client.C00PacketServerQuery;
 import net.minecraft.network.status.client.C01PacketPing;
 import net.minecraft.network.status.server.S00PacketServerInfo;
 import net.minecraft.network.status.server.S01PacketPong;
-import org.apache.logging.log4j.LogManager;
 
 public enum EnumConnectionState
 {
@@ -250,13 +249,11 @@ public enum EnumConnectionState
         if (this.field_150769_h.containsKey(Integer.valueOf(p_150751_1_)))
         {
             s = "Serverbound packet ID " + p_150751_1_ + " is already assigned to " + this.field_150769_h.get(Integer.valueOf(p_150751_1_)) + "; cannot re-assign to " + p_150751_2_;
-            LogManager.getLogger().fatal(s);
             throw new IllegalArgumentException(s);
         }
         else if (this.field_150769_h.containsValue(p_150751_2_))
         {
             s = "Serverbound packet " + p_150751_2_ + " is already assigned to ID " + this.field_150769_h.inverse().get(p_150751_2_) + "; cannot re-assign to " + p_150751_1_;
-            LogManager.getLogger().fatal(s);
             throw new IllegalArgumentException(s);
         }
         else
@@ -273,13 +270,11 @@ public enum EnumConnectionState
         if (this.field_150770_i.containsKey(Integer.valueOf(p_150756_1_)))
         {
             s = "Clientbound packet ID " + p_150756_1_ + " is already assigned to " + this.field_150770_i.get(Integer.valueOf(p_150756_1_)) + "; cannot re-assign to " + p_150756_2_;
-            LogManager.getLogger().fatal(s);
             throw new IllegalArgumentException(s);
         }
         else if (this.field_150770_i.containsValue(p_150756_2_))
         {
             s = "Clientbound packet " + p_150756_2_ + " is already assigned to ID " + this.field_150770_i.inverse().get(p_150756_2_) + "; cannot re-assign to " + p_150756_1_;
-            LogManager.getLogger().fatal(s);
             throw new IllegalArgumentException(s);
         }
         else

@@ -1,6 +1,5 @@
 package net.minecraft.client.renderer.tileentity;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Calendar;
@@ -57,10 +56,7 @@ public class TileEntityChestRenderer extends TileEntitySpecialRenderer
                 {
                 ((BlockChest)block).func_149954_e(p_147500_1_.getWorldObj(), p_147500_1_.xCoord, p_147500_1_.yCoord, p_147500_1_.zCoord);
                 }
-                catch (ClassCastException e)
-                {
-                    FMLLog.severe("Attempted to render a chest at %d,  %d, %d that was not a chest", p_147500_1_.xCoord, p_147500_1_.yCoord, p_147500_1_.zCoord);
-                }
+                catch (ClassCastException ignored) {}
                 i = p_147500_1_.getBlockMetadata();
             }
 

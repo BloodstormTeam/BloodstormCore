@@ -89,8 +89,6 @@ import net.minecraft.util.ReportedException;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import net.minecraftforge.cauldron.CauldronUtils;
 import net.minecraftforge.common.ForgeHooks;
@@ -155,9 +153,7 @@ import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.event.inventory.InventoryType;
 // Cauldron end
 
-public class NetHandlerPlayServer implements INetHandlerPlayServer
-{
-    private static final Logger logger = LogManager.getLogger();
+public class NetHandlerPlayServer implements INetHandlerPlayServer {
     public final NetworkManager netManager;
     private final MinecraftServer serverController;
     public EntityPlayerMP playerEntity;
@@ -301,10 +297,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer
     public void processPlayer(C03PacketPlayer p_147347_1_)
     {
         // CraftBukkit start - Check for NaN
-        if (Double.isNaN(p_147347_1_.field_149479_a) || Double.isNaN(p_147347_1_.field_149477_b) || Double.isNaN(p_147347_1_.field_149478_c)
-                || Double.isNaN(p_147347_1_.field_149475_d))
-        {
-            logger.warn(playerEntity.getCommandSenderName() + " was caught trying to crash the server with an invalid position.");
+        if (Double.isNaN(p_147347_1_.field_149479_a) || Double.isNaN(p_147347_1_.field_149477_b) || Double.isNaN(p_147347_1_.field_149478_c) || Double.isNaN(p_147347_1_.field_149475_d)) {
             getPlayerB().kickPlayer("Nope!");
             return;
         }
@@ -511,7 +504,6 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer
                 // Thermos, allow bypass of moved too quickly if accelerating straight down
                 if (d10 > 100.0D && this.hasMoved && (!this.serverController.isSinglePlayer()) && !(downMovement && d8 * d8 / 100.0D > .96))   // CraftBukkit - Added this.checkMovement condition to solve this check being triggered by teleports
                 {
-                    logger.warn(this.playerEntity.getCommandSenderName() + " moved too quickly! " + d4 + "," + d5 + "," + d6 + " (" + d7 + ", " + d8 + ", " + d9 + ")");
                     this.setPlayerLocation(this.lastPosX, this.lastPosY, this.lastPosZ, this.playerEntity.rotationYaw, this.playerEntity.rotationPitch);
                     return;
                 }
@@ -548,7 +540,6 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer
                 if (d10 > 0.0625D && !this.playerEntity.isPlayerSleeping() && !this.playerEntity.theItemInWorldManager.isCreative())
                 {
                     flag1 = true;
-                    logger.warn(this.playerEntity.getCommandSenderName() + " moved wrongly!");
                 }
 
                 if (!this.hasMoved) //Fixes "Moved Too Fast" kick when being teleported while moving
@@ -573,9 +564,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer
                     {
                         ++this.floatingTickCount;
 
-                        if (this.floatingTickCount > 80)
-                        {
-                            logger.warn(this.playerEntity.getCommandSenderName() + " was kicked for floating too long!");
+                        if (this.floatingTickCount > 80) {
                             this.kickPlayerFromServer("Flying is not enabled on this server");
                             return;
                         }
@@ -675,9 +664,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer
                 // Else we increment the drop count and check the amount.
                 this.dropCount++;
 
-                if (this.dropCount >= 20)
-                {
-                    this.logger.warn(this.playerEntity.getCommandSenderName() + " dropped their items too quickly!");
+                if (this.dropCount >= 20) {
                     this.kickPlayerFromServer("You dropped your items too quickly (Hacking?)");
                     return;
                 }
@@ -951,7 +938,6 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer
             this.processedDisconnect = true;
         }
         // CraftBukkit end
-        logger.info(this.playerEntity.getCommandSenderName() + " lost connection: " + p_147231_1_.getUnformattedText()); // CraftBukkit - Don't toString the component
         this.serverController.func_147132_au();
         // CraftBukkit start - Replace vanilla quit message handling with our own.
         /*
@@ -969,9 +955,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer
         }
         // CraftBukkit end
 
-        if (this.serverController.isSinglePlayer() && this.playerEntity.getCommandSenderName().equals(this.serverController.getServerOwner()))
-        {
-            logger.info("Stopping singleplayer server as player logged out");
+        if (this.serverController.isSinglePlayer() && this.playerEntity.getCommandSenderName().equals(this.serverController.getServerOwner())) {
             this.serverController.initiateShutdown();
         }
     }
@@ -1048,10 +1032,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer
             // CraftBukkit end
             this.playerEntity.inventory.currentItem = p_147355_1_.func_149614_c();
             this.playerEntity.func_143004_u();
-        }
-        else
-        {
-            logger.warn(this.playerEntity.getCommandSenderName() + " tried to set an invalid carried item");
+        } else {
             this.kickPlayerFromServer("Nope!"); // CraftBukkit
         }
     }
@@ -1121,10 +1102,6 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer
                 {
                     this.serverController.server.playerCommandState = false;
                 }
-            }
-            else if (s.isEmpty())
-            {
-                logger.warn(this.playerEntity.getCommandSenderName() + " tried to send an empty message");
             }
             else if (getPlayerB().isConversing())
             {
@@ -1364,14 +1341,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer
             return;
         }
 
-        try
-        {
-            // Spigot Start
-            if (org.spigotmc.SpigotConfig.logCommands)
-            {
-                this.logger.info(event.getPlayer().getName() + " issued server command: " + event.getMessage()); // CraftBukkit
-            }
-
+        try {
             // Spigot end
             // Cauldron start - handle bukkit/vanilla commands
             int space = event.getMessage().indexOf(" ");
@@ -1615,7 +1585,6 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer
                     if (entity instanceof EntityItem || entity instanceof EntityXPOrb || entity instanceof EntityArrow || entity == this.playerEntity)
                     {
                         this.kickPlayerFromServer("Attempting to attack an invalid entity");
-                        this.serverController.logWarning("Player " + this.playerEntity.getCommandSenderName() + " tried to attack an invalid entity");
                         return;
                     }
 
@@ -2309,9 +2278,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer
             {
                 TileEntitySign tileentitysign = (TileEntitySign)tileentity;
 
-                if (!tileentitysign.func_145914_a() || tileentitysign.func_145911_b() != this.playerEntity)
-                {
-                    this.serverController.logWarning("Player " + this.playerEntity.getCommandSenderName() + " just tried to change non-editable sign");
+                if (!tileentitysign.func_145914_a() || tileentitysign.func_145911_b() != this.playerEntity) {
                     this.sendPacket(new S33PacketUpdateSign(p_147343_1_.func_149588_c(), p_147343_1_.func_149586_d(), p_147343_1_.func_149585_e(), tileentitysign.signText)); // CraftBukkit
                     return;
                 }
@@ -2481,21 +2448,13 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer
                 }
             }
             // CraftBukkit start
-            catch (Throwable throwable)
-            {
-                logger.error("Couldn\'t handle book info", throwable);
-                if (throwable instanceof RuntimeException && !(throwable instanceof IOException))
-                {
+            catch (Throwable throwable) {
+                if (throwable instanceof RuntimeException) {
                     this.kickPlayerFromServer(throwable.getMessage());
-                }
-                else
-                {
+                } else {
                     this.kickPlayerFromServer("Invalid book data!");
                 }
-                // CraftBukkit end
-            }
-            finally
-            {
+            } finally {
                 packetbuffer.release();
             }
 
@@ -2537,50 +2496,30 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer
                 }
             }
             // CraftBukkit start
-            catch (Throwable throwable)
-            {
-                logger.error("Couldn\'t sign book", throwable);
-                if (throwable instanceof RuntimeException && !(throwable instanceof IOException))
-                {
+            catch (Throwable throwable) {
+                if (throwable instanceof RuntimeException) {
                     this.kickPlayerFromServer(throwable.getMessage());
-                }
-                else
-                {
+                } else {
                     this.kickPlayerFromServer("Invalid book data!");
                 }
-                // CraftBukkit end
-            }
-            finally
-            {
+            } finally {
                 packetbuffer.release();
             }
-
-            return;
-        }
-        else
-        {
+        } else {
             DataInputStream datainputstream;
             int i;
 
-            if ("MC|TrSel".equals(p_147349_1_.func_149559_c()))
-            {
-                try
-                {
+            if ("MC|TrSel".equals(p_147349_1_.func_149559_c())) {
+                try {
                     datainputstream = new DataInputStream(new ByteArrayInputStream(p_147349_1_.func_149558_e()));
                     i = datainputstream.readInt();
                     Container container = this.playerEntity.openContainer;
 
-                    if (container instanceof ContainerMerchant)
-                    {
+                    if (container instanceof ContainerMerchant) {
                         ((ContainerMerchant)container).setCurrentRecipeIndex(i);
                     }
-                }
-                // CraftBukkit start
-                catch (Throwable exception2)
-                {
-                    logger.error("Couldn\'t select trade", exception2);
+                } catch (Throwable exception2) {
                     this.kickPlayerFromServer("Invalid trade data!");
-                    // CraftBukkit end
                 }
             }
             else if ("MC|AdvCdm".equals(p_147349_1_.func_149559_c()))
@@ -2629,7 +2568,6 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer
                     // CraftBukkit start
                     catch (Throwable exception3)
                     {
-                        logger.error("Couldn\'t set command block", exception3);
                         this.kickPlayerFromServer("Invalid CommandBlock data!");
                         // CraftBukkit end
                     }
@@ -2667,7 +2605,6 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer
                     // CraftBukkit start
                     catch (Throwable exception4)
                     {
-                        logger.error("Couldn\'t set beacon", exception4);
                         this.kickPlayerFromServer("Invalid beacon data!");
                         // CraftBukkit end
                     }

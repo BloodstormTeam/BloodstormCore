@@ -1,0 +1,22 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+    maven {
+        url "https://libraries.minecraft.net/"
+    }
+    mavenCentral()
+}
+
+group = 'net.minecraft'
+archivesBaseName = 'launchwrapper'
+version = '1.12'
+sourceCompatibility = 1.7
+
+dependencies {
+    implementation 'net.sf.jopt-simple:jopt-simple:4.5'
+    implementation 'org.ow2.asm:asm-debug-all:5.0.3'
+    implementation 'org.lwjgl.lwjgl:lwjgl:2.9.1'
+}
+
+targetCompatibility = JavaVersion.VERSION_1_7

@@ -28,13 +28,9 @@ import net.minecraft.world.storage.ISaveHandler;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
-public class IntegratedServer extends MinecraftServer
-{
-    private static final Logger logger = LogManager.getLogger();
+public class IntegratedServer extends MinecraftServer {
     private final Minecraft mc;
     private final WorldSettings theWorldSettings;
     private boolean isGamePaused;
@@ -80,15 +76,12 @@ public class IntegratedServer extends MinecraftServer
         this.initialWorldChunkLoad();
     }
 
-    protected boolean startServer() throws java.net.UnknownHostException // Cauldron
-    {
-        logger.info("Starting integrated minecraft server version 1.7.10");
+    protected boolean startServer() {
         this.setOnlineMode(true);
         this.setCanSpawnAnimals(true);
         this.setCanSpawnNPCs(true);
         this.setAllowPvp(true);
         this.setAllowFlight(true);
-        logger.info("Generating keypair");
         this.setKeyPair(CryptManager.createNewKeyPair());
         if (!FMLCommonHandler.instance().handleServerAboutToStart(this)) { return false; }
         this.loadAllWorlds(this.getFolderName(), this.getWorldName(), this.theWorldSettings.getSeed(), this.theWorldSettings.getTerrainType(), this.theWorldSettings.func_82749_j());
@@ -103,7 +96,6 @@ public class IntegratedServer extends MinecraftServer
 
         if (!flag && this.isGamePaused)
         {
-            logger.info("Saving and pausing game...");
             this.getConfigurationManager().saveAllPlayerData();
             try
             {
@@ -122,7 +114,6 @@ public class IntegratedServer extends MinecraftServer
 
             if (this.mc.gameSettings.renderDistanceChunks != this.getConfigurationManager().getViewDistance())
             {
-                logger.info("Changing view distance to {}, from {}", new Object[] {Integer.valueOf(this.mc.gameSettings.renderDistanceChunks), Integer.valueOf(this.getConfigurationManager().getViewDistance())});
                 this.getConfigurationManager().func_152611_a(this.mc.gameSettings.renderDistanceChunks);
             }
         }
@@ -231,14 +222,13 @@ public class IntegratedServer extends MinecraftServer
                 i = 25564;
             }
 
-            this.func_147137_ag().addLanEndpoint((InetAddress)null, i);
-            logger.info("Started on " + i);
+            this.func_147137_ag().addLanEndpoint(null, i);
             this.isPublic = true;
             this.lanServerPing = new ThreadLanServerPing(this.getMOTD(), i + "");
             this.lanServerPing.start();
             this.getConfigurationManager().func_152604_a(p_71206_1_);
             this.getConfigurationManager().setCommandsAllowedForAll(p_71206_2_);
-            return i + "";
+            return String.valueOf(i);
         }
         catch (IOException ioexception1)
         {

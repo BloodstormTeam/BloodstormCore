@@ -19,12 +19,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import org.apache.logging.log4j.Level;
-
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.LoaderException;
 import cpw.mods.fml.common.MetadataCollection;
 import cpw.mods.fml.common.ModContainer;
@@ -49,7 +46,6 @@ public class DirectoryDiscoverer implements ITypeDiscoverer
     {
         this.table = table;
         List<ModContainer> found = Lists.newArrayList();
-        FMLLog.fine("Examining directory %s for potential mods", candidate.getModContainer().getName());
         exploreFileSystem("", candidate.getModContainer(), found, candidate, null);
         for (ModContainer mc : found)
         {
@@ -68,12 +64,10 @@ public class DirectoryDiscoverer implements ITypeDiscoverer
                 FileInputStream fis = new FileInputStream(metadata);
                 mc = MetadataCollection.from(fis,modDir.getName());
                 fis.close();
-                FMLLog.fine("Found an mcmod.info file in directory %s", modDir.getName());
             }
             catch (Exception e)
             {
                 mc = MetadataCollection.from(null,"");
-                FMLLog.fine("No mcmod.info file found in directory %s", modDir.getName());
             }
         }
 
@@ -85,7 +79,6 @@ public class DirectoryDiscoverer implements ITypeDiscoverer
         {
             if (file.isDirectory())
             {
-                FMLLog.finer("Recursing into package %s", path + file.getName());
                 exploreFileSystem(path + file.getName() + ".", file, harvestedMods, candidate, mc);
                 continue;
             }
@@ -101,14 +94,11 @@ public class DirectoryDiscoverer implements ITypeDiscoverer
                     fis.close();
                     candidate.addClassEntry(path+file.getName());
                 }
-                catch (LoaderException e)
-                {
-                    FMLLog.log(Level.ERROR, e, "There was a problem reading the file %s - probably this is a corrupt file", file.getPath());
+                catch (LoaderException e) {
                     throw e;
                 }
-                catch (Exception e)
-                {
-                    Throwables.propagate(e);
+                catch (Exception e) {
+                    Throwables.throwIfUnchecked(e);
                 }
 
                 modParser.validate();

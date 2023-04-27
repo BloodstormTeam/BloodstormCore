@@ -27,8 +27,6 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 // CraftBukkit start
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -38,7 +36,6 @@ import com.mojang.authlib.properties.Property;
 public class NetHandlerLoginServer implements INetHandlerLoginServer
 {
     private static final AtomicInteger field_147331_b = new AtomicInteger(0);
-    private static final Logger logger = LogManager.getLogger();
     private static final Random field_147329_d = new Random();
     private final byte[] field_147330_e = new byte[4];
     private final MinecraftServer field_147327_f;
@@ -79,15 +76,11 @@ public class NetHandlerLoginServer implements INetHandlerLoginServer
     {
         try
         {
-            logger.info("Disconnecting " + this.func_147317_d() + ": " + p_147322_1_);
             ChatComponentText chatcomponenttext = new ChatComponentText(p_147322_1_);
             this.field_147333_a.scheduleOutboundPacket(new S00PacketDisconnect(chatcomponenttext), new GenericFutureListener[0]);
             this.field_147333_a.closeChannel(chatcomponenttext);
         }
-        catch (Exception exception)
-        {
-            logger.error("Error whilst disconnecting player", exception);
-        }
+        catch (Exception ignored) {}
     }
 
     // Spigot start
@@ -141,10 +134,7 @@ public class NetHandlerLoginServer implements INetHandlerLoginServer
         }
     }
 
-    public void onDisconnect(IChatComponent p_147231_1_)
-    {
-        logger.info(this.func_147317_d() + " lost connection: " + p_147231_1_.getUnformattedText());
-    }
+    public void onDisconnect(IChatComponent p_147231_1_) {}
 
     public String func_147317_d()
     {
@@ -159,20 +149,13 @@ public class NetHandlerLoginServer implements INetHandlerLoginServer
 
     public void processLoginStart(C00PacketLoginStart p_147316_1_)
     {
-        if (debug) logger.info("Login attempt");
         Validate.validState(this.field_147328_g == LoginState.HELLO, "Unexpected hello packet", new Object[0]);
         this.field_147337_i = p_147316_1_.func_149304_c();
-        if (debug) logger.info("Received profile: " + this.field_147337_i.getName());
 
-        if (this.field_147327_f.isServerInOnlineMode() && !this.field_147333_a.isLocalChannel())
-        {
-            if (debug) logger.info("Send encryption request to " + this.field_147337_i.getName());
+        if (this.field_147327_f.isServerInOnlineMode() && !this.field_147333_a.isLocalChannel()) {
             this.field_147328_g = LoginState.KEY;
             this.field_147333_a.scheduleOutboundPacket(new S01PacketEncryptionRequest(this.field_147334_j, this.field_147327_f.getKeyPair().getPublic(), this.field_147330_e), new GenericFutureListener[0]);
-        }
-        else
-        {
-            if (debug) logger.info("Lookup offline UUID for " + this.field_147337_i.getName());
+        } else {
             (new ThreadPlayerLookupUUID(this, "User Authenticator #" + field_147331_b.incrementAndGet())).start(); // Spigot
         }
     }
@@ -182,17 +165,12 @@ public class NetHandlerLoginServer implements INetHandlerLoginServer
         Validate.validState(this.field_147328_g == LoginState.KEY, "Unexpected key packet", new Object[0]);
         PrivateKey privatekey = this.field_147327_f.getKeyPair().getPrivate();
 
-        if (!Arrays.equals(this.field_147330_e, p_147315_1_.func_149299_b(privatekey)))
-        {
+        if (!Arrays.equals(this.field_147330_e, p_147315_1_.func_149299_b(privatekey))) {
             throw new IllegalStateException("Invalid nonce!");
-        }
-        else
-        {
-            if (debug) logger.info("Enabling encryption for " + this.field_147337_i.getName());
+        } else {
             this.field_147335_k = p_147315_1_.func_149300_a(privatekey);
             this.field_147328_g = NetHandlerLoginServer.LoginState.AUTHENTICATING;
             this.field_147333_a.enableEncryption(this.field_147335_k);
-            if (debug) logger.info("Lookup online UUID for " + this.field_147337_i.getName());
             (new ThreadPlayerLookupUUID(this, "User Authenticator #" + field_147331_b.incrementAndGet())).start();
         }
     }
@@ -217,18 +195,12 @@ public class NetHandlerLoginServer implements INetHandlerLoginServer
     }
 
     static GameProfile processPlayerLoginGameProfile(NetHandlerLoginServer loginServer, GameProfile gameprofile) {
-        if (loginServer.debug) logger.info("Player logged in: " + gameprofile);
         return loginServer.field_147337_i = gameprofile;
     }
 
     static GameProfile getGameProfile(NetHandlerLoginServer loginServer) {
         return loginServer.field_147337_i;
     }
-
-    static Logger getLogger() {
-        return logger;
-    }
-
     static void setLoginState(NetHandlerLoginServer loginServer, LoginState state)
     {
         loginServer.field_147328_g = state;

@@ -16,7 +16,6 @@ import net.minecraft.world.World;
 
 // CraftBukkit start
 import java.util.ArrayList;
-import org.apache.logging.log4j.Level;
 import org.bukkit.craftbukkit.command.VanillaCommandWrapper;
 import com.google.common.base.Joiner;
 import net.minecraft.command.PlayerSelector;
@@ -222,23 +221,7 @@ public abstract class CommandBlockLogic implements ICommandSender
                         completed++;
                     }
                 }
-                catch (Throwable exception)
-                {
-                    if (this instanceof TileEntityCommandBlockListener)
-                    {
-                        TileEntityCommandBlockListener listener = (TileEntityCommandBlockListener) this;
-                        MinecraftServer.getLogger().log(Level.WARN, String.format("CommandBlock at (%d,%d,%d) failed to handle command", listener.getPlayerCoordinates().posX, listener.getPlayerCoordinates().posY, listener.getPlayerCoordinates().posZ), exception);
-                    }
-                    else if (this instanceof EntityMinecartCommandBlockListener)
-                    {
-                        EntityMinecartCommandBlockListener listener = (EntityMinecartCommandBlockListener) this;
-                        MinecraftServer.getLogger().log(Level.WARN, String.format("MinecartCommandBlock at (%d,%d,%d) failed to handle command", listener.getPlayerCoordinates().posX, listener.getPlayerCoordinates().posY, listener.getPlayerCoordinates().posZ), exception);
-                    }
-                    else
-                    {
-                        MinecraftServer.getLogger().log(Level.WARN, String.format("Unknown CommandBlock failed to handle command"), exception);
-                    }
-                }
+                catch (Throwable ignored) {}
             }
 
             this.field_145764_b = completed;

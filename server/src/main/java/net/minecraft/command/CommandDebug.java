@@ -8,12 +8,8 @@ import java.util.List;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-public class CommandDebug extends CommandBase
-{
-    private static final Logger logger = LogManager.getLogger();
+public class CommandDebug extends CommandBase {
     private long field_147206_b;
     private int field_147207_c;
     private static final String __OBFID = "CL_00000270";
@@ -83,10 +79,7 @@ public class CommandDebug extends CommandBase
             filewriter.write(this.func_147204_b(p_147205_1_, p_147205_3_));
             filewriter.close();
         }
-        catch (Throwable throwable)
-        {
-            logger.error("Could not save profiler results to " + file1, throwable);
-        }
+        catch (Throwable ignored) {}
     }
 
     private String func_147204_b(long p_147204_1_, int p_147204_3_)

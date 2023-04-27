@@ -19,7 +19,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
 import java.util.Set;
-import org.apache.logging.log4j.Level;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.LaunchClassLoader;
@@ -69,9 +68,7 @@ public class ModClassLoader extends URLClassLoader
             }
             return sources;
         }
-        catch (URISyntaxException e)
-        {
-            FMLLog.log(Level.ERROR, e, "Unable to process our input to locate the minecraft code");
+        catch (URISyntaxException e) {
             throw new LoaderException(e);
         }
     }

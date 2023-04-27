@@ -31,12 +31,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.dedicated.PropertyManager;
 import net.minecraft.util.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PreYggdrasilConverter
 {
-    private static final Logger field_152732_e = LogManager.getLogger();
     public static final File field_152728_a = new File("banned-ips.txt");
     public static final File field_152729_b = new File("banned-players.txt");
     public static final File field_152730_c = new File("ops.txt");
@@ -64,13 +62,9 @@ public class PreYggdrasilConverter
         }
         else
         {
-            String[] astring1 = astring;
-            int i = astring.length;
 
-            for (int j = 0; j < i; ++j)
-            {
-                String s = astring1[j];
-                UUID uuid = EntityPlayer.func_146094_a(new GameProfile((UUID)null, s));
+            for (String s : astring) {
+                UUID uuid = EntityPlayer.func_146094_a(new GameProfile(null, s));
                 GameProfile gameprofile = new GameProfile(uuid, s);
                 p_152717_2_.onProfileLookupSucceeded(gameprofile);
             }
@@ -90,21 +84,17 @@ public class PreYggdrasilConverter
             }
             else if (!minecraftserver.isSinglePlayer() && minecraftserver.isServerInOnlineMode())
             {
-                final ArrayList arraylist = Lists.newArrayList();
+                final ArrayList<@Nullable Object> arraylist = Lists.newArrayList();
                 ProfileLookupCallback profilelookupcallback = new ProfileLookupCallback()
                 {
-                    private static final String __OBFID = "CL_00001880";
                     public void onProfileLookupSucceeded(GameProfile p_onProfileLookupSucceeded_1_)
                     {
                         minecraftserver.func_152358_ax().func_152649_a(p_onProfileLookupSucceeded_1_);
                         arraylist.add(p_onProfileLookupSucceeded_1_);
                     }
-                    public void onProfileLookupFailed(GameProfile p_onProfileLookupFailed_1_, Exception p_onProfileLookupFailed_2_)
-                    {
-                        PreYggdrasilConverter.field_152732_e.warn("Could not lookup user whitelist entry for " + p_onProfileLookupFailed_1_.getName(), p_onProfileLookupFailed_2_);
-                    }
+                    public void onProfileLookupFailed(GameProfile p_onProfileLookupFailed_1_, Exception p_onProfileLookupFailed_2_) {}
                 };
-                func_152717_a(minecraftserver, Lists.newArrayList(new String[] {p_152719_0_}), profilelookupcallback);
+                func_152717_a(minecraftserver, Lists.newArrayList(p_152719_0_), profilelookupcallback);
                 return arraylist.size() > 0 && ((GameProfile)arraylist.get(0)).getId() != null ? ((GameProfile)arraylist.get(0)).getId().toString() : "";
             }
             else
@@ -152,10 +142,7 @@ public class PreYggdrasilConverter
                 {
                     userlistbans.func_152679_g();
                 }
-                catch (FileNotFoundException filenotfoundexception)
-                {
-                    field_152732_e.warn("Could not load existing file " + userlistbans.func_152691_c().getName(), filenotfoundexception);
-                }
+                catch (FileNotFoundException ignored) {}
             }
 
             try
@@ -172,7 +159,6 @@ public class PreYggdrasilConverter
 
                         if (astring == null)
                         {
-                            PreYggdrasilConverter.field_152732_e.warn("Could not convert user banlist entry for " + p_onProfileLookupSucceeded_1_.getName());
                             throw new PreYggdrasilConverter.ConversionError("Profile not in the conversionlist", null);
                         }
                         else
@@ -186,8 +172,6 @@ public class PreYggdrasilConverter
                     }
                     public void onProfileLookupFailed(GameProfile p_onProfileLookupFailed_1_, Exception p_onProfileLookupFailed_2_)
                     {
-                        PreYggdrasilConverter.field_152732_e.warn("Could not lookup user banlist entry for " + p_onProfileLookupFailed_1_.getName(), p_onProfileLookupFailed_2_);
-
                         if (!(p_onProfileLookupFailed_2_ instanceof ProfileNotFoundException))
                         {
                             throw new PreYggdrasilConverter.ConversionError("Could not request user " + p_onProfileLookupFailed_1_.getName() + " from backend systems", p_onProfileLookupFailed_2_, null);
@@ -199,14 +183,8 @@ public class PreYggdrasilConverter
                 func_152727_c(field_152729_b);
                 return true;
             }
-            catch (IOException ioexception)
+            catch (IOException | ConversionError ioexception)
             {
-                field_152732_e.warn("Could not read old user banlist to convert it!", ioexception);
-                return false;
-            }
-            catch (PreYggdrasilConverter.ConversionError preyggdrasilconverterconversionerror)
-            {
-                field_152732_e.error("Conversion failed, please try again later", preyggdrasilconverterconversionerror);
                 return false;
             }
         }
@@ -229,10 +207,7 @@ public class PreYggdrasilConverter
                 {
                     banlist.func_152679_g();
                 }
-                catch (FileNotFoundException filenotfoundexception)
-                {
-                    field_152732_e.warn("Could not load existing file " + banlist.func_152691_c().getName(), filenotfoundexception);
-                }
+                catch (FileNotFoundException ignored) {}
             }
 
             try
@@ -258,7 +233,6 @@ public class PreYggdrasilConverter
             }
             catch (IOException ioexception)
             {
-                field_152732_e.warn("Could not parse old ip banlist to convert it!", ioexception);
                 return false;
             }
         }
@@ -281,10 +255,7 @@ public class PreYggdrasilConverter
                 {
                     userlistops.func_152679_g();
                 }
-                catch (FileNotFoundException filenotfoundexception)
-                {
-                    field_152732_e.warn("Could not load existing file " + userlistops.func_152691_c().getName(), filenotfoundexception);
-                }
+                catch (FileNotFoundException ignored) {}
             }
 
             try
@@ -292,18 +263,13 @@ public class PreYggdrasilConverter
                 List list = Files.readLines(field_152730_c, Charsets.UTF_8);
                 ProfileLookupCallback profilelookupcallback = new ProfileLookupCallback()
                 {
-                    private static final String __OBFID = "CL_00001909";
                     public void onProfileLookupSucceeded(GameProfile p_onProfileLookupSucceeded_1_)
                     {
                         p_152718_0_.func_152358_ax().func_152649_a(p_onProfileLookupSucceeded_1_);
                         userlistops.func_152687_a(new UserListOpsEntry(p_onProfileLookupSucceeded_1_, p_152718_0_.getOpPermissionLevel()));
                     }
-                    public void onProfileLookupFailed(GameProfile p_onProfileLookupFailed_1_, Exception p_onProfileLookupFailed_2_)
-                    {
-                        PreYggdrasilConverter.field_152732_e.warn("Could not lookup oplist entry for " + p_onProfileLookupFailed_1_.getName(), p_onProfileLookupFailed_2_);
-
-                        if (!(p_onProfileLookupFailed_2_ instanceof ProfileNotFoundException))
-                        {
+                    public void onProfileLookupFailed(GameProfile p_onProfileLookupFailed_1_, Exception p_onProfileLookupFailed_2_) {
+                        if (!(p_onProfileLookupFailed_2_ instanceof ProfileNotFoundException)) {
                             throw new PreYggdrasilConverter.ConversionError("Could not request user " + p_onProfileLookupFailed_1_.getName() + " from backend systems", p_onProfileLookupFailed_2_, null);
                         }
                     }
@@ -313,14 +279,8 @@ public class PreYggdrasilConverter
                 func_152727_c(field_152730_c);
                 return true;
             }
-            catch (IOException ioexception)
+            catch (IOException | ConversionError ioexception)
             {
-                field_152732_e.warn("Could not read old oplist to convert it!", ioexception);
-                return false;
-            }
-            catch (PreYggdrasilConverter.ConversionError preyggdrasilconverterconversionerror)
-            {
-                field_152732_e.error("Conversion failed, please try again later", preyggdrasilconverterconversionerror);
                 return false;
             }
         }
@@ -343,14 +303,10 @@ public class PreYggdrasilConverter
                 {
                     userlistwhitelist.func_152679_g();
                 }
-                catch (FileNotFoundException filenotfoundexception)
-                {
-                    field_152732_e.warn("Could not load existing file " + userlistwhitelist.func_152691_c().getName(), filenotfoundexception);
-                }
+                catch (FileNotFoundException ignored) {}
             }
 
-            try
-            {
+            try {
                 List list = Files.readLines(field_152731_d, Charsets.UTF_8);
                 ProfileLookupCallback profilelookupcallback = new ProfileLookupCallback()
                 {
@@ -362,8 +318,6 @@ public class PreYggdrasilConverter
                     }
                     public void onProfileLookupFailed(GameProfile p_onProfileLookupFailed_1_, Exception p_onProfileLookupFailed_2_)
                     {
-                        PreYggdrasilConverter.field_152732_e.warn("Could not lookup user whitelist entry for " + p_onProfileLookupFailed_1_.getName(), p_onProfileLookupFailed_2_);
-
                         if (!(p_onProfileLookupFailed_2_ instanceof ProfileNotFoundException))
                         {
                             throw new PreYggdrasilConverter.ConversionError("Could not request user " + p_onProfileLookupFailed_1_.getName() + " from backend systems", p_onProfileLookupFailed_2_, null);
@@ -375,14 +329,8 @@ public class PreYggdrasilConverter
                 func_152727_c(field_152731_d);
                 return true;
             }
-            catch (IOException ioexception)
+            catch (IOException | ConversionError ioexception)
             {
-                field_152732_e.warn("Could not read old whitelist to convert it!", ioexception);
-                return false;
-            }
-            catch (PreYggdrasilConverter.ConversionError preyggdrasilconverterconversionerror)
-            {
-                field_152732_e.error("Conversion failed, please try again later", preyggdrasilconverterconversionerror);
                 return false;
             }
         }
@@ -444,8 +392,6 @@ public class PreYggdrasilConverter
                     }
                     public void onProfileLookupFailed(GameProfile p_onProfileLookupFailed_1_, Exception p_onProfileLookupFailed_2_)
                     {
-                        PreYggdrasilConverter.field_152732_e.warn("Could not lookup user uuid for " + p_onProfileLookupFailed_1_.getName(), p_onProfileLookupFailed_2_);
-
                         if (p_onProfileLookupFailed_2_ instanceof ProfileNotFoundException)
                         {
                             String s2 = this.func_152744_a(p_onProfileLookupFailed_1_);
@@ -495,7 +441,6 @@ public class PreYggdrasilConverter
             }
             catch (PreYggdrasilConverter.ConversionError preyggdrasilconverterconversionerror)
             {
-                field_152732_e.error("Conversion failed, please try again later", preyggdrasilconverterconversionerror);
                 return false;
             }
         }
@@ -560,37 +505,7 @@ public class PreYggdrasilConverter
             flag3 = true;
         }
 
-        if (!flag && !flag1 && !flag2 && !flag3)
-        {
-            return true;
-        }
-        else
-        {
-            field_152732_e.warn("**** FAILED TO START THE SERVER AFTER ACCOUNT CONVERSION!");
-            field_152732_e.warn("** please remove the following files and restart the server:");
-
-            if (flag)
-            {
-                field_152732_e.warn("* " + field_152729_b.getName());
-            }
-
-            if (flag1)
-            {
-                field_152732_e.warn("* " + field_152728_a.getName());
-            }
-
-            if (flag2)
-            {
-                field_152732_e.warn("* " + field_152730_c.getName());
-            }
-
-            if (flag3)
-            {
-                field_152732_e.warn("* " + field_152731_d.getName());
-            }
-
-            return false;
-        }
+        return !flag && !flag1 && !flag2 && !flag3;
     }
 
     @SideOnly(Side.SERVER)
@@ -611,9 +526,6 @@ public class PreYggdrasilConverter
 
             if (astring.length > 0)
             {
-                field_152732_e.warn("**** DETECTED OLD PLAYER FILES IN THE WORLD SAVE");
-                field_152732_e.warn("**** THIS USUALLY HAPPENS WHEN THE AUTOMATIC CONVERSION FAILED IN SOME WAY");
-                field_152732_e.warn("** please restart the server and if the problem persists, remove the directory \'{}\'", new Object[] {file1.getPath()});
                 return false;
             }
         }

@@ -11,7 +11,6 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharSource;
-import cpw.mods.fml.relauncher.FMLRelaunchLog;
 
 public class ModAccessTransformer extends AccessTransformer {
     private static Map<String, String> embedded = Maps.newHashMap(); //Needs to be primitive so that both classloaders get the same class.
@@ -26,15 +25,8 @@ public class ModAccessTransformer extends AccessTransformer {
         otherField.setAccessible(true);
         embedded = (Map<String, String>)otherField.get(null);
 
-        for (Map.Entry<String, String> e : embedded.entrySet())
-        {
-            int old_count = getModifiers().size();
+        for (Map.Entry<String, String> e : embedded.entrySet()) {
             processATFile(CharSource.wrap(e.getValue()));
-            int added = getModifiers().size() - old_count;
-            if (added > 0)
-            {
-                FMLRelaunchLog.fine("Loaded %d rules from AccessTransformer mod jar file %s\n", added, e.getKey());
-            }
         }
     }
 

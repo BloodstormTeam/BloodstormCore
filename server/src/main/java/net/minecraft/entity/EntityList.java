@@ -65,15 +65,7 @@ import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatList;
 import net.minecraft.world.World;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import cpw.mods.fml.common.FMLLog;
-
-public class EntityList
-{
-    private static final Logger logger = LogManager.getLogger();
+public class EntityList {
     public static Map stringToClassMapping = new HashMap();
     public static Map classToStringMapping = new HashMap();
     public static Map IDtoClassMapping = new HashMap();
@@ -174,15 +166,8 @@ public class EntityList
             }
             catch (Exception e)
             {
-                FMLLog.log(Level.ERROR, e,
-                        "An Entity %s(%s) has thrown an exception during loading, its state cannot be restored. Report this to the mod author",
-                        p_75615_0_.getString("id"), oclass.getName());
                 entity = null;
             }
-        }
-        else
-        {
-            logger.warn("Skipping Entity with id " + p_75615_0_.getString("id"));
         }
 
         return entity;
@@ -204,11 +189,6 @@ public class EntityList
         catch (Exception exception)
         {
             exception.printStackTrace();
-        }
-
-        if (entity == null)
-        {
-            logger.warn("Skipping Entity with id " + p_75616_0_);
         }
 
         return entity;

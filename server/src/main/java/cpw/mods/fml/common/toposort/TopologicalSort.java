@@ -28,8 +28,6 @@ import java.util.TreeSet;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 
-import cpw.mods.fml.common.FMLLog;
-
 /**
  * Topological sort for mod loading
  *
@@ -180,13 +178,7 @@ public class TopologicalSort
                 return;
             }
 
-            FMLLog.severe("Mod Sorting failed.");
-            FMLLog.severe("Visting node %s", node);
-            FMLLog.severe("Current sorted list : %s", sortedResult);
-            FMLLog.severe("Visited set for this node : %s", visitedNodes);
-            FMLLog.severe("Explored node set : %s", expandedNodes);
             SetView<T> cycleList = Sets.difference(visitedNodes, expandedNodes);
-            FMLLog.severe("Likely cycle is in : %s", cycleList);
             throw new ModSortingException("There was a cycle detected in the input graph, sorting is not possible", node, cycleList);
         }
 

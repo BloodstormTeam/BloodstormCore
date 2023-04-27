@@ -24,10 +24,6 @@ import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 import paulscode.sound.SoundSystem;
 import paulscode.sound.SoundSystemConfig;
 import paulscode.sound.SoundSystemException;
@@ -40,10 +36,7 @@ import net.minecraftforge.client.event.sound.*;
 import net.minecraftforge.common.MinecraftForge;
 
 @SideOnly(Side.CLIENT)
-public class SoundManager
-{
-    private static final Marker field_148623_a = MarkerManager.getMarker("SOUNDS");
-    private static final Logger logger = LogManager.getLogger();
+public class SoundManager {
     public final SoundHandler sndHandler;
     private final GameSettings options;
     private SoundManager.SoundSystemStarterThread sndSystem;
@@ -75,10 +68,7 @@ public class SoundManager
             SoundSystemConfig.setCodec("ogg", CodecJOrbis.class);
             MinecraftForge.EVENT_BUS.post(new SoundSetupEvent(this));
         }
-        catch (SoundSystemException soundsystemexception)
-        {
-            logger.error(field_148623_a, "Error linking with the LibraryJavaSound plug-in", soundsystemexception);
-        }
+        catch (SoundSystemException ignored) {}
     }
 
     public void reloadSoundSystem()
@@ -96,19 +86,15 @@ public class SoundManager
             {
                 (new Thread(new Runnable()
                 {
-                    private static final String __OBFID = "CL_00001142";
                     public void run()
                     {
                         SoundManager.this.sndSystem = SoundManager.this.new SoundSystemStarterThread(null);
                         SoundManager.this.loaded = true;
                         SoundManager.this.sndSystem.setMasterVolume(SoundManager.this.options.getSoundLevel(SoundCategory.MASTER));
-                        SoundManager.logger.info(SoundManager.field_148623_a, "Sound engine started");
                     }
                 }, "Sound Library Loader")).start();
             }
-            catch (RuntimeException runtimeexception)
-            {
-                logger.error(field_148623_a, "Error starting SoundSystem. Turning off sounds & music", runtimeexception);
+            catch (RuntimeException runtimeexception) {
                 this.options.setSoundLevel(SoundCategory.MASTER, 0.0F);
                 this.options.saveOptions();
             }
@@ -229,7 +215,6 @@ public class SoundManager
                     }
 
                     iterator.remove();
-                    logger.debug(field_148623_a, "Removed channel {} because it\'s not playing anymore", new Object[] {s});
                     this.sndSystem.removeSource(s);
                     this.playingSoundsStopTime.remove(s);
                     this.playingSoundPoolEntries.remove(isound);
@@ -303,9 +288,7 @@ public class SoundManager
         if (this.loaded)
         {
             if (this.sndSystem.getMasterVolume() <= 0.0F)
-            {
-                logger.debug(field_148623_a, "Skipped playing soundEvent: {}, master volume was zero", new Object[] {p_148611_1_.getPositionedSoundLocation()});
-            }
+            {}
             else
             {
                 p_148611_1_ = ForgeHooksClient.playSound(this, p_148611_1_);
@@ -313,19 +296,11 @@ public class SoundManager
 
                 SoundEventAccessorComposite soundeventaccessorcomposite = this.sndHandler.getSound(p_148611_1_.getPositionedSoundLocation());
 
-                if (soundeventaccessorcomposite == null)
-                {
-                    logger.warn(field_148623_a, "Unable to play unknown soundEvent: {}", new Object[] {p_148611_1_.getPositionedSoundLocation()});
-                }
-                else
+                if (soundeventaccessorcomposite != null)
                 {
                     SoundPoolEntry soundpoolentry = soundeventaccessorcomposite.func_148720_g();
 
-                    if (soundpoolentry == SoundHandler.missing_sound)
-                    {
-                        logger.warn(field_148623_a, "Unable to play empty soundEvent: {}", new Object[] {soundeventaccessorcomposite.getSoundEventLocation()});
-                    }
-                    else
+                    if (soundpoolentry != SoundHandler.missing_sound)
                     {
                         float f = p_148611_1_.getVolume();
                         float f1 = 16.0F;
@@ -340,11 +315,7 @@ public class SoundManager
                         double d0 = (double)this.getNormalizedPitch(p_148611_1_, soundpoolentry);
                         ResourceLocation resourcelocation = soundpoolentry.getSoundPoolEntryLocation();
 
-                        if (f2 == 0.0F)
-                        {
-                            logger.debug(field_148623_a, "Skipped playing sound {}, volume was zero.", new Object[] {resourcelocation});
-                        }
-                        else
+                        if (f2 != 0.0F)
                         {
                             boolean flag = p_148611_1_.canRepeat() && p_148611_1_.getRepeatDelay() == 0;
                             String s = UUID.randomUUID().toString();
@@ -360,7 +331,6 @@ public class SoundManager
                                 MinecraftForge.EVENT_BUS.post(new PlaySoundSourceEvent(this, p_148611_1_, s));
                             }
 
-                            logger.debug(field_148623_a, "Playing sound {} for event {} as channel {}", new Object[] {soundpoolentry.getSoundPoolEntryLocation(), soundeventaccessorcomposite.getSoundEventLocation(), s});
                             this.sndSystem.setPitch(s, (float)d0);
                             this.sndSystem.setVolume(s, f2);
                             this.sndSystem.play(s);
@@ -396,24 +366,18 @@ public class SoundManager
 
     public void pauseAllSounds()
     {
-        Iterator iterator = this.playingSounds.keySet().iterator();
 
-        while (iterator.hasNext())
-        {
-            String s = (String)iterator.next();
-            logger.debug(field_148623_a, "Pausing channel {}", new Object[] {s});
+        for (Object o : this.playingSounds.keySet()) {
+            String s = (String) o;
             this.sndSystem.pause(s);
         }
     }
 
     public void resumeAllSounds()
     {
-        Iterator iterator = this.playingSounds.keySet().iterator();
 
-        while (iterator.hasNext())
-        {
-            String s = (String)iterator.next();
-            logger.debug(field_148623_a, "Resuming channel {}", new Object[] {s});
+        for (Object o : this.playingSounds.keySet()) {
+            String s = (String) o;
             this.sndSystem.play(s);
         }
     }

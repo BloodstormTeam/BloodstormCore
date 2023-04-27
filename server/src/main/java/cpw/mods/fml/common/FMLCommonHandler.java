@@ -12,14 +12,17 @@
 
 package cpw.mods.fml.common;
 
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.*;
+import com.google.common.collect.ImmutableList.Builder;
+import cpw.mods.fml.common.eventhandler.EventBus;
+import cpw.mods.fml.common.gameevent.InputEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.server.FMLServerHandler;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.item.EntityItem;
@@ -31,34 +34,22 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.SaveHandler;
 import net.minecraft.world.storage.WorldInfo;
-
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
-import com.google.common.collect.Lists;
-import com.google.common.collect.MapMaker;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import cpw.mods.fml.common.eventhandler.EventBus;
-import cpw.mods.fml.common.gameevent.InputEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.server.FMLServerHandler;
+import java.io.File;
+import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -89,10 +80,10 @@ public class FMLCommonHandler
     private boolean noForge;
     private List<String> brandings;
     private List<String> brandingsNoMC;
-    private List<ICrashCallable> crashCallables = Lists.newArrayList(Loader.instance().getCallableCrashInformation());
-    private Set<SaveHandler> handlerSet = Sets.newSetFromMap(new MapMaker().weakKeys().<SaveHandler,Boolean>makeMap());
+    private final List<ICrashCallable> crashCallables = Lists.newArrayList(Loader.instance().getCallableCrashInformation());
+    private final Set<SaveHandler> handlerSet = Collections.newSetFromMap(new MapMaker().weakKeys().<SaveHandler, Boolean>makeMap());
     private WeakReference<SaveHandler> handlerToCheck;
-    private EventBus eventBus = new EventBus();
+    private final EventBus eventBus = new EventBus();
     private volatile CountDownLatch exitLatch = null;
     /**
      * The FML event bus. Subscribe here for FML related events
@@ -107,10 +98,8 @@ public class FMLCommonHandler
     public void beginLoading(IFMLSidedHandler handler)
     {
         sidedDelegate = handler;
-        FMLLog.log("MinecraftForge", Level.INFO, "Attempting early MinecraftForge initialization");
         callForgeMethod("initialize");
         callForgeMethod("registerCrashCallable");
-        FMLLog.log("MinecraftForge", Level.INFO, "Completed early MinecraftForge initialization");
     }
 
     /**
@@ -135,14 +124,6 @@ public class FMLCommonHandler
             return Loader.instance().getReversedModObjectList().get(mod);
         }
     }
-    /**
-     * Get the forge mod loader logging instance (goes to the forgemodloader log file)
-     * @return The log instance for the FML log file
-     */
-    public Logger getFMLLogger()
-    {
-        return FMLLog.getLogger();
-    }
 
     public Side getSide()
     {
@@ -163,17 +144,6 @@ public class FMLCommonHandler
         }
 
         return Side.CLIENT;
-    }
-    /**
-     * Raise an exception
-     */
-    public void raiseException(Throwable exception, String message, boolean stopGame)
-    {
-        FMLLog.log(Level.ERROR, exception, "Something raised an exception. The message was '%s'. 'stopGame' is %b", message, stopGame);
-        if (stopGame)
-        {
-            getSidedDelegate().haltGame(message,exception);
-        }
     }
 
 
@@ -463,20 +433,9 @@ public class FMLCommonHandler
         {
             try
             {
-                FMLLog.info("Waiting for the server to terminate/save.");
-                if (!latch.await(10, TimeUnit.SECONDS))
-                {
-                    FMLLog.warning("The server didn't stop within 10 seconds, exiting anyway.");
-                }
-                else
-                {
-                    FMLLog.info("Server terminated.");
-                }
+                latch.await(10, TimeUnit.SECONDS);
             }
-            catch (InterruptedException e)
-            {
-                FMLLog.warning("Interrupted wait, exiting.");
-            }
+            catch (InterruptedException ignored) {}
         }
 
         System.exit(retVal);
@@ -634,27 +593,10 @@ public class FMLCommonHandler
      * @param exitCode The exit code
      * @param hardExit Perform a halt instead of an exit (only use when the world is unsavable) - read the warnings at {@link Runtime#halt(int)}
      */
-    public void exitJava(int exitCode, boolean hardExit)
-    {
-        FMLLog.log(Level.INFO, "Java has been asked to exit (code %d) by %s.", exitCode, Thread.currentThread().getStackTrace()[1]);
-        if (hardExit)
-        {
-            FMLLog.log(Level.INFO, "This is an abortive exit and could cause world corruption or other things");
-        }
-        if (Boolean.parseBoolean(System.getProperty("fml.debugExit", "false")))
-        {
-            FMLLog.log(Level.INFO, new Throwable(), "Exit trace");
-        }
-        else
-        {
-            FMLLog.log(Level.INFO, "If this was an unexpected exit, use -Dfml.debugExit=true as a JVM argument to find out where it was called");
-        }
-        if (hardExit)
-        {
+    public void exitJava(int exitCode, boolean hardExit) {
+        if (hardExit) {
             Runtime.getRuntime().halt(exitCode);
-        }
-        else
-        {
+        } else {
             Runtime.getRuntime().exit(exitCode);
         }
     }

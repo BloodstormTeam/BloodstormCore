@@ -10,16 +10,10 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.NetworkStatistics;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 
 public class MessageDeserializer extends ByteToMessageDecoder
 {
-    private static final Logger logger = LogManager.getLogger();
-    private static final Marker field_150799_b = MarkerManager.getMarker("PACKET_RECEIVED", NetworkManager.logMarkerPackets);
-    private final NetworkStatistics field_152499_c;
+   private final NetworkStatistics field_152499_c;
     private static final String __OBFID = "CL_00001252";
 
     public MessageDeserializer(NetworkStatistics p_i1183_1_)
@@ -56,11 +50,6 @@ public class MessageDeserializer extends ByteToMessageDecoder
                 {
                     p_decode_3_.add(packet);
                     this.field_152499_c.func_152469_a(j, (long)i);
-
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug(field_150799_b, " IN: [{}:{}] {}[{}]", new Object[] {p_decode_1_.channel().attr(NetworkManager.attrKeyConnectionState).get(), Integer.valueOf(j), packet.getClass().getName(), packet.serialize()});
-                    }
                 }
             }
         }

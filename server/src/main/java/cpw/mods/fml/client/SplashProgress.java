@@ -34,7 +34,6 @@ import net.minecraft.launchwrapper.Launch;
 import net.minecraft.util.ResourceLocation;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.Level;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
@@ -45,9 +44,7 @@ import org.lwjgl.util.glu.GLU;
 
 import cpw.mods.fml.common.EnhancedRuntimeException;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.ICrashCallable;
-import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ProgressManager;
 import cpw.mods.fml.common.ProgressManager.ProgressBar;
 import cpw.mods.fml.common.asm.FMLSanityChecker;
@@ -119,10 +116,7 @@ public class SplashProgress
             r = new FileReader(configFile);
             config.load(r);
         }
-        catch(IOException e)
-        {
-            FMLLog.info("Could not load splash.properties, will create a default one");
-        }
+        catch(IOException ignored) {}
         finally
         {
             IOUtils.closeQuietly(r);
@@ -151,10 +145,7 @@ public class SplashProgress
             w = new FileWriter(configFile);
             config.store(w, "Splash screen properties");
         }
-        catch(IOException e)
-        {
-            FMLLog.log(Level.ERROR, e, "Could not save the splash.properties file");
-        }
+        catch(IOException ignored) {}
         finally
         {
             IOUtils.closeQuietly(w);
@@ -419,14 +410,7 @@ public class SplashProgress
                 }
             }
         });
-        thread.setUncaughtExceptionHandler(new UncaughtExceptionHandler()
-        {
-            public void uncaughtException(Thread t, Throwable e)
-            {
-                FMLLog.log(Level.ERROR, e, "Splash thread Exception");
-                threadError = e;
-            }
-        });
+        thread.setUncaughtExceptionHandler((t, e) -> threadError = e);
         thread.start();
         checkThreadState();
     }
@@ -552,7 +536,6 @@ public class SplashProgress
         }
         catch(IOException e)
         {
-            FMLLog.log(Level.ERROR, e, "Could not save the splash.properties file");
             return false;
         }
         finally

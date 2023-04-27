@@ -17,11 +17,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.ThreadContext;
-
-import com.google.common.base.Joiner;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.Collections2;
@@ -94,16 +89,12 @@ public class LoadController
             //Create mod logger, and make the EventBus logger a child of it.
             EventBus bus = new EventBus(mod.getModId());
             boolean isActive = mod.registerBus(bus, this);
-            if (isActive)
-            {
+            if (isActive) {
                 activeModList.add(mod);
                 modStates.put(mod.getModId(), ModState.UNLOADED);
                 eventBus.put(mod.getModId(), bus);
                 FMLCommonHandler.instance().addModToResourcePack(mod);
-            }
-            else
-            {
-                FMLLog.log(mod.getModId(), Level.WARN, "Mod %s has been disabled through configuration", mod.getModId());
+            } else {
                 modStates.put(mod.getModId(), ModState.UNLOADED);
                 modStates.put(mod.getModId(), ModState.DISABLED);
             }
@@ -122,39 +113,27 @@ public class LoadController
 
     public void transition(LoaderState desiredState, boolean forceState)
     {
-        LoaderState oldState = state;
         state = state.transition(!errors.isEmpty());
         if (state != desiredState && !forceState)
         {
             Throwable toThrow = null;
-            FMLLog.severe("Fatal errors were detected during the transition from %s to %s. Loading cannot continue", oldState, desiredState);
             StringBuilder sb = new StringBuilder();
             printModStates(sb);
-            FMLLog.severe("%s", sb.toString());
             if (errors.size()>0)
             {
-                FMLLog.severe("The following problems were captured during this phase");
-                for (Entry<String, Throwable> error : errors.entries())
-                {
-                    FMLLog.log(Level.ERROR, error.getValue(), "Caught exception from %s", error.getKey());
-                    if (error.getValue() instanceof IFMLHandledException)
-                    {
+                for (Entry<String, Throwable> error : errors.entries()) {
+                    if (error.getValue() instanceof IFMLHandledException) {
                         toThrow = error.getValue();
-                    }
-                    else if (toThrow == null)
-                    {
+                    } else if (toThrow == null) {
                         toThrow = error.getValue();
                     }
                 }
             }
             else
             {
-                FMLLog.severe("The ForgeModLoader state engine has become corrupted. Probably, a state was missed by and invalid modification to a base class" +
-                        "ForgeModLoader depends on. This is a critical error and not recoverable. Investigate any modifications to base classes outside of" +
-                        "ForgeModLoader, especially Optifine, to see if there are fixes available.");
                 throw new RuntimeException("The ForgeModLoader state engine is invalid");
             }
-            if (toThrow != null && toThrow instanceof RuntimeException)
+            if (toThrow instanceof RuntimeException)
             {
                 throw (RuntimeException)toThrow;
             }
@@ -163,12 +142,10 @@ public class LoadController
                 throw new LoaderException(toThrow);
             }
         }
-        else if (state != desiredState && forceState)
+        else if (state != desiredState)
         {
-            FMLLog.info("The state engine was in incorrect state %s and forced into state %s. Errors may have been discarded.", state, desiredState);
             forceState(desiredState);
         }
-
     }
 
     public ModContainer activeContainer()
@@ -200,18 +177,13 @@ public class LoadController
         {
             if (av.getLabel()!= null && requirements.contains(av.getLabel()) && modStates.containsEntry(av.getLabel(),ModState.ERRORED))
             {
-                FMLLog.log(modId, Level.ERROR, "Skipping event %s and marking errored mod %s since required dependency %s has errored", stateEvent.getEventType(), modId, av.getLabel());
                 modStates.put(modId, ModState.ERRORED);
                 return;
             }
         }
         activeContainer = mc;
         stateEvent.applyModContainer(activeContainer());
-        ThreadContext.put("mod", modId);
-        FMLLog.log(modId, Level.TRACE, "Sending event %s to mod %s", stateEvent.getEventType(), modId);
         eventChannels.get(modId).post(stateEvent);
-        FMLLog.log(modId, Level.TRACE, "Sent event %s to mod %s", stateEvent.getEventType(), modId);
-        ThreadContext.remove("mod");
         activeContainer = null;
         if (stateEvent instanceof FMLStateEvent)
         {
@@ -242,7 +214,6 @@ public class LoadController
             }
             if (mc.getMod()==null && !mc.isImmutable() && state!=LoaderState.CONSTRUCTING)
             {
-                FMLLog.severe("There is a severe problem with %s - it appears not to have constructed correctly", mc.getModId());
                 if (state != LoaderState.CONSTRUCTING)
                 {
                     this.errorOccurred(mc, new RuntimeException());
@@ -298,7 +269,6 @@ public class LoadController
         }
         catch (Exception e)
         {
-            FMLLog.log(Level.ERROR, e, "An unexpected exception");
             throw new LoaderException(e);
         }
     }
@@ -307,7 +277,6 @@ public class LoadController
     {
         if (modObjectList == null)
         {
-            FMLLog.severe("Detected an attempt by a mod %s to perform game activity during mod construction. This is a serious programming error.", activeContainer);
             return buildModObjectList();
         }
         return ImmutableBiMap.copyOf(modObjectList);

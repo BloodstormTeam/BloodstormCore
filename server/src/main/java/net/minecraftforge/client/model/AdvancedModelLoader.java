@@ -10,7 +10,6 @@ import net.minecraftforge.client.model.techne.TechneModelLoader;
 
 import com.google.common.collect.Maps;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -51,14 +50,12 @@ public class AdvancedModelLoader {
         int i = name.lastIndexOf('.');
         if (i == -1)
         {
-            FMLLog.severe("The resource name %s is not valid", resource);
             throw new IllegalArgumentException("The resource name is not valid");
         }
         String suffix = name.substring(i+1);
         IModelCustomLoader loader = instances.get(suffix);
         if (loader == null)
         {
-            FMLLog.severe("The resource name %s is not supported", resource);
             throw new IllegalArgumentException("The resource name is not supported");
         }
 

@@ -1,15 +1,8 @@
 package net.minecraft.network;
 
 import java.util.concurrent.atomic.AtomicReference;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 
-public class NetworkStatistics
-{
-    private static final Logger field_152478_a = LogManager.getLogger();
-    private static final Marker field_152479_b = MarkerManager.getMarker("NETSTAT_MARKER", NetworkManager.field_152461_c);
+public class NetworkStatistics {
     private NetworkStatistics.Tracker field_152480_c = new NetworkStatistics.Tracker();
     private NetworkStatistics.Tracker field_152481_d = new NetworkStatistics.Tracker();
     private static final String __OBFID = "CL_00001897";
@@ -164,13 +157,7 @@ public class NetworkStatistics
                     }
                     while (!this.field_152490_a[p_152488_1_].compareAndSet(packetstatdata, packetstatdata1));
                 }
-                catch (Exception exception)
-                {
-                    if (NetworkStatistics.field_152478_a.isDebugEnabled())
-                    {
-                        NetworkStatistics.field_152478_a.debug(NetworkStatistics.field_152479_b, "NetStat failed with packetId: " + p_152488_1_, exception);
-                    }
-                }
+                catch (Exception ignored) {}
             }
 
             public long func_152485_a()

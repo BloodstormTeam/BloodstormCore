@@ -3,11 +3,6 @@ package net.minecraft.client.renderer;
 import com.google.gson.JsonSyntaxException;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import java.io.IOException;
-import java.nio.FloatBuffer;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.Callable;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -34,34 +29,27 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.potion.Potion;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MouseFilter;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.ReportedException;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.biome.BiomeGenBase;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.IRenderHandler;
+import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
+import net.minecraftforge.common.MinecraftForge;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.util.glu.Project;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.IRenderHandler;
-import net.minecraftforge.client.event.DrawBlockHighlightEvent;
-import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.MinecraftForge;
+
+import java.io.IOException;
+import java.nio.FloatBuffer;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.Callable;
 
 @SideOnly(Side.CLIENT)
-public class EntityRenderer implements IResourceManagerReloadListener
-{
-    private static final Logger logger = LogManager.getLogger();
+public class EntityRenderer implements IResourceManagerReloadListener {
     private static final ResourceLocation locationRainPng = new ResourceLocation("textures/environment/rain.png");
     private static final ResourceLocation locationSnowPng = new ResourceLocation("textures/environment/snow.png");
     public static boolean anaglyphEnable;
@@ -163,61 +151,37 @@ public class EntityRenderer implements IResourceManagerReloadListener
         this.shaderIndex = shaderCount;
     }
 
-    public void activateNextShader()
-    {
-        if (OpenGlHelper.shadersSupported)
-        {
-            if (this.theShaderGroup != null)
-            {
+    public void activateNextShader() {
+        if (OpenGlHelper.shadersSupported) {
+            if (this.theShaderGroup != null) {
                 this.theShaderGroup.deleteShaderGroup();
             }
 
             this.shaderIndex = (this.shaderIndex + 1) % (shaderResourceLocations.length + 1);
 
-            if (this.shaderIndex != shaderCount)
-            {
-                try
-                {
-                    logger.info("Selecting effect " + shaderResourceLocations[this.shaderIndex]);
+            if (this.shaderIndex != shaderCount) {
+                try {
                     this.theShaderGroup = new ShaderGroup(this.mc.getTextureManager(), this.resourceManager, this.mc.getFramebuffer(), shaderResourceLocations[this.shaderIndex]);
                     this.theShaderGroup.createBindFramebuffers(this.mc.displayWidth, this.mc.displayHeight);
-                }
-                catch (IOException ioexception)
-                {
-                    logger.warn("Failed to load shader: " + shaderResourceLocations[this.shaderIndex], ioexception);
+                } catch (IOException | JsonSyntaxException ioexception) {
                     this.shaderIndex = shaderCount;
                 }
-                catch (JsonSyntaxException jsonsyntaxexception)
-                {
-                    logger.warn("Failed to load shader: " + shaderResourceLocations[this.shaderIndex], jsonsyntaxexception);
-                    this.shaderIndex = shaderCount;
-                }
-            }
-            else
-            {
+            } else {
                 this.theShaderGroup = null;
-                logger.info("No effect selected");
             }
         }
     }
 
-    public void onResourceManagerReload(IResourceManager p_110549_1_)
-    {
-        if (this.theShaderGroup != null)
-        {
+    public void onResourceManagerReload(IResourceManager p_110549_1_) {
+        if (this.theShaderGroup != null) {
             this.theShaderGroup.deleteShaderGroup();
         }
 
-        if (this.shaderIndex != shaderCount)
-        {
-            try
-            {
+        if (this.shaderIndex != shaderCount) {
+            try {
                 this.theShaderGroup = new ShaderGroup(this.mc.getTextureManager(), p_110549_1_, this.mc.getFramebuffer(), shaderResourceLocations[this.shaderIndex]);
                 this.theShaderGroup.createBindFramebuffers(this.mc.displayWidth, this.mc.displayHeight);
-            }
-            catch (IOException ioexception)
-            {
-                logger.warn("Failed to load shader: " + shaderResourceLocations[this.shaderIndex], ioexception);
+            } catch (IOException ioexception) {
                 this.shaderIndex = shaderCount;
             }
         }

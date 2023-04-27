@@ -1,4 +1,6 @@
 rootProject.name = 'Crucible'
 
 include 'server'
+include 'authlib'
+include 'launchwrapper'
 

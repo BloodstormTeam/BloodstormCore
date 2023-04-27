@@ -21,7 +21,6 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModAPIManager;
 import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
-import cpw.mods.fml.relauncher.FMLRelaunchLog;
 
 public class ModAPITransformer implements IClassTransformer {
 
@@ -44,17 +43,14 @@ public class ModAPITransformer implements IClassTransformer {
         ClassReader classReader = new ClassReader(basicClass);
         classReader.accept(classNode, 0);
 
-        if (logDebugInfo) FMLRelaunchLog.finer("Optional removal - found optionals for class %s - processing", name);
         for (ASMData optional : optionals.get(lookupName))
         {
             String modId = (String) optional.getAnnotationInfo().get("modid");
 
             if (Loader.isModLoaded(modId) || ModAPIManager.INSTANCE.hasAPI(modId))
             {
-                if (logDebugInfo) FMLRelaunchLog.finer("Optional removal skipped - mod present %s", modId);
                 continue;
             }
-            if (logDebugInfo) FMLRelaunchLog.finer("Optional on %s triggered - mod missing %s", name, modId);
 
             if (optional.getAnnotationInfo().containsKey("iface"))
             {
@@ -68,7 +64,6 @@ public class ModAPITransformer implements IClassTransformer {
             }
 
         }
-        if (logDebugInfo) FMLRelaunchLog.finer("Optional removal - class %s processed", name);
 
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         classNode.accept(writer);
@@ -89,37 +84,17 @@ public class ModAPITransformer implements IClassTransformer {
             if (methodDescriptor.equals(method.name+method.desc))
             {
                 iterator.remove();
-                if (logDebugInfo) FMLRelaunchLog.finer("Optional removal - method %s removed", methodDescriptor);
                 return;
             }
         }
-        if (logDebugInfo) FMLRelaunchLog.finer("Optional removal - method %s NOT removed - not found", methodDescriptor);
     }
 
     private void stripInterface(ClassNode classNode, String interfaceName, boolean stripRefs)
     {
         String ifaceName = interfaceName.replace('.', '/');
         boolean found = classNode.interfaces.remove(ifaceName);
-        if (found && logDebugInfo) FMLRelaunchLog.finer("Optional removal - interface %s removed", interfaceName);
-        if (!found && logDebugInfo) FMLRelaunchLog.finer("Optional removal - interface %s NOT removed - not found", interfaceName);
-
-        if (found && stripRefs)
-        {
-            if (logDebugInfo) FMLRelaunchLog.finer("Optional removal - interface %s - stripping method signature references", interfaceName);
-            for (Iterator<MethodNode> iterator = classNode.methods.iterator(); iterator.hasNext();)
-            {
-                MethodNode node = iterator.next();
-                if (node.desc.contains(ifaceName))
-                {
-                    if (logDebugInfo) FMLRelaunchLog.finer("Optional removal - interface %s - stripping method containing reference %s", interfaceName, node.name);
-                    iterator.remove();
-                }
-            }
-            if (logDebugInfo) FMLRelaunchLog.finer("Optional removal - interface %s - all method signature references stripped", interfaceName);
-        }
-        else if (found)
-        {
-            if (logDebugInfo) FMLRelaunchLog.finer("Optional removal - interface %s - NOT stripping method signature references", interfaceName);
+        if (found && stripRefs) {
+            classNode.methods.removeIf(node -> node.desc.contains(ifaceName));
         }
     }
 

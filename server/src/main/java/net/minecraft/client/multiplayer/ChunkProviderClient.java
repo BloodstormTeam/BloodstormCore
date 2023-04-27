@@ -14,13 +14,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.IChunkProvider;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
-public class ChunkProviderClient implements IChunkProvider
-{
-    private static final Logger logger = LogManager.getLogger();
+public class ChunkProviderClient implements IChunkProvider {
     private Chunk blankChunk;
     private LongHashMap chunkMapping = new LongHashMap();
     private List chunkListing = new ArrayList();
@@ -77,17 +73,10 @@ public class ChunkProviderClient implements IChunkProvider
     public boolean unloadQueuedChunks()
     {
         long i = System.currentTimeMillis();
-        Iterator iterator = this.chunkListing.iterator();
 
-        while (iterator.hasNext())
-        {
-            Chunk chunk = (Chunk)iterator.next();
+        for (Object o : this.chunkListing) {
+            Chunk chunk = (Chunk) o;
             chunk.func_150804_b(System.currentTimeMillis() - i > 5L);
-        }
-
-        if (System.currentTimeMillis() - i > 100L)
-        {
-            logger.info("Warning: Clientside chunk ticking took {} ms", new Object[] {Long.valueOf(System.currentTimeMillis() - i)});
         }
 
         return false;

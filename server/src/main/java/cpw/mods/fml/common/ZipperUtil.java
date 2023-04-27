@@ -11,8 +11,6 @@ import java.util.LinkedList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.logging.log4j.Level;
-
 import com.google.common.io.Files;
 
 /**
@@ -28,7 +26,7 @@ public class ZipperUtil {
         URI base = directory.toURI();
         Deque<File> queue = new LinkedList<File>();
         queue.push(directory);
-        OutputStream out = new FileOutputStream(zipfile);
+        OutputStream out = java.nio.file.Files.newOutputStream(zipfile.toPath());
         Closeable res = null;
         try
         {
@@ -76,17 +74,6 @@ public class ZipperUtil {
     {
         File dstFolder = FMLCommonHandler.instance().getSavesDirectory();
         File zip = new File(dstFolder, String.format("%s-%2$tY%2$tm%2$td-%2$tH%2$tM%2$tS.zip", dirName, System.currentTimeMillis()));
-
-        try
-        {
-            ZipperUtil.zip(new File(dstFolder, dirName), zip);
-        }
-        catch (IOException e)
-        {
-            FMLLog.log(Level.WARN, e, "World backup failed.");
-            throw e;
-        }
-
-        FMLLog.info("World backup created at %s.", zip.getCanonicalPath());
+        ZipperUtil.zip(new File(dstFolder, dirName), zip);
     }
 }

@@ -6,8 +6,6 @@ import io.netty.buffer.Unpooled;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.logging.log4j.Level;
-
 import com.google.common.base.Throwables;
 
 import net.minecraft.entity.DataWatcher;
@@ -15,7 +13,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.MathHelper;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.registry.EntityRegistry.EntityRegistration;
@@ -195,10 +192,8 @@ public abstract class FMLMessage {
             try
             {
                 entity.getDataWatcher().func_151509_a(pb);
-            } catch (IOException e)
-            {
-                FMLLog.log(Level.FATAL,e,"Encountered fatal exception trying to send entity spawn data watchers");
-                throw Throwables.propagate(e);
+            } catch (IOException e) {
+                Throwables.throwIfUnchecked(e);
             }
             buf.writeBytes(tmpBuf);
 
@@ -249,10 +244,8 @@ public abstract class FMLMessage {
             try
             {
                 dataWatcherList = DataWatcher.readWatchedListFromPacketBuffer(new PacketBuffer(dat));
-            } catch (IOException e)
-            {
-                FMLLog.log(Level.FATAL, e, "There was a critical error decoding the datawatcher stream for a mod entity.");
-                throw Throwables.propagate(e);
+            } catch (IOException e) {
+                Throwables.throwIfUnchecked(e);
             }
 
             throwerId = dat.readInt();

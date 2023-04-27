@@ -4,8 +4,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.network.ForgeMessage.DimensionRegisterMessage;
-import org.apache.logging.log4j.Level;
-import cpw.mods.fml.common.FMLLog;
 
 public class DimensionMessageHandler extends SimpleChannelInboundHandler<ForgeMessage.DimensionRegisterMessage>{
     @Override
@@ -19,8 +17,6 @@ public class DimensionMessageHandler extends SimpleChannelInboundHandler<ForgeMe
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
     {
-        FMLLog.log(Level.ERROR, cause, "DimensionMessageHandler exception");
         super.exceptionCaught(ctx, cause);
     }
-
 }

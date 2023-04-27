@@ -17,8 +17,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.Event.Result;
 
@@ -27,9 +25,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import net.minecraft.server.MinecraftServer;
 // CraftBukkit end
 
-public class EntityItem extends Entity
-{
-    private static final Logger logger = LogManager.getLogger();
+public class EntityItem extends Entity {
     public int age;
     public int delayBeforeCanPickup;
     private int health;

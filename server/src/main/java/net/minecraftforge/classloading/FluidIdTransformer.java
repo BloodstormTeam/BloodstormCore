@@ -10,11 +10,8 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
-
-import cpw.mods.fml.common.FMLLog;
 
 public class FluidIdTransformer implements IClassTransformer {
     private static final String FLUID_TYPE = "net/minecraftforge/fluids/FluidStack";
@@ -40,7 +37,6 @@ public class FluidIdTransformer implements IClassTransformer {
                     FieldInsnNode fi = (FieldInsnNode)insnNode;
                     if (FLUID_TYPE.equals(fi.owner) && LEGACY_FIELDNAME.equals(fi.name) && fi.getOpcode() == Opcodes.GETFIELD)
                     {
-                        FMLLog.fine("Method %s.%s%s: Replacing GETFIELD fluidID with INVOKEVIRTUAL getFluidID", name, m.name, m.desc);
                         it.remove();
                         MethodInsnNode replace = new MethodInsnNode(Opcodes.INVOKEVIRTUAL, FLUID_TYPE, GETID_NAME, GETID_DESC, false);
                         it.add(replace);

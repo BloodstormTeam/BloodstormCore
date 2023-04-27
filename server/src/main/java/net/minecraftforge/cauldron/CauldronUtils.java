@@ -44,11 +44,6 @@ public class CauldronUtils {
             sortedClassList.add(clazz.getName());
         }
         Collections.sort(sortedClassList);
-        if (MinecraftServer.tileEntityConfig.enableTECanUpdateWarning.getValue()) {
-            for (String aSortedClassList : sortedClassList) {
-                MinecraftServer.getServer().logInfo("Detected TE " + aSortedClassList + " with canUpdate set to true and no updateEntity override!. This is NOT good, please report to mod author as this can hurt performance.");
-            }
-        }
     }
 
     public static boolean migrateWorlds(String worldType, String oldWorldContainer, String newWorldContainer, String worldName) {
@@ -57,33 +52,19 @@ public class CauldronUtils {
         File oldWorld = new File(new File(oldWorldContainer), worldName);
 
         if ((!newWorld.isDirectory()) && (oldWorld.isDirectory())) {
-            MinecraftServer.getServer().logInfo("---- Migration of old " + worldType + " folder required ----");
-            MinecraftServer.getServer().logInfo("Cauldron has moved back to using the Forge World structure, your " + worldType + " folder will be moved to a new location in order to operate correctly.");
-            MinecraftServer.getServer().logInfo("We will move this folder for you, but it will mean that you need to move it back should you wish to stop using Cauldron in the future.");
-            MinecraftServer.getServer().logInfo("Attempting to move " + oldWorld + " to " + newWorld + "...");
-
             if (newWorld.exists()) {
-                MinecraftServer.getServer().logSevere("A file or folder already exists at " + newWorld + "!");
-                MinecraftServer.getServer().logInfo("---- Migration of old " + worldType + " folder failed ----");
                 result = false;
             } else if (newWorld.getParentFile().mkdirs() || newWorld.getParentFile().exists()) {
-                MinecraftServer.getServer().logInfo("Success! To restore " + worldType + " in the future, simply move " + newWorld + " to " + oldWorld);
-
                 // Migrate world data
                 try {
                     com.google.common.io.Files.move(oldWorld, newWorld);
                 } catch (IOException exception) {
-                    MinecraftServer.getServer().logSevere("Unable to move world data.");
                     exception.printStackTrace();
                     result = false;
                 }
                 try {
                     com.google.common.io.Files.copy(new File(oldWorld.getParent(), "level.dat"), new File(newWorld, "level.dat"));
-                } catch (IOException exception) {
-                    MinecraftServer.getServer().logSevere("Unable to migrate world level.dat.");
-                }
-
-                MinecraftServer.getServer().logInfo("---- Migration of old " + worldType + " folder complete ----");
+                } catch (IOException ignored) {}
             } else result = false;
         }
         return result;

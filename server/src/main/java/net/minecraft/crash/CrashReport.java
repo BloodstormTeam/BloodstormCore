@@ -22,14 +22,10 @@ import net.minecraft.world.gen.layer.IntCache;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
-public class CrashReport
-{
-    private static final Logger logger = LogManager.getLogger();
+public class CrashReport {
     private final String description;
     private final Throwable cause;
     private final CrashReportCategory theReportCategory = new CrashReportCategory(this, "System Details");
@@ -322,9 +318,7 @@ public class CrashReport
                 this.crashReportFile = p_147149_1_;
                 return true;
             }
-            catch (Throwable throwable)
-            {
-                logger.error("Could not save crash report to " + p_147149_1_, throwable);
+            catch (Throwable throwable) {
                 return false;
             }
         }

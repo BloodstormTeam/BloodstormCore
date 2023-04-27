@@ -54,9 +54,7 @@ public class CraftProfileBanList implements org.bukkit.BanList {
 
         try {
             list.func_152678_f();
-        } catch (IOException ex) {
-            MinecraftServer.getLogger().error("Failed to save banned-players.json, " + ex.getMessage());
-        }
+        } catch (IOException ignored) {}
 
         return new CraftProfileBanEntry(profile, entry, list);
     }

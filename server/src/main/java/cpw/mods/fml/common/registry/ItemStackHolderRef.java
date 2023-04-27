@@ -5,12 +5,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import net.minecraft.item.ItemStack;
-
-import org.apache.logging.log4j.Level;
-
 import com.google.common.base.Throwables;
-
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.registry.GameRegistry.ItemStackHolder;
 
 
@@ -63,22 +58,10 @@ class ItemStackHolderRef {
     public void apply()
     {
         ItemStack is;
-        try
-        {
-            is = GameRegistry.makeItemStack(itemName, meta, 1, serializednbt);
-        } catch (RuntimeException e)
-        {
-            FMLLog.getLogger().log(Level.ERROR, "Caught exception processing itemstack {},{},{} in annotation at {}.{}", itemName, meta, serializednbt,field.getClass().getName(),field.getName());
-            throw e;
-        }
-        try
-        {
+        is = GameRegistry.makeItemStack(itemName, meta, 1, serializednbt);
+        try {
             Object fieldAccessor = newFieldAccessor.invoke(reflectionFactory, field, false);
             fieldAccessorSet.invoke(fieldAccessor, null, is);
-        }
-        catch (Exception e)
-        {
-            FMLLog.getLogger().log(Level.WARN, "Unable to set {} with value {},{},{}", this.field, this.itemName, this.meta, this.serializednbt);
-        }
+        } catch (Exception ignored) {}
     }
 }

@@ -3,7 +3,6 @@ package org.bukkit.craftbukkit.command;
 import net.minecraft.entity.EntityMinecartCommandBlockListener;
 import net.minecraft.tileentity.TileEntityCommandBlockListener;
 import org.apache.commons.lang.Validate;
-import org.apache.logging.log4j.Level;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -124,15 +123,6 @@ public final class VanillaCommandWrapper extends VanillaCommand {
             net.minecraft.util.ChatComponentTranslation chatmessage3 = new net.minecraft.util.ChatComponentTranslation("commands.generic.exception");
             chatmessage3.getChatStyle().setColor(net.minecraft.util.EnumChatFormatting.RED);
             icommandlistener.addChatMessage(chatmessage3);
-            if (icommandlistener instanceof TileEntityCommandBlockListener) {
-                TileEntityCommandBlockListener listener = (TileEntityCommandBlockListener) icommandlistener;
-                net.minecraft.server.MinecraftServer.getLogger().log(Level.WARN, String.format("CommandBlock at (%d,%d,%d) failed to handle command", listener.getPlayerCoordinates().posX, listener.getPlayerCoordinates().posY, listener.getPlayerCoordinates().posZ), throwable);
-            } else if (icommandlistener instanceof EntityMinecartCommandBlockListener) {
-                EntityMinecartCommandBlockListener listener = (EntityMinecartCommandBlockListener) icommandlistener;
-                net.minecraft.server.MinecraftServer.getLogger().log(Level.WARN, String.format("MinecartCommandBlock at (%d,%d,%d) failed to handle command", listener.getPlayerCoordinates().posX, listener.getPlayerCoordinates().posY, listener.getPlayerCoordinates().posZ), throwable);
-            } else {
-                net.minecraft.server.MinecraftServer.getLogger().log(Level.WARN, String.format("Unknown CommandBlock failed to handle command"), throwable);
-            }
         } finally {
             net.minecraft.server.MinecraftServer.getServer().worldServers = prev;
         }

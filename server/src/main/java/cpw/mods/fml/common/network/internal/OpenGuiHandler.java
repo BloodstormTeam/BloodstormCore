@@ -1,11 +1,9 @@
 package cpw.mods.fml.common.network.internal;
 
-import org.apache.logging.log4j.Level;
 import net.minecraft.entity.player.EntityPlayer;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.network.internal.FMLMessage.OpenGui;
 
 public class OpenGuiHandler extends SimpleChannelInboundHandler<FMLMessage.OpenGui> {
@@ -20,8 +18,6 @@ public class OpenGuiHandler extends SimpleChannelInboundHandler<FMLMessage.OpenG
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
     {
-        FMLLog.log(Level.ERROR, cause, "OpenGuiHandler exception");
         super.exceptionCaught(ctx, cause);
     }
-
 }

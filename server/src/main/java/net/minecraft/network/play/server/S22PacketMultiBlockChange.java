@@ -12,12 +12,8 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.chunk.Chunk;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-public class S22PacketMultiBlockChange extends Packet
-{
-    private static final Logger logger = LogManager.getLogger();
+public class S22PacketMultiBlockChange extends Packet {
     private ChunkCoordIntPair field_148925_b;
     private byte[] field_148926_c;
     private int field_148924_d;
@@ -54,7 +50,6 @@ public class S22PacketMultiBlockChange extends Packet
         }
         catch (IOException ioexception)
         {
-            logger.error("Couldn\'t create bulk block update packet", ioexception);
             this.field_148926_c = null;
         }
     }
@@ -96,7 +91,7 @@ public class S22PacketMultiBlockChange extends Packet
 
     public String serialize()
     {
-        return String.format("xc=%d, zc=%d, count=%d", new Object[] {Integer.valueOf(this.field_148925_b.chunkXPos), Integer.valueOf(this.field_148925_b.chunkZPos), Integer.valueOf(this.field_148924_d)});
+        return String.format("xc=%d, zc=%d, count=%d", this.field_148925_b.chunkXPos, this.field_148925_b.chunkZPos, Integer.valueOf(this.field_148924_d));
     }
 
     @SideOnly(Side.CLIENT)

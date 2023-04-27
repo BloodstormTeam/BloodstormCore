@@ -1,7 +1,5 @@
 package io.github.crucible;
 
-import cpw.mods.fml.common.FMLLog;
-
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Optional;
@@ -44,7 +42,6 @@ public class CrucibleMetadata {
                 break;
             }
         } catch (Exception e) {
-            FMLLog.severe("[Crucible] Unable to parse metadata.");
             e.printStackTrace();
         }
         CRUCIBLE_VERSION = parsedVersion;

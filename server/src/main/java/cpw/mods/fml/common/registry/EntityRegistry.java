@@ -17,8 +17,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.logging.log4j.Level;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
@@ -36,15 +34,12 @@ import com.google.common.collect.Maps;
 import com.google.common.primitives.UnsignedBytes;
 
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.network.internal.FMLMessage.EntitySpawnMessage;
 
 // Cauldron start
-import net.minecraftforge.common.util.EnumHelper;
-import org.bukkit.craftbukkit.entity.CraftEntity;
-import org.bukkit.entity.EntityType;
+
 // Cauldron end
 
 public class EntityRegistry
@@ -172,16 +167,10 @@ public class EntityRegistry
                 String entityModName = String.format("%s.%s", mc.getModId(), entityName);
                 EntityList.classToStringMapping.put(entityClass, entityModName);
                 EntityList.stringToClassMapping.put(entityModName, entityClass);
-                FMLLog.finer("Automatically registered mod %s entity %s as %s", mc.getModId(), entityName, entityModName);
-            }
-            else
-            {
-                FMLLog.fine("Skipping automatic mod %s entity registration for already registered class %s", mc.getModId(), entityClass.getName());
             }
         }
         catch (IllegalArgumentException e)
         {
-            FMLLog.log(Level.WARN, e, "The mod %s tried to register the entity (name,class) (%s,%s) one or both of which are already registered", mc.getModId(), entityName, entityClass.getName());
             return;
         }
         entityRegistrations.put(mc, er);
@@ -191,17 +180,6 @@ public class EntityRegistry
     {
         if (EntityList.classToStringMapping.containsKey(entityClass))
         {
-            ModContainer activeModContainer = Loader.instance().activeModContainer();
-            String modId = "unknown";
-            if (activeModContainer != null)
-            {
-                modId = activeModContainer.getModId();
-            }
-            else
-            {
-                FMLLog.severe("There is a rogue mod failing to register entities from outside the context of mod loading. This is incredibly dangerous and should be stopped.");
-            }
-            FMLLog.warning("The mod %s tried to register the entity class %s which was already registered - if you wish to override default naming for FML mod entities, register it here first", modId, entityClass);
             return;
         }
         id = instance().validateAndClaimId(id);
@@ -215,8 +193,7 @@ public class EntityRegistry
         int realId = id;
         if (id < Byte.MIN_VALUE)
         {
-            FMLLog.warning("Compensating for modloader out of range compensation by mod : entityId %d for mod %s is now %d", id, Loader.instance().activeModContainer().getModId(), realId);
-            realId += 3000;
+           realId += 3000;
         }
 
         if (realId < 0)
@@ -227,34 +204,15 @@ public class EntityRegistry
         {
             UnsignedBytes.checkedCast(realId);
         }
-        catch (IllegalArgumentException e)
-        {
-            FMLLog.log(Level.ERROR, "The entity ID %d for mod %s is not an unsigned byte and may not work", id, Loader.instance().activeModContainer().getModId());
-        }
+        catch (IllegalArgumentException ignored) {}
 
-        if (!availableIndicies.get(realId))
-        {
-            FMLLog.severe("The mod %s has attempted to register an entity ID %d which is already reserved. This could cause severe problems", Loader.instance().activeModContainer().getModId(), id);
-        }
         availableIndicies.clear(realId);
         return realId;
     }
 
     public static void registerGlobalEntityID(Class <? extends Entity > entityClass, String entityName, int id, int backgroundEggColour, int foregroundEggColour)
     {
-        if (EntityList.classToStringMapping.containsKey(entityClass))
-        {
-            ModContainer activeModContainer = Loader.instance().activeModContainer();
-            String modId = "unknown";
-            if (activeModContainer != null)
-            {
-                modId = activeModContainer.getModId();
-            }
-            else
-            {
-                FMLLog.severe("There is a rogue mod failing to register entities from outside the context of mod loading. This is incredibly dangerous and should be stopped.");
-            }
-            FMLLog.warning("The mod %s tried to register the entity class %s which was already registered - if you wish to override default naming for FML mod entities, register it here first", modId, entityClass);
+        if (EntityList.classToStringMapping.containsKey(entityClass)) {
             return;
         }
         instance().validateAndClaimId(id);

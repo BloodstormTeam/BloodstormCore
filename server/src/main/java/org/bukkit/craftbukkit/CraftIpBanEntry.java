@@ -79,8 +79,6 @@ public final class CraftIpBanEntry implements org.bukkit.BanEntry {
         this.list.func_152687_a(entry);
         try {
             this.list.func_152678_f();
-        } catch (IOException ex) {
-            MinecraftServer.getLogger().error("Failed to save banned-ips.json, " + ex.getMessage());
-        }
+        } catch (IOException ignored) {}
     }
 }

@@ -1,8 +1,5 @@
 package net.minecraft.server.management;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S21PacketChunkData;
@@ -15,17 +12,13 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-//CraftBukkit start
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Queue;
-// CraftBukkit end
 
-public class PlayerManager
-{
-    private static final Logger field_152627_a = LogManager.getLogger();
+public class PlayerManager {
     private final WorldServer theWorldServer;
     private final List players = new ArrayList();
     private final LongHashMap playerInstances = new LongHashMap();
@@ -410,39 +403,26 @@ public class PlayerManager
 
         public void addPlayer(final EntityPlayerMP p_73255_1_)
         {
-            if (this.playersWatchingChunk.contains(p_73255_1_))
+            if (this.playersWatchingChunk.isEmpty())
             {
-                PlayerManager.field_152627_a.debug("Failed to add player. {} already is in chunk {}, {}", new Object[] {p_73255_1_, Integer.valueOf(this.chunkLocation.chunkXPos), Integer.valueOf(this.chunkLocation.chunkZPos)});
+                this.previousWorldTime = PlayerManager.this.theWorldServer.getTotalWorldTime();
+            }
+
+            this.playersWatchingChunk.add(p_73255_1_);
+            Runnable playerRunnable;
+
+            if (this.loaded)
+            {
+                playerRunnable = null;
+                p_73255_1_.loadedChunks.add(this.chunkLocation);
             }
             else
             {
-                if (this.playersWatchingChunk.isEmpty())
-                {
-                    this.previousWorldTime = PlayerManager.this.theWorldServer.getTotalWorldTime();
-                }
-
-                this.playersWatchingChunk.add(p_73255_1_);
-                Runnable playerRunnable;
-
-                if (this.loaded)
-                {
-                    playerRunnable = null;
-                    p_73255_1_.loadedChunks.add(this.chunkLocation);
-                }
-                else
-                {
-                    playerRunnable = new Runnable()
-                    {
-                        public void run()
-                        {
-                            p_73255_1_.loadedChunks.add(PlayerInstance.this.chunkLocation);
-                        }
-                    };
-                    PlayerManager.this.getWorldServer().theChunkProviderServer.loadChunk(this.chunkLocation.chunkXPos, this.chunkLocation.chunkZPos, playerRunnable);
-                }
-
-                this.players.put(p_73255_1_, playerRunnable);
+                playerRunnable = () -> p_73255_1_.loadedChunks.add(PlayerInstance.this.chunkLocation);
+                PlayerManager.this.getWorldServer().theChunkProviderServer.loadChunk(this.chunkLocation.chunkXPos, this.chunkLocation.chunkZPos, playerRunnable);
             }
+
+            this.players.put(p_73255_1_, playerRunnable);
         }
 
         public void removePlayer(EntityPlayerMP p_73252_1_)

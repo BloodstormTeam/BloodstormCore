@@ -10,12 +10,8 @@ import java.util.regex.Pattern;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.ReportedException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-public class NBTTagCompound extends NBTBase
-{
-    private static final Logger logger = LogManager.getLogger();
+public class NBTTagCompound extends NBTBase {
     private Map<String, NBTBase> tagMap = null;
     private static final String __OBFID = "CL_00001215";
 

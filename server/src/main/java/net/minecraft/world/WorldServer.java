@@ -1,23 +1,8 @@
 package net.minecraft.world;
 
 import com.bloodstorm.core.util.ChunkHash;
-import com.google.common.collect.Lists;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.Collections;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEventData;
 import net.minecraft.block.material.Material;
@@ -35,25 +20,14 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.network.play.server.S19PacketEntityStatus;
-import net.minecraft.network.play.server.S24PacketBlockAction;
-import net.minecraft.network.play.server.S27PacketExplosion;
-import net.minecraft.network.play.server.S2APacketParticles;
-import net.minecraft.network.play.server.S2BPacketChangeGameState;
-import net.minecraft.network.play.server.S2CPacketSpawnGlobalEntity;
+import net.minecraft.network.play.server.*;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.scoreboard.ScoreboardSaveData;
 import net.minecraft.scoreboard.ServerScoreboard;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerManager;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.IProgressUpdate;
-import net.minecraft.util.IntHashMap;
-import net.minecraft.util.ReportedException;
-import net.minecraft.util.Vec3;
-import net.minecraft.util.WeightedRandom;
-import net.minecraft.util.WeightedRandomChestContent;
+import net.minecraft.util.*;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManager;
 import net.minecraft.world.chunk.Chunk;
@@ -63,37 +37,27 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraft.world.chunk.storage.IChunkLoader;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraft.world.gen.feature.WorldGeneratorBonusChest;
-import net.minecraft.world.storage.DerivedWorldInfo;
 import net.minecraft.world.storage.ISaveHandler;
+import net.minecraftforge.cauldron.command.CauldronCommand;
 import net.minecraftforge.common.ChestGenHooks;
-import static net.minecraftforge.common.ChestGenHooks.BONUS_CHEST;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.cauldron.command.CauldronCommand;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-
-// CraftBukkit start
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.BlockJukebox;
-import net.minecraft.tileentity.*;
-
 import org.bukkit.WeatherType;
 import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.util.LongHash;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.event.weather.ThunderChangeEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
+
+import java.io.File;
+import java.util.*;
+
+import static net.minecraftforge.common.ChestGenHooks.BONUS_CHEST;
 // CraftBukkit end
 
-public class WorldServer extends World
-{
-    private static final Logger logger = LogManager.getLogger();
+public class WorldServer extends World {
     private final MinecraftServer mcServer;
     public EntityTracker theEntityTracker; // CraftBukkit - private final -> public
     private final PlayerManager thePlayerManager;
@@ -826,11 +790,6 @@ public class WorldServer extends World
             else
             {
                 iterator = this.pendingTickListEntriesThisTick.iterator();
-
-                if (!this.pendingTickListEntriesThisTick.isEmpty())
-                {
-                    logger.debug("toBeTicked = " + this.pendingTickListEntriesThisTick.size());
-                }
             }
 
             while (iterator.hasNext())
@@ -1021,10 +980,6 @@ public class WorldServer extends World
             {
                 i = chunkposition.chunkPosX;
                 k = chunkposition.chunkPosZ;
-            }
-            else
-            {
-                logger.warn("Unable to find spawn biome");
             }
 
             int l = 0;

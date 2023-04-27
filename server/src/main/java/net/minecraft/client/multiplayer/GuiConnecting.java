@@ -18,14 +18,11 @@ import net.minecraft.network.handshake.client.C00Handshake;
 import net.minecraft.network.login.client.C00PacketLoginStart;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
 public class GuiConnecting extends GuiScreen
 {
     private static final AtomicInteger field_146372_a = new AtomicInteger(0);
-    private static final Logger logger = LogManager.getLogger();
     private NetworkManager field_146371_g;
     private boolean field_146373_h;
     private final GuiScreen field_146374_i;
@@ -51,7 +48,6 @@ public class GuiConnecting extends GuiScreen
 
     private void func_146367_a(final String p_146367_1_, final int p_146367_2_)
     {
-        logger.info("Connecting to " + p_146367_1_ + ", " + p_146367_2_);
         (new Thread("Server Connector #" + field_146372_a.incrementAndGet())
         {
             private static final String __OBFID = "CL_00000686";
@@ -79,7 +75,6 @@ public class GuiConnecting extends GuiScreen
                         return;
                     }
 
-                    GuiConnecting.logger.error("Couldn\'t connect to server", unknownhostexception);
                     GuiConnecting.this.mc.displayGuiScreen(new GuiDisconnected(GuiConnecting.this.field_146374_i, "connect.failed", new ChatComponentTranslation("disconnect.genericReason", new Object[] {"Unknown host"})));
                 }
                 catch (Exception exception)
@@ -89,7 +84,6 @@ public class GuiConnecting extends GuiScreen
                         return;
                     }
 
-                    GuiConnecting.logger.error("Couldn\'t connect to server", exception);
                     String s = exception.toString();
 
                     if (inetaddress != null)

@@ -40,88 +40,6 @@ public class CauldronHooks {
     public static Map<Class<? extends Entity>, SushchestvoCache> sushchestvoCache = new HashMap<Class<? extends Entity>, SushchestvoCache>();
 
     private static final TObjectLongHashMap<CollisionWarning> recentWarnings = new TObjectLongHashMap<CollisionWarning>();
-
-    public static void logInfo(String msg, Object... args) {
-        MinecraftServer.getServer().logInfo(MessageFormat.format(msg, args));
-    }
-
-    public static void logWarning(String msg, Object... args) {
-        MinecraftServer.getServer().logWarning(MessageFormat.format(msg, args));
-    }
-
-    public static void logSevere(String msg, Object... args) {
-        MinecraftServer.getServer().logSevere(MessageFormat.format(msg, args));
-    }
-
-    public static void logStack() {
-        if (CrucibleConfigs.configs.cauldron_logging_logWithStackTraces) {
-            Throwable ex = new Throwable();
-            ex.fillInStackTrace();
-            ex.printStackTrace();
-        }
-    }
-
-//TODO-crucible: possible code removal
-//    public static void logEntityDeath(Entity entity) {
-//        if (CrucibleConfigs.configs.cauldron_logging_entityDeath) {
-//            logInfo("Dim: {0} setDead(): {1}", entity.worldObj.provider.dimensionId, entity);
-//            logStack();
-//        }
-//    }
-
-    public static void logEntityDespawn(Entity entity, String reason) {
-        if (CrucibleConfigs.configs.cauldron_logging_entityDespawn) {
-            logInfo("Dim: {0} Despawning ({1}): {2}", entity.worldObj.provider.dimensionId, reason, entity);
-            //logInfo("Chunk Is Active: {0}", entity.worldObj.inActiveChunk(entity));
-            logStack();
-        }
-    }
-
-    public static void logEntitySpawn(World world, Entity entity, SpawnReason spawnReason) {
-        if (CrucibleConfigs.configs.cauldron_logging_entitySpawn) {
-            logInfo("Dim: {0} Spawning ({1}): {2}", world.provider.dimensionId, spawnReason, entity);
-            logInfo("Dim: {0} Entities Last Tick: {1}", world.provider.dimensionId, world.entitiesTicked);
-            logInfo("Dim: {0} Tiles Last Tick: {1}", world.provider.dimensionId, world.tilesTicked);
-            //logInfo("Chunk Is Active: {0}", world.inActiveChunk(entity));
-            logStack();
-        }
-    }
-
-    public static void logChunkLoad(ChunkProviderServer provider, String msg, int x, int z, boolean logLoadOnRequest) {
-        if (CrucibleConfigs.configs.cauldron_logging_chunkLoad) {
-            logInfo("{0} Chunk At [{1}] ({2}, {3})", msg, provider.worldObj.provider.dimensionId, x, z);
-            if (logLoadOnRequest) {
-                logLoadOnRequest(provider, x, z);
-            }
-            logStack();
-        }
-    }
-
-    public static void logChunkUnload(ChunkProviderServer provider, int x, int z, String msg) {
-        if (CrucibleConfigs.configs.cauldron_logging_chunkUnload) {
-            logInfo("{0} [{1}] ({2}, {3})", msg, provider.worldObj.provider.dimensionId, x, z);
-            long currentTick = MinecraftServer.getServer().getTickCounter();
-            long lastAccessed = provider.lastAccessed(x, z);
-            long diff = currentTick - lastAccessed;
-            logInfo(" Last accessed: {0, number} Current Tick: {1, number} [{2, number}]", lastAccessed, currentTick, diff);
-        }
-    }
-
-    private static void logLoadOnRequest(ChunkProviderServer provider, int x, int z) {
-        long currentTick = MinecraftServer.getServer().getTickCounter();
-        long lastAccessed = provider.lastAccessed(x, z);
-        long diff = currentTick - lastAccessed;
-        logInfo(" Last accessed: {0, number} Current Tick: {1, number} [{2, number}]", lastAccessed, currentTick, diff);
-        logInfo(" Finding Spawn Point: {0}", provider.worldObj.findingSpawnPoint);
-        logInfo(" Load chunk on request: {0}", provider.loadChunkOnProvideRequest);
-        logInfo(" Calling Forge Tick: {0}", MinecraftServer.callingForgeTick);
-        logInfo(" Load chunk on forge tick: {0}", CrucibleConfigs.configs.cauldron_settings_loadChunkOnForgeTick);
-        long providerTickDiff = currentTick - provider.initialTick;
-        if (providerTickDiff <= 100) {
-            logInfo(" Current Tick - Initial Tick: {0, number}", providerTickDiff);
-        }
-    }
-
     public static boolean checkBoundingBoxSize(Entity entity, AxisAlignedBB aabb) {
         if (entity instanceof EntityLivingBase && (!(entity instanceof IBossDisplayData) || !(entity instanceof IEntityMultiPart))
                 && !(entity instanceof EntityPlayer)) {
@@ -136,16 +54,8 @@ public class CauldronHooks {
 
             int size = Math.abs(x1 - x) * Math.abs(y1 - y) * Math.abs(z1 - z);
             if (size > CrucibleConfigs.configs.cauldron_settings_largeBoundingBoxLogSize) {
-                logWarning("Entity being removed for bounding box restrictions");
-                logWarning("BB Size: {0} > {1} avg edge: {2}", size, logSize, aabb.getAverageEdgeLength());
-                logWarning("Motion: ({0}, {1}, {2})", entity.motionX, entity.motionY, entity.motionZ);
-                logWarning("Calculated bounding box: {0}", aabb);
-                logWarning("Entity bounding box: {0}", entity.getBoundingBox());
-                logWarning("Entity: {0}", entity);
                 NBTTagCompound tag = new NBTTagCompound();
                 entity.writeToNBT(tag);
-                logWarning("Entity NBT: {0}", tag);
-                logStack();
                 entity.setDead();
                 return true;
             }
@@ -159,23 +69,6 @@ public class CauldronHooks {
         if (maxSpeed > 0 && CrucibleConfigs.configs.cauldron_settings_checkEntityMaxSpeeds) {
             double distance = x * x + z * z;
             if (distance > maxSpeed) {
-                if (CrucibleConfigs.configs.cauldron_logging_entitySpeedRemoval) {
-                    logInfo("Speed violation: {0} was over {1} - Removing Entity: {2}", distance, maxSpeed, entity);
-                    if (entity instanceof EntityLivingBase) {
-                        EntityLivingBase livingBase = (EntityLivingBase) entity;
-                        logInfo("Entity Motion: ({0}, {1}, {2}) Move Strafing: {3} Move Forward: {4}", entity.motionX, entity.motionY, entity.motionZ, livingBase.moveStrafing, livingBase.moveForward);
-                    }
-
-                    if (CrucibleConfigs.configs.cauldron_logging_logWithStackTraces) {
-                        logInfo("Move offset: ({0}, {1}, {2})", x, y, z);
-                        logInfo("Motion: ({0}, {1}, {2})", entity.motionX, entity.motionY, entity.motionZ);
-                        logInfo("Entity: {0}", entity);
-                        NBTTagCompound tag = new NBTTagCompound();
-                        entity.writeToNBT(tag);
-                        logInfo("Entity NBT: {0}", tag);
-                        logStack();
-                    }
-                }
                 if (entity instanceof EntityPlayer) // Skip killing players
                 {
                     entity.motionX = 0;
@@ -193,10 +86,6 @@ public class CauldronHooks {
 
     public static void logEntitySize(World world, Entity entity, List list) {
         if (!CrucibleConfigs.configs.cauldron_logging_entityCollisionChecks) return;
-        long largeCountLogSize = CrucibleConfigs.configs.cauldron_logging_largeCollisionWarnSize;
-        if (largeCountLogSize > 0 && world.entitiesTicked > largeCountLogSize) {
-            logWarning("Entity size > {0, number} at: {1}", largeCountLogSize, entity);
-        }
         if (list == null) return;
         long largeCollisionLogSize = CrucibleConfigs.configs.cauldron_logging_largeCollisionWarnSize;
         if (largeCollisionLogSize > 0 &&
@@ -208,7 +97,6 @@ public class CauldronHooks {
                 if ((MinecraftServer.getSystemTimeMillis() - lastWarned) < 30000) return;
             }
             recentWarnings.put(warning, System.currentTimeMillis());
-            logWarning("Entity collision > {0, number} at: {1}", largeCollisionLogSize, entity);
         }
     }
 
@@ -386,9 +274,7 @@ public class CauldronHooks {
             writer.endArray(); // Dimensions
             writer.close();
             fileWriter.close();
-        } catch (Throwable throwable) {
-            MinecraftServer.getServer().logSevere("Could not save chunk info report to " + file);
-        }
+        } catch (Throwable ignored) {}
     }
 
     private static <T> void writeChunkCounts(JsonWriter writer, String name, final TObjectIntHashMap<T> map) throws IOException {
@@ -431,9 +317,7 @@ public class CauldronHooks {
             Object hotspotMBean = ManagementFactory.newPlatformMXBeanProxy(server, "com.sun.management:type=HotSpotDiagnostic", clazz);
             Method m = clazz.getMethod("dumpHeap", String.class, boolean.class);
             m.invoke(hotspotMBean, file.getPath(), live);
-        } catch (Throwable t) {
-            logSevere("Could not write heap to {0}", file);
-        }
+        } catch (Throwable ignored) {}
     }
 
     public static void enableThreadContentionMonitoring() {

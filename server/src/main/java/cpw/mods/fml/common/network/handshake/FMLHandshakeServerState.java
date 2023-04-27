@@ -3,7 +3,6 @@ package cpw.mods.fml.common.network.handshake;
 import io.github.crucible.CrucibleConfigs;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.internal.FMLMessage;
@@ -37,16 +36,10 @@ enum FMLHandshakeServerState implements IHandshakeState<FMLHandshakeServerState>
             // Hello packet first
             if (msg instanceof FMLHandshakeMessage.ClientHello)
             {
-                FMLLog.info("Client protocol version %x", ((FMLHandshakeMessage.ClientHello)msg).protocolVersion());
                 return this;
             }
 
             FMLHandshakeMessage.ModList client = (FMLHandshakeMessage.ModList)msg;
-            if (CrucibleConfigs.configs.thermos_logging_clientModList) {
-                FMLLog.info("Client attempting to join with %d mods : %s", client.modListSize(), client.modListAsString());
-            } else {
-                FMLLog.info("Client attempting to join with %d mods", client.modListSize());
-            }
             String result = FMLNetworkHandler.checkModList(client, Side.CLIENT);
             if (result != null)
             {

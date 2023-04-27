@@ -3,9 +3,7 @@ package cpw.mods.fml.common.registry;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import org.apache.logging.log4j.Level;
 import com.google.common.base.Throwables;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.registry.GameRegistry.ObjectHolder;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -116,7 +114,6 @@ class ObjectHolderRef {
 
         if (thing == null)
         {
-            FMLLog.getLogger().log(Level.DEBUG, "Unable to lookup {} for {}. This means the object wasn't registered. It's likely just mod options.", injectedObject, field);
             return;
         }
         try
@@ -124,9 +121,6 @@ class ObjectHolderRef {
             Object fieldAccessor = newFieldAccessor.invoke(reflectionFactory, field, false);
             fieldAccessorSet.invoke(fieldAccessor, null, thing);
         }
-        catch (Exception e)
-        {
-            FMLLog.log(Level.WARN, e, "Unable to set %s with value %s (%s)", this.field, thing, this.injectedObject);
-        }
+        catch (Exception ignored) {}
     }
 }

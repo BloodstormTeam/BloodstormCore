@@ -64,7 +64,6 @@ public class TileEntityConfig extends ConfigBase {
             this.saveWorldConfigs();
             this.save();
         } catch (Exception ex) {
-            MinecraftServer.getServer().logSevere("Could not load " + this.configFile);
             ex.printStackTrace();
         }
     }

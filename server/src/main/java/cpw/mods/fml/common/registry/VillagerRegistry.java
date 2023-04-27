@@ -31,7 +31,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -121,7 +120,6 @@ public class VillagerRegistry
     {
         if (newVillagerIds.contains(id))
         {
-            FMLLog.severe("Attempt to register duplicate villager id %d", id);
             throw new RuntimeException();
         }
         newVillagerIds.add(id);

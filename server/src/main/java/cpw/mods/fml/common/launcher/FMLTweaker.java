@@ -11,9 +11,6 @@ import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -109,10 +106,8 @@ public class FMLTweaker implements ITweaker {
         {
             jarLocation = getClass().getProtectionDomain().getCodeSource().getLocation().toURI();
         }
-        catch (URISyntaxException e)
-        {
-            LogManager.getLogger("FMLTWEAK").log(Level.ERROR, "Missing URI information for FML tweak");
-            throw Throwables.propagate(e);
+        catch (URISyntaxException e) {
+             Throwables.throwIfUnchecked(e);
         }
     }
 

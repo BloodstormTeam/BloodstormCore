@@ -27,11 +27,6 @@ public abstract class RConThreadBase implements Runnable
     {
         this.server = p_i45300_1_;
         this.field_164003_c = p_i45300_2_;
-
-        if (this.server.isDebuggingEnabled())
-        {
-            this.logWarning("Debugging is enabled, performance maybe reduced!");
-        }
     }
 
     public synchronized void startThread()
@@ -46,26 +41,6 @@ public abstract class RConThreadBase implements Runnable
         return this.running;
     }
 
-    protected void logDebug(String p_72607_1_)
-    {
-        this.server.logDebug(p_72607_1_);
-    }
-
-    protected void logInfo(String p_72609_1_)
-    {
-        this.server.logInfo(p_72609_1_);
-    }
-
-    protected void logWarning(String p_72606_1_)
-    {
-        this.server.logWarning(p_72606_1_);
-    }
-
-    protected void logSevere(String p_72610_1_)
-    {
-        this.server.logSevere(p_72610_1_);
-    }
-
     protected int getNumberOfPlayers()
     {
         return this.server.getCurrentPlayerCount();
@@ -73,13 +48,11 @@ public abstract class RConThreadBase implements Runnable
 
     protected void registerSocket(DatagramSocket p_72601_1_)
     {
-        this.logDebug("registerSocket: " + p_72601_1_);
         this.socketList.add(p_72601_1_);
     }
 
     protected boolean closeSocket(DatagramSocket p_72604_1_, boolean p_72604_2_)
     {
-        this.logDebug("closeSocket: " + p_72604_1_);
 
         if (null == p_72604_1_)
         {
@@ -109,10 +82,7 @@ public abstract class RConThreadBase implements Runnable
         return this.closeServerSocket_do(p_72608_1_, true);
     }
 
-    protected boolean closeServerSocket_do(ServerSocket p_72605_1_, boolean p_72605_2_)
-    {
-        this.logDebug("closeSocket: " + p_72605_1_);
-
+    protected boolean closeServerSocket_do(ServerSocket p_72605_1_, boolean p_72605_2_) {
         if (null == p_72605_1_)
         {
             return false;
@@ -129,10 +99,7 @@ public abstract class RConThreadBase implements Runnable
                     flag1 = true;
                 }
             }
-            catch (IOException ioexception)
-            {
-                this.logWarning("IO: " + ioexception.getMessage());
-            }
+            catch (IOException ignored) {}
 
             if (p_72605_2_)
             {
@@ -177,10 +144,5 @@ public abstract class RConThreadBase implements Runnable
         }
 
         this.serverSocketList.clear();
-
-        if (p_72612_1_ && 0 < i)
-        {
-            this.logWarning("Force closed " + i + " sockets");
-        }
     }
 }

@@ -12,13 +12,9 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.handshake.client.C00Handshake;
 import net.minecraft.network.login.client.C00PacketLoginStart;
 import net.minecraft.util.ChatComponentTranslation;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
-public class RealmsConnect
-{
-    private static final Logger LOGGER = LogManager.getLogger();
+public class RealmsConnect {
     private final RealmsScreen onlineScreen;
     private volatile boolean aborted = false;
     private NetworkManager connection;
@@ -78,7 +74,6 @@ public class RealmsConnect
                         return;
                     }
 
-                    RealmsConnect.LOGGER.error("Couldn\'t connect to world", unknownhostexception);
                     Realms.setScreen(new DisconnectedOnlineScreen(RealmsConnect.this.onlineScreen, "connect.failed", new ChatComponentTranslation("disconnect.genericReason", new Object[] {"Unknown host \'" + p_connect_1_ + "\'"})));
                 }
                 catch (Exception exception)
@@ -88,7 +83,6 @@ public class RealmsConnect
                         return;
                     }
 
-                    RealmsConnect.LOGGER.error("Couldn\'t connect to world", exception);
                     String s = exception.toString();
 
                     if (inetaddress != null)

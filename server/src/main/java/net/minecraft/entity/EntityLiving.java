@@ -554,7 +554,6 @@ public abstract class EntityLiving extends EntityLivingBase
     // Cauldron start
     private void despawn(String reason) {
         this.setDead();
-        net.minecraftforge.cauldron.CauldronHooks.logEntityDespawn(this, reason);
     }
     // Cauldron end
 

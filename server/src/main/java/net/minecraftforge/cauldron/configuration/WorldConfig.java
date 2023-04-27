@@ -19,12 +19,6 @@ public class WorldConfig {
         baseConfig.save();
     }
 
-    private void log(String s) {
-        if (verbose) {
-            MinecraftServer.getServer().logInfo(s);
-        }
-    }
-
     public void set(String path, Object val) {
         baseConfig.config.set(path, val);
     }

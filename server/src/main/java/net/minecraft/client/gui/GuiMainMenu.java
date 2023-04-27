@@ -27,8 +27,6 @@ import net.minecraft.world.storage.ISaveFormat;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.client.ForgeHooksClient;
 import org.apache.commons.io.Charsets;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.util.glu.Project;
@@ -37,9 +35,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 @SideOnly(Side.CLIENT)
-public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
-{
-    private static final Logger logger = LogManager.getLogger();
+public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
     private static final Random rand = new Random();
     private float updateCounter;
     private String splashText;
@@ -299,10 +295,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
                     Object object = oclass.getMethod("getDesktop", new Class[0]).invoke((Object)null, new Object[0]);
                     oclass.getMethod("browse", new Class[] {URI.class}).invoke(object, new Object[] {new URI(this.field_104024_v)});
                 }
-                catch (Throwable throwable)
-                {
-                    logger.error("Couldn\'t open link", throwable);
-                }
+                catch (Throwable ignored) {}
             }
 
             this.mc.displayGuiScreen(this);

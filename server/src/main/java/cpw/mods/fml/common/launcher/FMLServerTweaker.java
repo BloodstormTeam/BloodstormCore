@@ -3,7 +3,10 @@ package cpw.mods.fml.common.launcher;
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
+import java.time.Instant;
+
 public class FMLServerTweaker extends FMLTweaker {
+    public static long startAtMS = System.currentTimeMillis();
     @Override
     public String getLaunchTarget()
     {

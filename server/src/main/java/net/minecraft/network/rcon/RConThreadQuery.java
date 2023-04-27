@@ -65,16 +65,11 @@ public class RConThreadQuery extends RConThreadBase
                 InetAddress inetaddress = InetAddress.getLocalHost();
                 this.queryHostname = inetaddress.getHostAddress();
             }
-            catch (UnknownHostException unknownhostexception)
-            {
-                this.logWarning("Unable to determine local host IP, please set server-ip in \'" + p_i1536_1_.getSettingsFilename() + "\' : " + unknownhostexception.getMessage());
-            }
+            catch (UnknownHostException ignored) {}
         }
 
-        if (0 == this.queryPort)
-        {
+        if (0 == this.queryPort) {
             this.queryPort = this.serverPort;
-            this.logInfo("Setting default query port to " + this.queryPort);
             p_i1536_1_.setProperty("query.port", Integer.valueOf(this.queryPort));
             p_i1536_1_.setProperty("debug", Boolean.valueOf(false));
             p_i1536_1_.saveProperties();
@@ -96,27 +91,15 @@ public class RConThreadQuery extends RConThreadBase
         byte[] abyte = p_72621_1_.getData();
         int i = p_72621_1_.getLength();
         SocketAddress socketaddress = p_72621_1_.getSocketAddress();
-        this.logDebug("Packet len " + i + " [" + socketaddress + "]");
 
-        if (3 <= i && -2 == abyte[0] && -3 == abyte[1])
-        {
-            this.logDebug("Packet \'" + RConUtils.getByteAsHexString(abyte[2]) + "\' [" + socketaddress + "]");
-
-            switch (abyte[2])
-            {
+        if (3 <= i && -2 == abyte[0] && -3 == abyte[1]) {
+            switch (abyte[2]) {
                 case 0:
-                    if (!this.verifyClientAuth(p_72621_1_).booleanValue())
-                    {
-                        this.logDebug("Invalid challenge [" + socketaddress + "]");
+                    if (!this.verifyClientAuth(p_72621_1_)) {
                         return false;
-                    }
-                    else if (15 == i)
-                    {
+                    } else if (15 == i) {
                         this.sendResponsePacket(this.createQueryResponse(p_72621_1_), p_72621_1_);
-                        this.logDebug("Rules [" + socketaddress + "]");
-                    }
-                    else
-                    {
+                    } else {
                         RConOutputStream rconoutputstream = new RConOutputStream(1460);
                         rconoutputstream.writeInt(0);
                         rconoutputstream.writeByteArray(this.getRequestID(p_72621_1_.getSocketAddress()));
@@ -128,19 +111,14 @@ public class RConThreadQuery extends RConThreadBase
                         rconoutputstream.writeShort((short)this.serverPort);
                         rconoutputstream.writeString(this.queryHostname);
                         this.sendResponsePacket(rconoutputstream.toByteArray(), p_72621_1_);
-                        this.logDebug("Status [" + socketaddress + "]");
                     }
                 case 9:
                     this.sendAuthChallenge(p_72621_1_);
-                    this.logDebug("Challenge [" + socketaddress + "]");
                     return true;
                 default:
                     return true;
             }
-        }
-        else
-        {
-            this.logDebug("Invalid packet [" + socketaddress + "]");
+        } else {
             return false;
         }
     }
@@ -258,9 +236,7 @@ public class RConThreadQuery extends RConThreadBase
         }
     }
 
-    public void run()
-    {
-        this.logInfo("Query running on " + this.serverHostname + ":" + this.queryPort);
+    public void run() {
         this.lastAuthCheckTime = MinecraftServer.getSystemTimeMillis();
         this.incomingPacket = new DatagramPacket(this.buffer, this.buffer.length);
 
@@ -278,12 +254,8 @@ public class RConThreadQuery extends RConThreadBase
                 {
                     this.cleanQueryClientsMap();
                 }
-                catch (PortUnreachableException portunreachableexception)
-                {
-                    ;
-                }
-                catch (IOException ioexception)
-                {
+                catch (PortUnreachableException ignored) {}
+                catch (IOException ioexception) {
                     this.stopWithException(ioexception);
                 }
             }
@@ -305,22 +277,13 @@ public class RConThreadQuery extends RConThreadBase
                     super.startThread();
                 }
             }
-            else
-            {
-                this.logWarning("Invalid query port " + this.queryPort + " found in \'" + this.server.getSettingsFilename() + "\' (queries disabled)");
-            }
         }
     }
 
     private void stopWithException(Exception p_72623_1_)
     {
-        if (this.running)
-        {
-            this.logWarning("Unexpected exception, buggy JRE? (" + p_72623_1_.toString() + ")");
-
-            if (!this.initQuerySystem())
-            {
-                this.logSevere("Failed to recover from buggy JRE, shutting down!");
+        if (this.running) {
+            if (!this.initQuerySystem()) {
                 this.running = false;
             }
         }
@@ -335,18 +298,7 @@ public class RConThreadQuery extends RConThreadBase
             this.querySocket.setSoTimeout(500);
             return true;
         }
-        catch (SocketException socketexception)
-        {
-            this.logWarning("Unable to initialise query system on " + this.serverHostname + ":" + this.queryPort + " (Socket): " + socketexception.getMessage());
-        }
-        catch (UnknownHostException unknownhostexception)
-        {
-            this.logWarning("Unable to initialise query system on " + this.serverHostname + ":" + this.queryPort + " (Unknown Host): " + unknownhostexception.getMessage());
-        }
-        catch (Exception exception)
-        {
-            this.logWarning("Unable to initialise query system on " + this.serverHostname + ":" + this.queryPort + " (E): " + exception.getMessage());
-        }
+        catch (Exception ignored) {}
 
         return false;
     }

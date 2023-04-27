@@ -14,29 +14,22 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ThreadLanServerPing;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
 public class LanServerDetector
 {
     private static final AtomicInteger field_148551_a = new AtomicInteger(0);
-    private static final Logger logger = LogManager.getLogger();
-    private static final String __OBFID = "CL_00001133";
 
     @SideOnly(Side.CLIENT)
     public static class LanServer
         {
             private String lanServerMotd;
             private String lanServerIpPort;
-            private long timeLastSeen;
-            private static final String __OBFID = "CL_00001134";
 
             public LanServer(String p_i1319_1_, String p_i1319_2_)
             {
                 this.lanServerMotd = p_i1319_1_;
                 this.lanServerIpPort = p_i1319_2_;
-                this.timeLastSeen = Minecraft.getSystemTime();
             }
 
             public String getServerMotd()
@@ -51,7 +44,6 @@ public class LanServerDetector
 
             public void updateLastSeen()
             {
-                this.timeLastSeen = Minecraft.getSystemTime();
             }
         }
 
@@ -146,12 +138,10 @@ public class LanServerDetector
                     }
                     catch (IOException ioexception1)
                     {
-                        LanServerDetector.logger.error("Couldn\'t ping server", ioexception1);
                         break;
                     }
 
                     String s = new String(datagrampacket.getData(), datagrampacket.getOffset(), datagrampacket.getLength());
-                    LanServerDetector.logger.debug(datagrampacket.getAddress() + ": " + s);
                     this.localServerList.func_77551_a(s, datagrampacket.getAddress());
                 }
 

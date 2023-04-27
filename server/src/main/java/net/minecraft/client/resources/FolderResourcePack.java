@@ -47,11 +47,7 @@ public class FolderResourcePack extends AbstractResourcePack
                 File file2 = afile[j];
                 String s = getRelativeName(file1, file2);
 
-                if (!s.equals(s.toLowerCase()))
-                {
-                    this.logNameNotLowercase(s);
-                }
-                else
+                if (s.equals(s.toLowerCase()))
                 {
                     hashset.add(s.substring(0, s.length() - 1));
                 }

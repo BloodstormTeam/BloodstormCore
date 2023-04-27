@@ -8,18 +8,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.nio.charset.StandardCharsets;
 
 @SideOnly(Side.SERVER)
-public class RConThreadClient extends RConThreadBase
-{
-    private static final Logger field_164005_h = LogManager.getLogger();
+public class RConThreadClient extends RConThreadBase {
     private boolean loggedIn;
     private Socket clientSocket;
-    private byte[] buffer = new byte[1460];
-    private String rconPassword;
-    private static final String __OBFID = "CL_00001804";
+    private final byte[] buffer = new byte[1460];
+    private final String rconPassword;
 
     RConThreadClient(IServer p_i1537_1_, Socket p_i1537_2_)
     {
@@ -36,25 +32,17 @@ public class RConThreadClient extends RConThreadBase
         }
 
         this.rconPassword = p_i1537_1_.getStringProperty("rcon.password", "");
-        this.logInfo("Rcon connection from: " + p_i1537_2_.getInetAddress());
     }
 
     public void run()
     {
         try
         {
-            while (true)
-            {
-                if (!this.running || clientSocket == null)
-                {
-                    break;
-                }
-
+            while (this.running && clientSocket != null) {
                 BufferedInputStream bufferedinputstream = new BufferedInputStream(this.clientSocket.getInputStream());
                 int i = bufferedinputstream.read(this.buffer, 0, 1460);
-                
-                if (i < 10)
-                {
+
+                if (i < 10) {
                     this.running = false; // Cauldron
                     return;
                 }
@@ -62,27 +50,21 @@ public class RConThreadClient extends RConThreadBase
                 byte b0 = 0;
                 int j = RConUtils.getBytesAsLEInt(this.buffer, 0, i);
 
-                if (j == i - 4)
-                {
+                if (j == i - 4) {
                     int i1 = b0 + 4;
                     int k = RConUtils.getBytesAsLEInt(this.buffer, i1, i);
                     i1 += 4;
                     int l = RConUtils.getRemainingBytesAsLEInt(this.buffer, i1);
                     i1 += 4;
 
-                    switch (l)
-                    {
+                    switch (l) {
                         case 2:
-                            if (this.loggedIn)
-                            {
+                            if (this.loggedIn) {
                                 String s1 = RConUtils.getBytesAsString(this.buffer, i1, i);
 
-                                try
-                                {
+                                try {
                                     this.sendMultipacketResponse(k, this.server.handleRConCommand(s1));
-                                }
-                                catch (Exception exception)
-                                {
+                                } catch (Exception exception) {
                                     this.sendMultipacketResponse(k, "Error executing: " + s1 + " (" + exception.getMessage() + ")");
                                 }
 
@@ -95,8 +77,7 @@ public class RConThreadClient extends RConThreadBase
                             String s = RConUtils.getBytesAsString(this.buffer, i1, i);
                             int j1 = i1 + s.length();
 
-                            if (0 != s.length() && s.equals(this.rconPassword))
-                            {
+                            if (0 != s.length() && s.equals(this.rconPassword)) {
                                 this.loggedIn = true;
                                 this.sendResponse(k, 2, "");
                                 continue;
@@ -106,26 +87,15 @@ public class RConThreadClient extends RConThreadBase
                             this.sendLoginFailedResponse();
                             continue;
                         default:
-                            this.sendMultipacketResponse(k, String.format("Unknown request %s", new Object[] {Integer.toHexString(l)}));
+                            this.sendMultipacketResponse(k, String.format("Unknown request %s", new Object[]{Integer.toHexString(l)}));
                             continue;
                     }
                 }
             }
             }
-            catch (SocketTimeoutException sockettimeoutexception)
-            {
-                return;
-            }
-            catch (IOException ioexception)
-            {
-                return;
-            }
-            catch (Exception exception1)
-            {
-                field_164005_h.error("Exception whilst parsing RCON input", exception1);
-            }
+            catch (Exception ignored) {}
             finally
-            {
+        {
                 this.closeSocket();
             }
     }
@@ -134,7 +104,7 @@ public class RConThreadClient extends RConThreadBase
     {
         ByteArrayOutputStream bytearrayoutputstream = new ByteArrayOutputStream(1248);
         DataOutputStream dataoutputstream = new DataOutputStream(bytearrayoutputstream);
-        byte[] abyte = p_72654_3_.getBytes("UTF-8");
+        byte[] abyte = p_72654_3_.getBytes(StandardCharsets.UTF_8);
         dataoutputstream.writeInt(Integer.reverseBytes(abyte.length + 10));
         dataoutputstream.writeInt(Integer.reverseBytes(p_72654_1_));
         dataoutputstream.writeInt(Integer.reverseBytes(p_72654_2_));
@@ -155,7 +125,7 @@ public class RConThreadClient extends RConThreadBase
 
         do
         {
-            int k = 4096 <= j ? 4096 : j;
+            int k = Math.min(4096, j);
             this.sendResponse(p_72655_1_, 0, p_72655_2_.substring(0, k));
             p_72655_2_ = p_72655_2_.substring(k);
             j = p_72655_2_.length();
@@ -163,20 +133,13 @@ public class RConThreadClient extends RConThreadBase
         while (0 != j);
     }
 
-    private void closeSocket()
-    {
+    private void closeSocket() {
         this.running = false;
-        if (null != this.clientSocket)
-        {
-            try
-            {
+        if (null != this.clientSocket) {
+            try {
                 this.clientSocket.close();
             }
-            catch (IOException ioexception)
-            {
-                this.logWarning("IO: " + ioexception.getMessage());
-            }
-
+            catch (IOException ignored) {}
             this.clientSocket = null;
         }
     }

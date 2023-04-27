@@ -12,13 +12,9 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
-public class LayeredTexture extends AbstractTexture
-{
-    private static final Logger logger = LogManager.getLogger();
+public class LayeredTexture extends AbstractTexture {
     public final List layeredTextureNames;
     private static final String __OBFID = "CL_00001051";
 
@@ -34,29 +30,23 @@ public class LayeredTexture extends AbstractTexture
 
         try
         {
-            Iterator iterator = this.layeredTextureNames.iterator();
 
-            while (iterator.hasNext())
-            {
-                String s = (String)iterator.next();
+            for (Object layeredTextureName : this.layeredTextureNames) {
+                String s = (String) layeredTextureName;
 
-                if (s != null)
-                {
+                if (s != null) {
                     InputStream inputstream = p_110551_1_.getResource(new ResourceLocation(s)).getInputStream();
                     BufferedImage bufferedimage1 = ImageIO.read(inputstream);
 
-                    if (bufferedimage == null)
-                    {
+                    if (bufferedimage == null) {
                         bufferedimage = new BufferedImage(bufferedimage1.getWidth(), bufferedimage1.getHeight(), 2);
                     }
 
-                    bufferedimage.getGraphics().drawImage(bufferedimage1, 0, 0, (ImageObserver)null);
+                    bufferedimage.getGraphics().drawImage(bufferedimage1, 0, 0, null);
                 }
             }
         }
-        catch (IOException ioexception)
-        {
-            logger.error("Couldn\'t load layered image", ioexception);
+        catch (IOException ioexception) {
             return;
         }
 

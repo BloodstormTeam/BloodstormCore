@@ -8,12 +8,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-public class Profiler
-{
-    private static final Logger logger = LogManager.getLogger();
+public class Profiler {
     private final List sectionList = new ArrayList();
     private final List timestampList = new ArrayList();
     public boolean profilingEnabled;
@@ -59,11 +55,6 @@ public class Profiler
             else
             {
                 this.profilingMap.put(this.profilingSection, Long.valueOf(k));
-            }
-
-            if (k > 100000000L)
-            {
-                logger.warn("Something\'s taking too long! \'" + this.profilingSection + "\' took aprox " + (double)k / 1000000.0D + " ms");
             }
 
             this.profilingSection = !this.sectionList.isEmpty() ? (String)this.sectionList.get(this.sectionList.size() - 1) : "";

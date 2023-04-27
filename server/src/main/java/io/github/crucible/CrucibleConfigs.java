@@ -250,7 +250,5 @@ public class CrucibleConfigs extends YamlConfig {
         ThreadMXBean mbean = ManagementFactory.getThreadMXBean();
         if (mbean.isThreadContentionMonitoringSupported())
             mbean.setThreadContentionMonitoringEnabled(cauldron_debug_enableThreadContentionMonitoring);
-        else
-            CrucibleModContainer.logger.warn("Thread monitoring is not supported!");
     }
 }

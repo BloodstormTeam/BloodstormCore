@@ -23,12 +23,8 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IJsonSerializable;
 import net.minecraft.util.TupleIntJsonSerializable;
 import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-public class StatisticsFile extends StatFileWriter
-{
-    private static final Logger logger = LogManager.getLogger();
+public class StatisticsFile extends StatFileWriter {
     private final MinecraftServer field_150890_c;
     private final File field_150887_d;
     private final Set field_150888_e = Sets.newHashSet();
@@ -51,14 +47,7 @@ public class StatisticsFile extends StatFileWriter
                 this.field_150875_a.clear();
                 this.field_150875_a.putAll(this.func_150881_a(FileUtils.readFileToString(this.field_150887_d)));
             }
-            catch (IOException ioexception)
-            {
-                logger.error("Couldn\'t read statistics file " + this.field_150887_d, ioexception);
-            }
-            catch (JsonParseException jsonparseexception)
-            {
-                logger.error("Couldn\'t parse statistics file " + this.field_150887_d, jsonparseexception);
-            }
+            catch (IOException | JsonParseException ignored) {}
         }
     }
 
@@ -68,10 +57,7 @@ public class StatisticsFile extends StatFileWriter
         {
             FileUtils.writeStringToFile(this.field_150887_d, func_150880_a(this.field_150875_a));
         }
-        catch (IOException ioexception)
-        {
-            logger.error("Couldn\'t save stats", ioexception);
-        }
+        catch (IOException ignored) {}
     }
 
     public void func_150873_a(EntityPlayer p_150873_1_, StatBase p_150873_2_, int p_150873_3_)
@@ -144,18 +130,11 @@ public class StatisticsFile extends StatFileWriter
                                 ijsonserializable.func_152753_a(jsonobject1.get("progress"));
                                 tupleintjsonserializable.setJsonSerializableValue(ijsonserializable);
                             }
-                            catch (Throwable throwable)
-                            {
-                                logger.warn("Invalid statistic progress in " + this.field_150887_d, throwable);
-                            }
+                            catch (Throwable ignored) {}
                         }
                     }
 
                     hashmap.put(statbase, tupleintjsonserializable);
-                }
-                else
-                {
-                    logger.warn("Invalid statistic in " + this.field_150887_d + ": Don\'t know what " + (String)entry.getKey() + " is");
                 }
             }
 
@@ -181,10 +160,7 @@ public class StatisticsFile extends StatFileWriter
                 {
                     jsonobject1.add("progress", ((TupleIntJsonSerializable)entry.getValue()).getJsonSerializableValue().getSerializableElement());
                 }
-                catch (Throwable throwable)
-                {
-                    logger.warn("Couldn\'t save statistic " + ((StatBase)entry.getKey()).func_150951_e() + ": error serializing progress", throwable);
-                }
+                catch (Throwable ignored) {}
 
                 jsonobject.add(((StatBase)entry.getKey()).statId, jsonobject1);
             }

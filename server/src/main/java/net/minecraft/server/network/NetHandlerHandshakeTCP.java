@@ -95,10 +95,7 @@ public class NetHandlerHandshakeTCP implements INetHandlerHandshakeServer
                         }
                     }
                 }
-                catch (Throwable t)
-                {
-                    org.apache.logging.log4j.LogManager.getLogger().debug("Failed to check connection throttle", t);
-                }
+                catch (Throwable ignored) {}
 
                 // CraftBukkit end
 

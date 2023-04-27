@@ -3,7 +3,6 @@ package cpw.mods.fml.common;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import org.apache.logging.log4j.Level;
 
 import cpw.mods.fml.relauncher.Side;
 
@@ -54,7 +53,6 @@ public interface ILanguageAdapter {
             catch (ClassNotFoundException e)
             {
                 // Not a singleton, look for @Instance field as a fallback.
-                FMLLog.log(Level.INFO, e, "An error occured trying to load a proxy into %s.%s. Did you declare your mod as 'class' instead of 'object'?", proxyTarget.getSimpleName(), target.getName());
                 return;
             }
 
@@ -90,12 +88,10 @@ public interface ILanguageAdapter {
             }
             catch (InvocationTargetException e)
             {
-                FMLLog.log(Level.ERROR, e, "An error occured trying to load a proxy into %s.%s", proxyTarget.getSimpleName(), target.getName());
                 throw new LoaderException(e);
             }
 
             // If we come here we could not find a setter for this proxy.
-            FMLLog.severe("Failed loading proxy into %s.%s, could not find setter function. Did you declare the field with 'val' instead of 'var'?", proxyTarget.getSimpleName(), target.getName());
             throw new LoaderException(String.format("Failed loading proxy into %s.%s, could not find setter function. Did you declare the field with 'val' instead of 'var'?", proxyTarget.getSimpleName(), target.getName()));
         }
 
@@ -140,27 +136,21 @@ public interface ILanguageAdapter {
 
                             if (!target.getType().isAssignableFrom(proxy.getClass()))
                             {
-                                FMLLog.severe("Attempted to load a proxy type %s into %s.%s, but the types don't match", targetType, proxyTarget.getSimpleName(), target.getName());
                                 throw new LoaderException(String.format("Attempted to load a proxy type %s into %s.%s, but the types don't match", targetType, proxyTarget.getSimpleName(), target.getName()));
                             }
 
                             setProxy(target, proxyTarget, proxy);
                         }
                         catch (Exception e) {
-                            FMLLog.log(Level.ERROR, e, "An error occured trying to load a proxy into %s.%s", proxyTarget.getSimpleName(), target.getName());
                             throw new LoaderException(e);
                         }
                     }
                 }
             }
-            else
-            {
-                FMLLog.finer("Mod does not appear to be a singleton.");
-            }
         }
     }
 
-    public static class JavaAdapter implements ILanguageAdapter {
+    class JavaAdapter implements ILanguageAdapter {
         @Override
         public Object getNewInstance(FMLModContainer container, Class<?> objectClass, ClassLoader classLoader, Method factoryMarkedMethod) throws Exception
         {

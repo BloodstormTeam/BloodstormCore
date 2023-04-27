@@ -158,7 +158,6 @@ public class ModAPIManager {
                 {
                     continue;
                 }
-                FMLLog.fine("Found API %s (owned by %s providing %s) embedded in %s",apiPackage, apiOwner, providedAPI, embeddedIn);
                 if (!embeddedIn.equals(apiOwner))
                 {
                     container.addAPIReference(embeddedIn);
@@ -176,7 +175,6 @@ public class ModAPIManager {
                     List<String> candidateIds = Lists.transform(candidate.getContainedMods(), new ModIdFunction());
                     if (!candidateIds.contains(container.ownerMod.getLabel()) && !container.currentReferents.containsAll(candidateIds))
                     {
-                        FMLLog.info("Found mod(s) %s containing declared API package %s (owned by %s) without associated API reference",candidateIds, pkg, container.ownerMod);
                         container.addAPIReferences(candidateIds);
                     }
                 }
@@ -189,18 +187,15 @@ public class ModAPIManager {
                     APIContainer parent = apiContainers.get(owner.getLabel());
                     if (parent == container)
                     {
-                        FMLLog.finer("APIContainer %s is it's own parent. skipping", owner);
                         container.markSelfReferenced();
                         break;
                     }
-                    FMLLog.finer("Removing upstream parent %s from %s", parent.ownerMod.getLabel(), container);
                     container.currentReferents.remove(parent.ownerMod.getLabel());
                     container.referredMods.remove(parent.ownerMod);
                     owner = parent.ownerMod;
                 }
                 while (apiContainers.containsKey(owner.getLabel()));
             }
-            FMLLog.fine("Creating API container dummy for API %s: owner: %s, dependents: %s", container.providedAPI, container.ownerMod, container.referredMods);
         }
     }
 

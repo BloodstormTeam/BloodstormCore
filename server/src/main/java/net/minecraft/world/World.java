@@ -55,7 +55,6 @@ import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldInfo;
-import cpw.mods.fml.common.FMLLog;
 
 import com.google.common.collect.ImmutableSetMultimap;
 
@@ -1832,7 +1831,6 @@ public abstract class World implements IBlockAccess
             this.getChunkFromChunkCoords(i, j).addEntity(p_72838_1_);
             this.loadedEntityList.add(p_72838_1_);
             this.onEntityAdded(p_72838_1_);
-            net.minecraftforge.cauldron.CauldronHooks.logEntitySpawn(this, p_72838_1_, spawnReason);
             return true;
         }
     }
@@ -2368,11 +2366,8 @@ public abstract class World implements IBlockAccess
 
                 if (ForgeModContainer.removeErroringEntities)
                 {
-                    FMLLog.getLogger().log(org.apache.logging.log4j.Level.ERROR, crashreport.getCompleteReport());
                     removeEntity(entity);
-                }
-                else
-                {
+                } else {
                     throw new ReportedException(crashreport);
                 }
             }
@@ -2447,7 +2442,6 @@ public abstract class World implements IBlockAccess
 
                     if (ForgeModContainer.removeErroringEntities)
                     {
-                        FMLLog.getLogger().log(org.apache.logging.log4j.Level.ERROR, crashreport.getCompleteReport());
                         removeEntity(entity);
                     }
                     else
@@ -2469,10 +2463,11 @@ public abstract class World implements IBlockAccess
                 {
                     this.getChunkFromChunkCoords(j, l).removeEntity(entity);
                 }
-                if (this.tickPosition < this.loadedEntityList.size()) // KCauldron
-                this.loadedEntityList.remove(this.tickPosition--); // CraftBukkit - Use field for loop variable
-                else CrucibleModContainer.logger.warn("Entity removal desync! {}", entity); // KCauldron
-                this.onEntityRemoved(entity);
+                if (this.tickPosition < this.loadedEntityList.size()) {
+                    this.loadedEntityList.remove(this.tickPosition--); // CraftBukkit - Use field for loop variable
+                } else {
+                    this.onEntityRemoved(entity);
+                }
             }
 
             this.theProfiler.endSection();
@@ -2550,7 +2545,6 @@ public abstract class World implements IBlockAccess
                     tileentity.func_145828_a(crashreportcategory);
                     if (ForgeModContainer.removeErroringTileEntities)
                     {
-                        FMLLog.getLogger().log(org.apache.logging.log4j.Level.ERROR, crashreport.getCompleteReport());
                         tileentity.invalidate();
                         setBlockToAir(tileentity.xCoord, tileentity.yCoord, tileentity.zCoord);
                     }

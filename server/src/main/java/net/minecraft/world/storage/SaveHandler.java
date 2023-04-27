@@ -18,19 +18,16 @@ import net.minecraft.world.MinecraftException;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.chunk.storage.IChunkLoader;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 // CraftBukkit start
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.UUID;
 
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 // CraftBukkit end
 import cpw.mods.fml.common.registry.GameData; // Cauldron
 
-public class SaveHandler implements ISaveHandler, IPlayerFileData
-{
-    private static final Logger logger = LogManager.getLogger();
+public class SaveHandler implements ISaveHandler, IPlayerFileData {
     private final File worldDirectory;
     private final File playersDirectory;
     private final File mapDataDir;
@@ -274,10 +271,7 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData
             file1.renameTo(file2);
             net.minecraftforge.event.ForgeEventFactory.firePlayerSavingEvent(p_75753_1_, this.playersDirectory, p_75753_1_.getUniqueID().toString());
         }
-        catch (Exception exception)
-        {
-            logger.warn("Failed to save player data for " + p_75753_1_.getCommandSenderName());
-        }
+        catch (Exception ignored) {}
     }
 
     public NBTTagCompound readPlayerData(EntityPlayer p_75752_1_)
@@ -293,10 +287,7 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData
                 nbttagcompound = CompressedStreamTools.readCompressed(new FileInputStream(file1));
             }
         }
-        catch (Exception exception)
-        {
-            logger.warn("Failed to load player data for " + p_75752_1_.getCommandSenderName());
-        }
+        catch (Exception ignored) {}
 
         if (nbttagcompound != null)
         {
@@ -328,13 +319,10 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData
 
             if (file1.exists())
             {
-                return CompressedStreamTools.readCompressed(new FileInputStream(file1));
+                return CompressedStreamTools.readCompressed(Files.newInputStream(file1.toPath()));
             }
         }
-        catch (Exception exception)
-        {
-            logger.warn("Failed to load player data for " + par1Str);
-        }
+        catch (Exception ignored) {}
 
         return null;
     }
@@ -382,63 +370,21 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData
 
         File file1 = new File(this.worldDirectory, "uid.dat");
 
+        Path file1Path = file1.toPath();
         if (file1.exists())
         {
-            DataInputStream dis = null;
 
-            try
-            {
-                dis = new DataInputStream(new FileInputStream(file1));
+            try (DataInputStream dis = new DataInputStream(Files.newInputStream(file1Path))) {
                 return uuid = new UUID(dis.readLong(), dis.readLong());
-            }
-            catch (IOException ex)
-            {
-                logger.warn("Failed to read " + file1 + ", generating new random UUID", ex);
-            }
-            finally
-            {
-                if (dis != null)
-                {
-                    try
-                    {
-                        dis.close();
-                    }
-                    catch (IOException ex)
-                    {
-                        // NOOP
-                    }
-                }
-            }
+            } catch (IOException ignored) {}
         }
 
         uuid = UUID.randomUUID();
-        DataOutputStream dos = null;
 
-        try
-        {
-            dos = new DataOutputStream(new FileOutputStream(file1));
+        try (DataOutputStream dos = new DataOutputStream(Files.newOutputStream(file1Path))) {
             dos.writeLong(uuid.getMostSignificantBits());
             dos.writeLong(uuid.getLeastSignificantBits());
-        }
-        catch (IOException ex)
-        {
-            logger.warn("Failed to write " + file1, ex);
-        }
-        finally
-        {
-            if (dos != null)
-            {
-                try
-                {
-                    dos.close();
-                }
-                catch (IOException ex)
-                {
-                    // NOOP
-                }
-            }
-        }
-
+        } catch (IOException ignored) {}
         return uuid;
     }
 
@@ -453,7 +399,7 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData
     public void initBukkitData(WorldInfo worldInfo)
     {
         // inject bukkit materials before plugins load
-        if (!this.initializedBukkit && (worldInfo == null || worldInfo.getDimension() == 0))
+        if (!initializedBukkit && (worldInfo == null || worldInfo.getDimension() == 0))
         {
             GameData.injectBlockBukkitMaterials();
             GameData.injectItemBukkitMaterials();
@@ -461,7 +407,7 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData
             // loaded after all mods have been loaded by FML to avoid race conditions.
             MinecraftServer.getServer().server.loadPlugins();
             MinecraftServer.getServer().server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.STARTUP);
-            this.initializedBukkit = true;
+            initializedBukkit = true;
         }
     }
     // Cauldron end
@@ -474,13 +420,11 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData
 
             if (file1.exists() && file1.isFile())
             {
-                return CompressedStreamTools.readCompressed(new FileInputStream(file1));
+                return CompressedStreamTools.readCompressed(Files.newInputStream(file1.toPath()));
             }
         }
-        catch (Exception exception)
-        {
-            logger.warn("Failed to load player data for " + player.getCommandSenderName());
-        }
+        catch (Exception ignored)
+        {}
         return null;
     }
 }

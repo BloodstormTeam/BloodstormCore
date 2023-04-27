@@ -23,7 +23,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
@@ -167,7 +166,6 @@ public class TechneModel extends ModelBase implements IModelCustom {
                 }
                 if (shapeType != null && !cubeTypes.contains(shapeType))
                 {
-                    FMLLog.warning("Model shape [" + shapeName + "] in " + fileName + " is not a cube, ignoring");
                     continue;
                 }
                 
@@ -235,9 +233,7 @@ public class TechneModel extends ModelBase implements IModelCustom {
 
                     parts.put(shapeName, cube);
                 }
-                catch (NumberFormatException e)
-                {
-                    FMLLog.warning("Model shape [" + shapeName + "] in " + fileName + " contains malformed integers within its data, ignoring");
+                catch (NumberFormatException e) {
                     e.printStackTrace();
                 }
             }

@@ -12,8 +12,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
-import cpw.mods.fml.common.FMLLog;
-
 
 /**
  * Executes tasks using a multi-stage process executor. Synchronous executions are via {@link AsynchronousExecutor#finishActive()} or the {@link AsynchronousExecutor#get(Object)} methods.
@@ -268,8 +266,6 @@ public final class AsynchronousExecutor<P, T, C, E extends Throwable> {
         if (task == null) {
             // Print debug info for QueuedChunk and avoid crash
             //throw new IllegalStateException("Unknown " + parameter);
-            FMLLog.info("Unknown %s", parameter);
-            FMLLog.info("This should not happen. Please report this error to Forge.");
             return false;
         }
         if (!task.callbacks.remove(callback)) {

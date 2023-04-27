@@ -28,7 +28,6 @@ import net.minecraft.world.storage.SaveFormatOld;
 import com.google.common.collect.ImmutableList;
 
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.IFMLSidedHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
@@ -151,19 +150,10 @@ public class FMLServerHandler implements IFMLSidedHandler
     }
 
     @Override
-    public void queryUser(StartupQuery query) throws InterruptedException
-    {
-        if (query.getResult() == null)
-        {
-            FMLLog.warning("%s", query.getText());
+    public void queryUser(StartupQuery query) throws InterruptedException {
+        if (query.getResult() == null) {
             query.finish();
-        }
-        else
-        {
-            String text = query.getText() +
-                    "\n\nRun the command /fml confirm or or /fml cancel to proceed." +
-                    "\nAlternatively start the server with -Dfml.queryResult=confirm or -Dfml.queryResult=cancel to preselect the answer.";
-            FMLLog.warning("%s", text);
+        } else {
 
             if (!query.isSynchronous()) return; // no-op until mc does commands in another thread (if ever)
 
@@ -182,23 +172,20 @@ public class FMLServerHandler implements IFMLSidedHandler
                     {
                         String cmd = it.next().command.trim().toLowerCase();
 
-                        if (cmd.equals("/fml confirm"))
-                        {
-                            FMLLog.info("confirmed");
-                            query.setResult(true);
-                            done = true;
-                            it.remove();
-                        }
-                        else if (cmd.equals("/fml cancel"))
-                        {
-                            FMLLog.info("cancelled");
-                            query.setResult(false);
-                            done = true;
-                            it.remove();
-                        }
-                        else if (cmd.equals("/stop"))
-                        {
-                            StartupQuery.abort();
+                        switch (cmd) {
+                            case "/fml confirm":
+                                query.setResult(true);
+                                done = true;
+                                it.remove();
+                                break;
+                            case "/fml cancel":
+                                query.setResult(false);
+                                done = true;
+                                it.remove();
+                                break;
+                            case "/stop":
+                                StartupQuery.abort();
+                                break;
                         }
                     }
                 }

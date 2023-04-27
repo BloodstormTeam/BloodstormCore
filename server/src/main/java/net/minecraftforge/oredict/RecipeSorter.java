@@ -11,7 +11,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.toposort.TopologicalSort;
 import cpw.mods.fml.common.toposort.TopologicalSort.DirectedGraph;
 import net.minecraft.item.crafting.CraftingManager;
@@ -141,7 +140,6 @@ public class RecipeSorter implements Comparator<IRecipe>
     public static void sortCraftManager()
     {
         bake();
-        FMLLog.fine("Sorting recipies");
         warned.clear();
         Collections.sort(CraftingManager.getInstance().getRecipeList(), INSTANCE);
     }
@@ -198,7 +196,6 @@ public class RecipeSorter implements Comparator<IRecipe>
         {
             if (!warned.contains(cls))
             {
-                FMLLog.info("  Unknown recipe class! %s Modder please refer to %s", cls.getName(), RecipeSorter.class.getName());
                 warned.add(cls);
             }
             cls = cls.getSuperclass();
@@ -208,7 +205,6 @@ public class RecipeSorter implements Comparator<IRecipe>
                 if (ret != null)
                 {
                     priorities.put(recipe.getClass(), ret);
-                    FMLLog.fine("    Parent Found: %d - %s", ret.intValue(), cls.getName());
                     return ret.intValue();
                 }
             }
@@ -220,7 +216,6 @@ public class RecipeSorter implements Comparator<IRecipe>
     private static void bake()
     {
         if (!isDirty) return;
-        FMLLog.fine("Forge RecipeSorter Baking:");
         DirectedGraph<SortEntry> sorter = new DirectedGraph<SortEntry>();
         sorter.addNode(before);
         sorter.addNode(after);
@@ -266,7 +261,6 @@ public class RecipeSorter implements Comparator<IRecipe>
         int x = sorted.size();
         for (SortEntry entry : sorted)
         {
-            FMLLog.fine("  %d: %s", x, entry);
             priorities.put(entry.cls, x--);
         }
     }

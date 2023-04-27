@@ -3,7 +3,6 @@ package net.minecraft.item;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -26,7 +25,6 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.event.HoverEvent;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -40,19 +38,9 @@ import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
 
-import org.bukkit.craftbukkit.util.CraftMagicNumbers; // CraftBukkit
-
 import net.minecraft.entity.player.EntityPlayerMP; // Spigot
 // Cauldron start
-import net.minecraft.block.BlockSapling;
-import net.minecraft.block.BlockMushroom;
 
-import org.bukkit.Location;
-import org.bukkit.TreeType;
-import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.block.CraftBlockState;
-import org.bukkit.entity.Player;
-import org.bukkit.event.world.StructureGrowEvent;
 // Cauldron end
 
 public final class ItemStack

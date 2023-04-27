@@ -18,8 +18,6 @@ import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -29,7 +27,6 @@ import org.lwjgl.opengl.GL12;
 @SideOnly(Side.CLIENT)
 public abstract class RendererLivingEntity extends Render
 {
-    private static final Logger logger = LogManager.getLogger();
     private static final ResourceLocation RES_ITEM_GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
     protected ModelBase mainModel;
     protected ModelBase renderPassModel;
@@ -267,10 +264,7 @@ public abstract class RendererLivingEntity extends Render
 
             GL11.glDisable(GL12.GL_RESCALE_NORMAL);
         }
-        catch (Exception exception)
-        {
-            logger.error("Couldn\'t render entity", exception);
-        }
+        catch (Exception ignored) {}
 
         OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
         GL11.glEnable(GL11.GL_TEXTURE_2D);

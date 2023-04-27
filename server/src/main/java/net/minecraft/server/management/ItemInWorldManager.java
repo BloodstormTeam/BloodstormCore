@@ -6,7 +6,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -21,12 +20,9 @@ import net.minecraftforge.event.world.BlockEvent;
 // CraftBukkit start
 import net.minecraft.init.Blocks;
 
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.craftbukkit.inventory.CraftInventory;
-import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
 
 // CraftBukkit end
 // Cauldron start
@@ -38,7 +34,6 @@ import org.bukkit.craftbukkit.inventory.CraftInventoryView;
 import org.bukkit.event.inventory.InventoryType;
 // Cauldron end
 
-import cpw.mods.fml.common.FMLLog;
 
 public class ItemInWorldManager
 {

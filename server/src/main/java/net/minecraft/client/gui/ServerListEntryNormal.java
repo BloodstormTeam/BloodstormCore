@@ -22,14 +22,10 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.Validate;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
-public class ServerListEntryNormal implements GuiListExtended.IGuiListEntry
-{
-    private static final Logger logger = LogManager.getLogger();
+public class ServerListEntryNormal implements GuiListExtended.IGuiListEntry {
     private static final ThreadPoolExecutor field_148302_b = new ScheduledThreadPoolExecutor(5, (new ThreadFactoryBuilder()).setNameFormat("Server Pinger #%d").setDaemon(true).build());
     private final GuiMultiplayer field_148303_c;
     private final Minecraft field_148300_d;
@@ -202,22 +198,16 @@ public class ServerListEntryNormal implements GuiListExtended.IGuiListEntry
             ByteBuf bytebuf = Unpooled.copiedBuffer(this.field_148301_e.getBase64EncodedIconData(), Charsets.UTF_8);
             ByteBuf bytebuf1 = Base64.decode(bytebuf);
             BufferedImage bufferedimage;
-            label74:
-            {
-                try
-                {
+            label74:{
+                try {
                     bufferedimage = ImageIO.read(new ByteBufInputStream(bytebuf1));
                     Validate.validState(bufferedimage.getWidth() == 64, "Must be 64 pixels wide", new Object[0]);
                     Validate.validState(bufferedimage.getHeight() == 64, "Must be 64 pixels high", new Object[0]);
                     break label74;
                 }
-                catch (Exception exception)
-                {
-                    logger.error("Invalid icon for server " + this.field_148301_e.serverName + " (" + this.field_148301_e.serverIP + ")", exception);
+                catch (Exception exception) {
                     this.field_148301_e.func_147407_a((String)null);
-                }
-                finally
-                {
+                } finally {
                     bytebuf.release();
                     bytebuf1.release();
                 }

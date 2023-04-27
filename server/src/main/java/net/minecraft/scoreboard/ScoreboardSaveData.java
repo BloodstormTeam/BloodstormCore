@@ -6,12 +6,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.world.WorldSavedData;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-public class ScoreboardSaveData extends WorldSavedData
-{
-    private static final Logger logger = LogManager.getLogger();
+public class ScoreboardSaveData extends WorldSavedData {
     private Scoreboard theScoreboard;
     private NBTTagCompound field_96506_b;
     private static final String __OBFID = "CL_00000620";
@@ -128,17 +124,10 @@ public class ScoreboardSaveData extends WorldSavedData
 
     public void writeToNBT(NBTTagCompound p_76187_1_)
     {
-        if (this.theScoreboard == null)
-        {
-            logger.warn("Tried to save scoreboard without having a scoreboard...");
-        }
-        else
-        {
-            p_76187_1_.setTag("Objectives", this.func_96505_b());
-            p_76187_1_.setTag("PlayerScores", this.func_96503_e());
-            p_76187_1_.setTag("Teams", this.func_96496_a());
-            this.func_96497_d(p_76187_1_);
-        }
+        p_76187_1_.setTag("Objectives", this.func_96505_b());
+        p_76187_1_.setTag("PlayerScores", this.func_96503_e());
+        p_76187_1_.setTag("Teams", this.func_96496_a());
+        this.func_96497_d(p_76187_1_);
     }
 
     protected NBTTagList func_96496_a()

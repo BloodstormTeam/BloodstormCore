@@ -12,15 +12,10 @@
 
 package cpw.mods.fml.common.asm.transformers;
 
+import cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 import net.minecraft.launchwrapper.IClassNameTransformer;
 import net.minecraft.launchwrapper.IClassTransformer;
-
-import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.commons.RemappingClassAdapter;
-
-import cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
-import cpw.mods.fml.common.asm.transformers.deobf.FMLRemappingAdapter;
 
 public class DeobfuscationTransformer implements IClassTransformer, IClassNameTransformer {
 
@@ -31,10 +26,7 @@ public class DeobfuscationTransformer implements IClassTransformer, IClassNameTr
         {
             return null;
         }
-        ClassReader classReader = new ClassReader(bytes);
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-        RemappingClassAdapter remapAdapter = new FMLRemappingAdapter(classWriter);
-        classReader.accept(remapAdapter, ClassReader.EXPAND_FRAMES);
         return classWriter.toByteArray();
     }
 

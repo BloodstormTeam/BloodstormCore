@@ -16,13 +16,9 @@ import java.util.SortedSet;
 import net.minecraft.client.resources.data.IMetadataSerializer;
 import net.minecraft.client.resources.data.LanguageMetadataSection;
 import net.minecraft.util.StringTranslate;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
-public class LanguageManager implements IResourceManagerReloadListener
-{
-    private static final Logger logger = LogManager.getLogger();
+public class LanguageManager implements IResourceManagerReloadListener {
     private final IMetadataSerializer theMetadataSerializer;
     private String currentLanguage;
     protected static final Locale currentLocale = new Locale();
@@ -51,27 +47,18 @@ public class LanguageManager implements IResourceManagerReloadListener
 
                 if (languagemetadatasection != null)
                 {
-                    Iterator iterator1 = languagemetadatasection.getLanguages().iterator();
 
-                    while (iterator1.hasNext())
-                    {
-                        Language language = (Language)iterator1.next();
+                    for (Object o : languagemetadatasection.getLanguages()) {
+                        Language language = (Language) o;
 
-                        if (!this.languageMap.containsKey(language.getLanguageCode()))
-                        {
+                        if (!this.languageMap.containsKey(language.getLanguageCode())) {
                             this.languageMap.put(language.getLanguageCode(), language);
                         }
                     }
                 }
             }
-            catch (RuntimeException runtimeexception)
-            {
-                logger.warn("Unable to parse metadata section of resourcepack: " + iresourcepack.getPackName(), runtimeexception);
-            }
-            catch (IOException ioexception)
-            {
-                logger.warn("Unable to parse metadata section of resourcepack: " + iresourcepack.getPackName(), ioexception);
-            }
+            catch (RuntimeException ignored) {}
+            catch (IOException ignored) {}
         }
     }
 

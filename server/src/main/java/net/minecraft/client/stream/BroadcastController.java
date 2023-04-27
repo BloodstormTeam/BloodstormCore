@@ -9,8 +9,6 @@ import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.ThreadSafeBoundList;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tv.twitch.AuthToken;
 import tv.twitch.Core;
 import tv.twitch.ErrorCode;
@@ -40,9 +38,7 @@ import tv.twitch.broadcast.UserInfo;
 import tv.twitch.broadcast.VideoParams;
 
 @SideOnly(Side.CLIENT)
-public class BroadcastController implements IStatCallbacks, IStreamCallbacks
-{
-    private static final Logger field_152861_B = LogManager.getLogger();
+public class BroadcastController implements IStatCallbacks, IStreamCallbacks {
     protected final int field_152865_a = 30;
     protected final int field_152866_b = 3;
     private static final ThreadSafeBoundList field_152862_C = new ThreadSafeBoundList(String.class, 50);
@@ -1051,13 +1047,11 @@ public class BroadcastController implements IStatCallbacks, IStreamCallbacks
     {
         this.field_152863_D = p_152820_1_;
         field_152862_C.func_152757_a("<Error> " + p_152820_1_);
-        field_152861_B.error(TwitchStream.field_152949_a, "[Broadcast controller] {}", new Object[] {p_152820_1_});
     }
 
     protected void func_152832_e(String p_152832_1_)
     {
         field_152862_C.func_152757_a("<Warning> " + p_152832_1_);
-        field_152861_B.warn(TwitchStream.field_152949_a, "[Broadcast controller] {}", new Object[] {p_152832_1_});
     }
 
     public ErrorCode func_152852_P()

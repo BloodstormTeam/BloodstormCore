@@ -2,7 +2,6 @@ package net.minecraft.entity;
 
 import co.aikar.timings.MinecraftTimings;
 import co.aikar.timings.Timing;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
@@ -35,7 +33,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IChatComponent;
@@ -1574,7 +1571,6 @@ public abstract class Entity
                 }
                 catch (Throwable t)
                 {
-                    FMLLog.severe("Failed to save extended properties for %s.  This is a mod issue.", identifier);
                     t.printStackTrace();
                 }
             }
@@ -1653,14 +1649,10 @@ public abstract class Entity
 
             for (String identifier : this.extendedProperties.keySet())
             {
-                try
-                {
+                try {
                     IExtendedEntityProperties props = this.extendedProperties.get(identifier);
                     props.loadNBTData(p_70020_1_);
-                }
-                catch (Throwable t)
-                {
-                    FMLLog.severe("Failed to load extended properties for %s.  This is a mod issue.", identifier);
+                } catch (Throwable t) {
                     t.printStackTrace();
                 }
             }
@@ -2732,12 +2724,10 @@ public abstract class Entity
     {
         if (identifier == null)
         {
-            FMLLog.warning("Someone is attempting to register extended properties using a null identifier.  This is not allowed.  Aborting.  This may have caused instability.");
             return "";
         }
         if (properties == null)
         {
-            FMLLog.warning("Someone is attempting to register null extended properties.  This is not allowed.  Aborting.  This may have caused instability.");
             return "";
         }
 
@@ -2746,11 +2736,6 @@ public abstract class Entity
         while (this.extendedProperties.containsKey(identifier))
         {
             identifier = String.format("%s%d", baseIdentifier, identifierModCount++);
-        }
-
-        if (baseIdentifier != identifier)
-        {
-            FMLLog.info("An attempt was made to register exended properties using an existing key.  The duplicate identifier (%s) has been remapped to %s.", baseIdentifier, identifier);
         }
 
         this.extendedProperties.put(identifier, properties);

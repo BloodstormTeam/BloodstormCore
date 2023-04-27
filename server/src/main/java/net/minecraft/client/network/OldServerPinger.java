@@ -43,14 +43,11 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MathHelper;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
 public class OldServerPinger
 {
     private static final Splitter field_147230_a = Splitter.on('\u0000').limit(6);
-    private static final Logger logger = LogManager.getLogger();
     private final List field_147229_c = Collections.synchronizedList(new ArrayList());
     private static final String __OBFID = "CL_00000892";
 
@@ -134,18 +131,13 @@ public class OldServerPinger
                 {
                     String s = serverstatusresponse.func_151316_d();
 
-                    if (s.startsWith("data:image/png;base64,"))
-                    {
+                    if (s.startsWith("data:image/png;base64,")) {
                         p_147224_1_.func_147407_a(s.substring("data:image/png;base64,".length()));
-                    }
-                    else
-                    {
-                        OldServerPinger.logger.error("Invalid server icon (unknown format)");
                     }
                 }
                 else
                 {
-                    p_147224_1_.func_147407_a((String)null);
+                    p_147224_1_.func_147407_a(null);
                 }
 
                 FMLClientHandler.instance().bindServerListData(p_147224_1_, serverstatusresponse);
@@ -163,7 +155,6 @@ public class OldServerPinger
             {
                 if (!this.field_147403_d)
                 {
-                    OldServerPinger.logger.error("Can\'t ping " + p_147224_1_.serverIP + ": " + p_147231_1_.getUnformattedText());
                     p_147224_1_.serverMOTD = EnumChatFormatting.DARK_RED + "Can\'t connect to server.";
                     p_147224_1_.populationInfo = "";
                     OldServerPinger.this.func_147225_b(p_147224_1_);
@@ -182,12 +173,9 @@ public class OldServerPinger
         try
         {
             networkmanager.scheduleOutboundPacket(new C00Handshake(5, serveraddress.getIP(), serveraddress.getPort(), EnumConnectionState.STATUS), new GenericFutureListener[0]);
-            networkmanager.scheduleOutboundPacket(new C00PacketServerQuery(), new GenericFutureListener[0]);
+            networkmanager.scheduleOutboundPacket(new C00PacketServerQuery());
         }
-        catch (Throwable throwable)
-        {
-            logger.error(throwable);
-        }
+        catch (Throwable ignored) {}
     }
 
     private void func_147225_b(final ServerData p_147225_1_)
@@ -202,10 +190,7 @@ public class OldServerPinger
                 {
                     p_initChannel_1_.config().setOption(ChannelOption.IP_TOS, Integer.valueOf(24));
                 }
-                catch (ChannelException channelexception1)
-                {
-                    ;
-                }
+                catch (ChannelException ignored) {}
 
                 try
                 {

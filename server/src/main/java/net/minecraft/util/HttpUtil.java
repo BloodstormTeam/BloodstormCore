@@ -21,13 +21,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.server.MinecraftServer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class HttpUtil
 {
     private static final AtomicInteger downloadThreadsStarted = new AtomicInteger(0);
-    private static final Logger logger = LogManager.getLogger();
     private static final String __OBFID = "CL_00001485";
 
     public static String buildPostString(Map p_76179_0_)
@@ -114,11 +111,6 @@ public class HttpUtil
         }
         catch (Exception exception)
         {
-            if (!p_151225_2_)
-            {
-                logger.error("Could not post to " + p_151225_0_, exception);
-            }
-
             return "";
         }
     }
@@ -185,8 +177,6 @@ public class HttpUtil
 
                             return;
                         }
-
-                        HttpUtil.logger.warn("Deleting " + p_151223_0_ + " as it does not match what we currently have (" + i + " vs our " + j + ").");
                         p_151223_0_.delete();
                     }
                     else if (p_151223_0_.getParentFile() != null)

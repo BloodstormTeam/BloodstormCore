@@ -24,9 +24,7 @@ import net.minecraft.network.rcon.RConThreadQuery;
 import net.minecraft.profiler.PlayerUsageSnooper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerEula;
-import net.minecraft.server.gui.MinecraftServerGui;
 import net.minecraft.server.management.PreYggdrasilConverter;
-import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.CryptManager;
 import net.minecraft.util.MathHelper;
@@ -35,21 +33,15 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.storage.AnvilSaveConverter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 // CraftBukkit start
-import java.io.PrintStream;
-import org.apache.logging.log4j.Level;
 
-import org.bukkit.craftbukkit.LoggerOutputStream;
 import org.bukkit.event.server.ServerCommandEvent;
 // CraftBukkit end
 
 @SideOnly(Side.SERVER)
 public class DedicatedServer extends MinecraftServer implements IServer
 {
-    private static final Logger field_155771_h = LogManager.getLogger();
     public final List pendingCommandList = Collections.synchronizedList(new ArrayList());
     private RConThreadQuery theRConThreadQuery;
     private RConThreadMain theRConThreadMain;
@@ -133,10 +125,7 @@ public class DedicatedServer extends MinecraftServer implements IServer
                     }
 
                 }
-                catch (IOException ioexception)
-                {
-                    DedicatedServer.field_155771_h.error("Exception handling console input", ioexception);
-                }
+                catch (IOException ignored) {}
             }
         };
         thread.setDaemon(true);
@@ -150,42 +139,15 @@ public class DedicatedServer extends MinecraftServer implements IServer
             global.removeHandler(handler);
         }
 
-        global.addHandler(new org.bukkit.craftbukkit.util.ForwardLogHandler());
-        final org.apache.logging.log4j.core.Logger logger = ((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger());
-
-        for (org.apache.logging.log4j.core.Appender appender : logger.getAppenders().values())
-        {
-            if (appender instanceof org.apache.logging.log4j.core.appender.ConsoleAppender)
-            {
-                logger.removeAppender(appender);
-            }
-        }
-
-        new Thread(new org.bukkit.craftbukkit.util.TerminalConsoleWriterThread(System.out, this.reader)).start();
-        System.setOut(new PrintStream(new LoggerOutputStream(logger, Level.INFO), true));
-        System.setErr(new PrintStream(new LoggerOutputStream(logger, Level.WARN), true));
-        // CraftBukkit end 
-        field_155771_h.info("Starting minecraft server version 1.7.10");
-
-        if (Runtime.getRuntime().maxMemory() / 1024L / 1024L < 512L)
-        {
-            field_155771_h.warn("To start the server with more ram, launch it as \"java -Xmx1024M -Xms1024M -jar minecraft_server.jar\"");
-        }
-
         FMLCommonHandler.instance().onServerStart(this);
-
-        field_155771_h.info("Loading properties");
-        this.settings = new PropertyManager(this.options); // CraftBukkit - CLI argument support
+        this.settings = new PropertyManager(options); // CraftBukkit - CLI argument support
         this.field_154332_n = new ServerEula(new File("eula.txt"));
 
         if (!this.field_154332_n.func_154346_a())
         {
-            field_155771_h.info("You need to agree to the EULA in order to run the server. Go to eula.txt for more info.");
             this.field_154332_n.func_154348_b();
             return false;
-        }
-        else
-        {
+        } else {
             if (this.isSinglePlayer())
             {
                 this.setHostname("127.0.0.1");
@@ -217,7 +179,6 @@ public class DedicatedServer extends MinecraftServer implements IServer
             this.canSpawnStructures = this.settings.getBooleanProperty("generate-structures", true);
             int i = this.settings.getIntProperty("gamemode", WorldSettings.GameType.SURVIVAL.getID());
             this.gameType = WorldSettings.getGameTypeById(i);
-            field_155771_h.info("Default game type: " + this.gameType);
             InetAddress inetaddress = null;
 
             if (this.getServerHostname().length() > 0)
@@ -231,7 +192,7 @@ public class DedicatedServer extends MinecraftServer implements IServer
             }
 
             // Spigot start
-            this.func_152361_a((ServerConfigurationManager) (new DedicatedPlayerList(this)));
+            this.func_152361_a(new DedicatedPlayerList(this));
             org.spigotmc.SpigotConfig.init();
             org.spigotmc.SpigotConfig.registerCommands();
             // Spigot end
@@ -242,28 +203,14 @@ public class DedicatedServer extends MinecraftServer implements IServer
             //sushchestvoConfig.registerCommands();
             // Cauldron end
 
-            field_155771_h.info("Generating keypair");
             this.setKeyPair(CryptManager.createNewKeyPair());
-            field_155771_h.info("Starting Minecraft server on " + (this.getServerHostname().length() == 0 ? "*" : this.getServerHostname()) + ":" + this.getServerPort());
 
             try
             {
                 this.func_147137_ag().addLanEndpoint(inetaddress, this.getServerPort());
             }
-            catch (Throwable ioexception) // CraftBukkit - IOException -> Throwable
-            {
-                field_155771_h.warn("**** FAILED TO BIND TO PORT!");
-                field_155771_h.warn("The exception was: {}", new Object[] {ioexception.toString()});
-                field_155771_h.warn("Perhaps a server is already running on that port?");
+            catch (Throwable ioexception) {
                 return false;
-            }
-
-            if (!this.isServerInOnlineMode())
-            {
-                field_155771_h.warn("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
-                field_155771_h.warn("The server will make no attempt to authenticate usernames. Beware.");
-                field_155771_h.warn("While this makes the game possible to play without internet access, it also opens up the ability for hackers to connect with any username they choose.");
-                field_155771_h.warn("To change this, set \"online-mode\" to \"true\" in the server.properties file.");
             }
 
             try
@@ -332,31 +279,24 @@ public class DedicatedServer extends MinecraftServer implements IServer
                 this.setBuildLimit(MathHelper.clamp_int(this.getBuildLimit(), 64, 256));
                 this.settings.setProperty("max-build-height", Integer.valueOf(this.getBuildLimit()));
                 if (!FMLCommonHandler.instance().handleServerAboutToStart(this)) { return false; }
-                field_155771_h.info("Preparing level \"" + this.getFolderName() + "\"");
                 this.loadAllWorlds(this.getFolderName(), this.getFolderName(), k, worldtype, s2);
                 long i1 = System.nanoTime() - j;
                 String s3 = String.format("%.3fs", new Object[] {Double.valueOf((double)i1 / 1.0E9D)});
-                field_155771_h.info("Done (" + s3 + ")! For help, type \"help\" or \"?\"");
 
                 if (this.settings.getBooleanProperty("enable-query", false))
                 {
-                    field_155771_h.info("Starting GS4 status listener");
                     this.theRConThreadQuery = new RConThreadQuery(this);
                     this.theRConThreadQuery.startThread();
                 }
 
                 if (this.settings.getBooleanProperty("enable-rcon", false))
                 {
-                    field_155771_h.info("Starting remote control listener");
                     this.theRConThreadMain = new RConThreadMain(this);
                     this.theRConThreadMain.startThread();
                 }
 
                 // CraftBukkit start
-                if (this.server.getBukkitSpawnRadius() > -1)
-                {
-                    field_155771_h
-                            .info("'settings.spawn-radius' in bukkit.yml has been moved to 'spawn-protection' in server.properties. I will move your config for you.");
+                if (this.server.getBukkitSpawnRadius() > -1) {
                     this.settings.serverProperties.remove("spawn-protection");
                     this.settings.getIntProperty("spawn-protection", this.server.getBukkitSpawnRadius());
                     this.server.removeBukkitSpawnRadius();
@@ -517,12 +457,6 @@ public class DedicatedServer extends MinecraftServer implements IServer
         return file1 != null ? file1.getAbsolutePath() : "No settings file";
     }
 
-    public void setGuiEnabled()
-    {
-        MinecraftServerGui.createServerGui(this);
-        this.guiIsEnabled = true;
-    }
-
     public boolean getGuiEnabled()
     {
         return this.guiIsEnabled;
@@ -598,11 +532,8 @@ public class DedicatedServer extends MinecraftServer implements IServer
         boolean flag = false;
         int i;
 
-        for (i = 0; !flag && i <= 2; ++i)
-        {
-            if (i > 0)
-            {
-                field_155771_h.warn("Encountered a problem while converting the user banlist, retrying in a few seconds");
+        for (i = 0; !flag && i <= 2; ++i) {
+            if (i > 0) {
                 this.func_152369_aG();
             }
 
@@ -613,9 +544,7 @@ public class DedicatedServer extends MinecraftServer implements IServer
 
         for (i = 0; !flag1 && i <= 2; ++i)
         {
-            if (i > 0)
-            {
-                field_155771_h.warn("Encountered a problem while converting the ip banlist, retrying in a few seconds");
+            if (i > 0) {
                 this.func_152369_aG();
             }
 
@@ -624,11 +553,8 @@ public class DedicatedServer extends MinecraftServer implements IServer
 
         boolean flag2 = false;
 
-        for (i = 0; !flag2 && i <= 2; ++i)
-        {
-            if (i > 0)
-            {
-                field_155771_h.warn("Encountered a problem while converting the op list, retrying in a few seconds");
+        for (i = 0; !flag2 && i <= 2; ++i) {
+            if (i > 0) {
                 this.func_152369_aG();
             }
 
@@ -637,11 +563,8 @@ public class DedicatedServer extends MinecraftServer implements IServer
 
         boolean flag3 = false;
 
-        for (i = 0; !flag3 && i <= 2; ++i)
-        {
-            if (i > 0)
-            {
-                field_155771_h.warn("Encountered a problem while converting the whitelist, retrying in a few seconds");
+        for (i = 0; !flag3 && i <= 2; ++i) {
+            if (i > 0) {
                 this.func_152369_aG();
             }
 
@@ -650,11 +573,8 @@ public class DedicatedServer extends MinecraftServer implements IServer
 
         boolean flag4 = false;
 
-        for (i = 0; !flag4 && i <= 2; ++i)
-        {
-            if (i > 0)
-            {
-                field_155771_h.warn("Encountered a problem while converting the player save files, retrying in a few seconds");
+        for (i = 0; !flag4 && i <= 2; ++i) {
+            if (i > 0) {
                 this.func_152369_aG();
             }
 

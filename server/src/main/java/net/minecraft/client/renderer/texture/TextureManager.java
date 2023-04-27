@@ -16,13 +16,9 @@ import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.ResourceLocation;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
-public class TextureManager implements ITickable, IResourceManagerReloadListener
-{
-    private static final Logger logger = LogManager.getLogger();
+public class TextureManager implements ITickable, IResourceManagerReloadListener {
     private final Map mapTextureObjects = Maps.newHashMap();
     private final Map mapResourceLocations = Maps.newHashMap();
     private final List listTickables = Lists.newArrayList();
@@ -86,11 +82,10 @@ public class TextureManager implements ITickable, IResourceManagerReloadListener
 
         try
         {
-            ((ITextureObject)p_110579_2_).loadTexture(this.theResourceManager);
+            p_110579_2_.loadTexture(this.theResourceManager);
         }
         catch (IOException ioexception)
         {
-            logger.warn("Failed to load texture: " + p_110579_1_, ioexception);
             p_110579_2_2 = TextureUtil.missingTexture;
             this.mapTextureObjects.put(p_110579_1_, p_110579_2_2);
             flag = false;

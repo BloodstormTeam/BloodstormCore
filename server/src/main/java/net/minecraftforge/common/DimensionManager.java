@@ -12,17 +12,14 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentMap;
 
 import io.github.crucible.CrucibleConfigs;
-import org.apache.logging.log4j.Level;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Multiset;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.MinecraftException;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldManager;
 import net.minecraft.world.WorldProvider;
@@ -195,22 +192,8 @@ public class DimensionManager
             {
                 List<World> allWorlds = Lists.newArrayList(weakWorldMap.keySet());
                 allWorlds.removeAll(worlds.values());
-                for (ListIterator<World> li = allWorlds.listIterator(); li.hasNext(); )
-                {
-                    World w = li.next();
+                for (World w : allWorlds) {
                     leakedWorlds.add(System.identityHashCode(w));
-                }
-                for (World w : allWorlds)
-                {
-                    int leakCount = leakedWorlds.count(System.identityHashCode(w));
-                    if (leakCount == 5)
-                    {
-                        FMLLog.fine("The world %x (%s) may have leaked: first encounter (5 occurences). Note: This may be a caused by a mod, plugin, or just a false-positive(No memory leak). If server crashes due to OOM, report to Cauldron.\n", System.identityHashCode(w), w.getWorldInfo().getWorldName());
-                    }
-                    else if (leakCount % 5 == 0)
-                    {
-                        FMLLog.fine("The world %x (%s) may have leaked: seen %d times. Note: This may be a caused by a mod, plugin, or just a false-positive(No memory leak). If server crashes due to OOM, report to Cauldron.\n", System.identityHashCode(w), w.getWorldInfo().getWorldName(), leakCount);
-                    }
                 }
             }
         }
@@ -219,7 +202,7 @@ public class DimensionManager
     }
     public static Integer[] getIDs()
     {
-        return worlds.keySet().toArray(new Integer[worlds.size()]); //Only loaded dims, since usually used to cycle through loaded worlds
+        return worlds.keySet().toArray(new Integer[0]); //Only loaded dims, since usually used to cycle through loaded worlds
     }
 
     public static void setWorld(int id, WorldServer world)
@@ -239,14 +222,10 @@ public class DimensionManager
             }
             // Cauldron end
             MinecraftServer.getServer().worldTickTimes.put(id, new long[100]);
-            FMLLog.info("Loading dimension %d (%s) (%s)", id, world.getWorldInfo().getWorldName(), world.func_73046_m());
-        }
-        else
-        {
+        } else {
             MinecraftServer.getServer().worlds.remove(getWorld(id)); // Cauldron - remove world from our new world arraylist
             worlds.remove(id);
             MinecraftServer.getServer().worldTickTimes.remove(id);
-            FMLLog.info("Unloading dimension %d", id);
         }
 
         ArrayList<WorldServer> tmp = new ArrayList<WorldServer>();
@@ -478,10 +457,7 @@ public class DimensionManager
                 throw new RuntimeException(String.format("No WorldProvider bound for dimension %d", dim)); //It's going to crash anyway at this point.  Might as well be informative
             }
         }
-        catch (Exception e)
-        {
-            FMLCommonHandler.instance().getFMLLogger().log(Level.ERROR, String.format("An error occured trying to create an instance of WorldProvider %d (%s)",
-                    dim, providers.get(getProviderType(dim)).getSimpleName()),e);
+        catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

@@ -11,9 +11,6 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -41,8 +38,6 @@ public final class UsernameCache {
 
     private static final File saveFile = new File( /* The minecraft dir */(File) FMLInjectionData.data()[6], "usernamecache.json");
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-    private static final Logger log = LogManager.getLogger(UsernameCache.class);
 
     private UsernameCache() {}
 
@@ -148,18 +143,10 @@ public final class UsernameCache {
 
             map = gson.fromJson(json, type);
         }
-        catch (JsonSyntaxException e)
+        catch (JsonSyntaxException | IOException e)
         {
-            log.error("Could not parse username cache file as valid json, deleting file", e);
             saveFile.delete();
-        }
-        catch (IOException e)
-        {
-            log.error("Failed to read username cache file from disk, deleting file", e);
-            saveFile.delete();
-        }
-        finally
-        {
+        } finally {
             // Can sometimes occur when the json file is malformed
             if (map == null)
             {
@@ -193,10 +180,7 @@ public final class UsernameCache {
                     Files.write(data, saveFile, charset);
                 }
             }
-            catch (IOException e)
-            {
-                log.error("Failed to save username cache to file!", e);
-            }
+            catch (IOException ignored) {}
         }
     }
 }

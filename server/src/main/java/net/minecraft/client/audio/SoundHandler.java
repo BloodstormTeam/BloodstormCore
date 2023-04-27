@@ -24,13 +24,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
-public class SoundHandler implements IResourceManagerReloadListener, IUpdatePlayerListBox
-{
-    private static final Logger logger = LogManager.getLogger();
+public class SoundHandler implements IResourceManagerReloadListener, IUpdatePlayerListBox {
     private static final Gson field_147699_c = (new GsonBuilder()).registerTypeAdapter(SoundList.class, new SoundListSerializer()).create();
     private static final ParameterizedType field_147696_d = new ParameterizedType()
     {
@@ -90,10 +86,7 @@ public class SoundHandler implements IResourceManagerReloadListener, IUpdatePlay
                             this.loadSoundResource(new ResourceLocation(s, (String)entry.getKey()), (SoundList)entry.getValue());
                         }
                     }
-                    catch (RuntimeException runtimeexception)
-                    {
-                        logger.warn("Invalid sounds.json", runtimeexception);
-                    }
+                    catch (RuntimeException ignored) {}
                 }
             }
             catch (IOException ioexception)
@@ -107,13 +100,9 @@ public class SoundHandler implements IResourceManagerReloadListener, IUpdatePlay
     {
         SoundEventAccessorComposite soundeventaccessorcomposite;
 
-        if (this.sndRegistry.containsKey(p_147693_1_) && !p_147693_2_.canReplaceExisting())
-        {
+        if (this.sndRegistry.containsKey(p_147693_1_) && !p_147693_2_.canReplaceExisting()) {
             soundeventaccessorcomposite = (SoundEventAccessorComposite)this.sndRegistry.getObject(p_147693_1_);
-        }
-        else
-        {
-            logger.debug("Registered/replaced new sound event location {}", new Object[] {p_147693_1_});
+        } else {
             soundeventaccessorcomposite = new SoundEventAccessorComposite(p_147693_1_, 1.0D, 1.0D, p_147693_2_.getSoundCategory());
             this.sndRegistry.registerSound(soundeventaccessorcomposite);
         }
@@ -137,14 +126,8 @@ public class SoundHandler implements IResourceManagerReloadListener, IUpdatePlay
                     {
                         this.mcResourceManager.getResource(resourcelocation2);
                     }
-                    catch (FileNotFoundException filenotfoundexception)
-                    {
-                        logger.warn("File {} does not exist, cannot add it to event {}", new Object[] {resourcelocation2, p_147693_1_});
-                        continue;
-                    }
                     catch (IOException ioexception)
                     {
-                        logger.warn("Could not load sound file " + resourcelocation2 + ", cannot add it to event " + p_147693_1_, ioexception);
                         continue;
                     }
 

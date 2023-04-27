@@ -39,15 +39,11 @@ import net.minecraft.world.gen.feature.WorldGenSwamp;
 import net.minecraft.world.gen.feature.WorldGenTallGrass;
 import net.minecraft.world.gen.feature.WorldGenTrees;
 import net.minecraft.world.gen.feature.WorldGenerator;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import net.minecraftforge.common.*;
 import net.minecraftforge.event.terraingen.*;
 
-public abstract class BiomeGenBase
-{
-    private static final Logger logger = LogManager.getLogger();
+public abstract class BiomeGenBase {
     protected static final BiomeGenBase.Height height_Default = new BiomeGenBase.Height(0.1F, 0.2F);
     protected static final BiomeGenBase.Height height_ShallowWaters = new BiomeGenBase.Height(-0.5F, 0.0F);
     protected static final BiomeGenBase.Height height_Oceans = new BiomeGenBase.Height(-1.0F, 0.1F);
@@ -491,10 +487,7 @@ public abstract class BiomeGenBase
         if (p_150568_0_ >= 0 && p_150568_0_ <= biomeList.length)
         {
             return biomeList[p_150568_0_];
-        }
-        else
-        {
-            logger.warn("Biome ID is out of bounds: " + p_150568_0_ + ", defaulting to 0 (Ocean)");
+        } else {
             return ocean;
         }
     }

@@ -19,9 +19,19 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    implementation("net.minecraft:launchwrapper:1.11")
+
+    implementation(project(":launchwrapper"))
+    implementation(project(":authlib"))
+
+    //[Logging]
+    implementation("ch.qos.logback:logback-classic:1.4.7")
+    implementation("ch.qos.logback:logback-core:1.4.7")
+
+    //[Bytecode manipulation's]
+    implementation("org.ow2.asm:asm:9.5")
+    implementation("org.ow2.asm:asm-commons:9.5")
+    implementation("org.ow2.asm:asm-util:9.5")
     implementation("com.google.code.findbugs:jsr305:1.3.9")
-    implementation("org.ow2.asm:asm-debug-all:5.0.3")
     implementation( "net.sf.jopt-simple:jopt-simple:4.5")
     implementation("lzma:lzma:0.0.1")
     implementation( "com.mojang:realms:1.3.5")
@@ -45,9 +55,6 @@ dependencies {
     implementation("net.java.jinput:jinput:2.0.5")
     implementation("net.java.jutils:jutils:1.0.0")
     implementation("com.google.code.gson:gson:2.2.4")
-    implementation("com.mojang:authlib:1.5.16")
-    implementation("org.apache.logging.log4j:log4j-api:2.3.2")
-    implementation("org.apache.logging.log4j:log4j-core:2.3.2")
     implementation("org.lwjgl.lwjgl:lwjgl:2.9.1")
     implementation("org.lwjgl.lwjgl:lwjgl_util:2.9.1")
     implementation("tv.twitch:twitch:5.16")
@@ -59,12 +66,15 @@ dependencies {
     implementation ("it.unimi.dsi:fastutil:8.5.12")
     implementation ("it.unimi.dsi:dsiutils:2.7.3") {
         exclude(group = "com.google", module = "guava")
+        exclude(group = "ch.qos.logback")
     }
     implementation("javax.persistence:javax.persistence-api:2.2")
     implementation("org.avaje:ebean:2.7.3")
     implementation("com.googlecode.json-simple:json-simple:1.1")
     implementation("commons-lang:commons-lang:2.6")
-    implementation("net.md-5:SpecialSource:1.7.4")
+    implementation("net.md-5:SpecialSource:1.7.4") {
+        exclude(group = "org.ow2.asm", module = "asm-debug-all")
+    }
 }
 
 tasks.test {

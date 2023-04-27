@@ -16,15 +16,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import net.minecraft.util.JsonUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 @SideOnly(Side.CLIENT)
-public class ResourceIndex
-{
-    private static final Logger field_152783_a = LogManager.getLogger();
+public class ResourceIndex {
     private final Map field_152784_b = Maps.newHashMap();
-    private static final String __OBFID = "CL_00001831";
 
     public ResourceIndex(File p_i1047_1_, String p_i1047_2_)
     {
@@ -57,14 +51,7 @@ public class ResourceIndex
                     }
                 }
             }
-            catch (JsonParseException jsonparseexception)
-            {
-                field_152783_a.error("Unable to parse resource index file: " + file3);
-            }
-            catch (FileNotFoundException filenotfoundexception)
-            {
-                field_152783_a.error("Can\'t find the resource index file: " + file3);
-            }
+            catch (JsonParseException | FileNotFoundException ignored) {}
             finally
             {
                 IOUtils.closeQuietly(bufferedreader);

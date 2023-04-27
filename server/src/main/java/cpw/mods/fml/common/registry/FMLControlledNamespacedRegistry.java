@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.logging.log4j.Level;
-
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -22,7 +20,6 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterators;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.functions.GenericIterableFactory;
 import cpw.mods.fml.common.registry.RegistryDelegate.Delegate;
 
@@ -151,17 +148,7 @@ public class FMLControlledNamespacedRegistry<I> extends RegistryNamespaced {
         name = ensureNamespaced(name);
         String existingName = getNameForObject(thing);
 
-        if (existingName == null)
-        {
-            FMLLog.bigWarning("Ignoring putObject(%s, %s), not resolvable", name, thing);
-        }
-        else if (existingName.equals(name))
-        {
-            FMLLog.bigWarning("Ignoring putObject(%s, %s), already added", name, thing);
-        }
-        else
-        {
-            FMLLog.bigWarning("Ignoring putObject(%s, %s), adding alias to %s instead", name, thing, existingName);
+        if (existingName != null && !existingName.equals(name)) {
             addAlias(name, existingName);
         }
     }
@@ -381,7 +368,6 @@ public class FMLControlledNamespacedRegistry<I> extends RegistryNamespaced {
 
         if (getRaw(name) == thing) // already registered, return prev registration's id
         {
-            FMLLog.bigWarning("The object %s has been registered twice for the same name %s.", thing, name);
             return getId(thing);
         }
         if (getRaw(name) != null) // duplicate name
@@ -394,27 +380,18 @@ public class FMLControlledNamespacedRegistry<I> extends RegistryNamespaced {
             Object otherThing = getRaw(foundId);
             throw new IllegalArgumentException(String.format("The object %s{%x} has been registered twice, using the names %s and %s. (Other object at this id is %s{%x})", thing, System.identityHashCode(thing), getNameForObject(thing), name, otherThing, System.identityHashCode(otherThing)));
         }
-        if (GameData.isFrozen(this))
-        {
-            FMLLog.bigWarning("The object %s (name %s) is being added too late.", thing, name);
-        }
 
         if (activeSubstitutions.containsKey(name))
         {
             thing = activeSubstitutions.get(name);
         }
         addObjectRaw(idToUse, name, thing);
-
-        if (DEBUG)
-            FMLLog.finer("Registry add: %s %d %s (req. id %d)", name, idToUse, thing, id);
         return idToUse;
     }
 
     void addAlias(String from, String to)
     {
         aliases.put(from, to);
-        if (DEBUG)
-            FMLLog.finer("Registry alias: %s -> %s", from, to);
     }
 
     Map<String,Integer> getEntriesNotIn(FMLControlledNamespacedRegistry<I> registry)
@@ -453,7 +430,6 @@ public class FMLControlledNamespacedRegistry<I> extends RegistryNamespaced {
         for (int id : ids)
         {
             I thing = getRaw(id);
-            FMLLog.finer("Registry: %d %s %s", id, getNameForObject(thing), thing);
         }
     }
 
@@ -491,7 +467,6 @@ public class FMLControlledNamespacedRegistry<I> extends RegistryNamespaced {
                     // point to us. Go to the "default state" registry to get it
                     original = (I)GameData.getItemRegistry().getRaw(nameToReplace);
                 }
-                FMLLog.log(Level.DEBUG, "Replacing %s with %s (name %s)", original, sub, nameToReplace);
                 Delegate<Item> delegate = (Delegate<Item>)((Item)original).delegate;
                 delegate.changeReference(sub);
                 ((Delegate<Item>)sub.delegate).setName(nameToReplace);
@@ -503,7 +478,6 @@ public class FMLControlledNamespacedRegistry<I> extends RegistryNamespaced {
     void addSubstitutionAlias(String modId, String nameToReplace, Object toReplace) throws ExistingSubstitutionException {
         if (getPersistentSubstitutions().containsKey(nameToReplace) || getPersistentSubstitutions().containsValue(toReplace))
         {
-            FMLLog.severe("The substitution of %s has already occured. You cannot duplicate substitutions", nameToReplace);
             throw new ExistingSubstitutionException(nameToReplace, toReplace);
         }
         I replacement = cast(toReplace);
@@ -514,16 +488,13 @@ public class FMLControlledNamespacedRegistry<I> extends RegistryNamespaced {
         }
         if (!original.getClass().isAssignableFrom(replacement.getClass()))
         {
-            FMLLog.severe("The substitute %s for %s (type %s) is type incompatible. This won't work", replacement.getClass().getName(), nameToReplace, original.getClass().getName());
             throw new IncompatibleSubstitutionException(nameToReplace, replacement, original);
         }
         int existingId = getId(replacement);
         if (existingId != -1)
         {
-            FMLLog.severe("The substitute %s for %s is registered into the game independently. This won't work", replacement.getClass().getName(), nameToReplace);
             throw new IllegalArgumentException("The object substitution is already registered. This won't work");
         }
-        FMLLog.log(Level.DEBUG, "Adding substitution %s with %s (name %s)", original, replacement, nameToReplace);
         getPersistentSubstitutions().put(nameToReplace, replacement);
     }
 

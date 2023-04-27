@@ -28,8 +28,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.storage.SaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 
-import org.apache.logging.log4j.Level;
-
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -104,7 +102,6 @@ public class FMLContainer extends DummyModContainer implements WorldAccessContai
         fmlData.setTag("ModList", list);
         // name <-> id mappings
         NBTTagList dataList = new NBTTagList();
-        FMLLog.fine("Gathering id map for writing to world save %s", info.getWorldName());
         GameData.GameDataSnapshot dataSnapshot = GameData.buildItemDataList();
         for (Entry<String, Integer> item : dataSnapshot.idMap.entrySet())
         {
@@ -157,38 +154,13 @@ public class FMLContainer extends DummyModContainer implements WorldAccessContai
     }
 
     @Override
-    public void readData(SaveHandler handler, WorldInfo info, Map<String, NBTBase> propertyMap, NBTTagCompound tag)
-    {
-        if (tag.hasKey("ModList"))
-        {
-            NBTTagList modList = tag.getTagList("ModList", (byte)10);
-            for (int i = 0; i < modList.tagCount(); i++)
-            {
-                NBTTagCompound mod = modList.getCompoundTagAt(i);
-                String modId = mod.getString("ModId");
-                String modVersion = mod.getString("ModVersion");
-                ModContainer container = Loader.instance().getIndexedModList().get(modId);
-                if (container == null)
-                {
-                    FMLLog.log("fml.ModTracker", Level.ERROR, "This world was saved with mod %s which appears to be missing, things may not work well", modId);
-                    continue;
-                }
-                if (!modVersion.equals(container.getVersion()))
-                {
-                    FMLLog.log("fml.ModTracker", Level.INFO, "This world was saved with mod %s version %s and it is now at version %s, things may not work well", modId, modVersion, container.getVersion());
-                }
-            }
-        }
-
+    public void readData(SaveHandler handler, WorldInfo info, Map<String, NBTBase> propertyMap, NBTTagCompound tag) {
         List<String> failedElements = null;
 
-        if (tag.hasKey("ModItemData"))
-        {
-            FMLLog.info("Attempting to convert old world data to new system. This may be trouble!");
+        if (tag.hasKey("ModItemData")) {
             NBTTagList modList = tag.getTagList("ModItemData", (byte)10);
             Map<String,Integer> dataList = Maps.newLinkedHashMap();
-            for (int i = 0; i < modList.tagCount(); i++)
-            {
+            for (int i = 0; i < modList.tagCount(); i++) {
                 NBTTagCompound itemTag = modList.getCompoundTagAt(i);
                 String modId = itemTag.getString("ModId");
                 String itemType = itemTag.getString("ItemType");
@@ -196,12 +168,7 @@ public class FMLContainer extends DummyModContainer implements WorldAccessContai
                 int ordinal = itemTag.getInteger("ordinal");
                 String forcedModId = itemTag.hasKey("ForcedModId") ? itemTag.getString("ForcedModId") : null;
                 String forcedName = itemTag.hasKey("ForcedName") ? itemTag.getString("ForcedName") : null;
-                if (forcedName == null)
-                {
-                    FMLLog.warning("Found unlabelled item in world save, this may cause problems. The item type %s:%d will not be present", itemType, ordinal);
-                }
-                else
-                {
+                if (forcedName != null) {
                     // all entries are Items, blocks were only saved through their ItemBlock
                     String itemLabel = String.format("%c%s:%s", '\u0002', forcedModId != null ? forcedModId : modId, forcedName);
                     dataList.put(itemLabel, itemId);
@@ -210,8 +177,7 @@ public class FMLContainer extends DummyModContainer implements WorldAccessContai
             failedElements = GameData.injectWorldIDMap(dataList, ImmutableSet.<String>of(), ImmutableSet.<String>of(), true, true);
 
         }
-        else if (tag.hasKey("ItemData"))
-        {
+        else if (tag.hasKey("ItemData")) {
             // name <-> id mappings
             NBTTagList list = tag.getTagList("ItemData", 10);
             Map<String,Integer> dataList = Maps.newLinkedHashMap();
@@ -223,8 +189,7 @@ public class FMLContainer extends DummyModContainer implements WorldAccessContai
 
             Set<Integer> blockedIds = new HashSet<Integer>();
 
-            if (!tag.hasKey("BlockedItemIds")) // no blocked id info -> old 1.7 save
-            {
+            if (!tag.hasKey("BlockedItemIds")) {
                 // old early 1.7 save potentially affected by the registry mapping bug
                 // fix the ids the best we can...
                 GameData.fixBrokenIds(dataList, blockedIds);
@@ -283,7 +248,6 @@ public class FMLContainer extends DummyModContainer implements WorldAccessContai
                         + "ID map and there is\n"
                         + "NOTHING FML or Forge can do to recover this save.\n\n"
                         + "If you changed your mods, try reverting the change";
-                FMLLog.log(Level.FATAL, ex, msg);
                 StartupQuery.notify(msg);
                 StartupQuery.abort();
             }

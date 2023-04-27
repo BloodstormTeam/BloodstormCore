@@ -47,7 +47,6 @@ public class StartupQuery {
             }
             catch (InterruptedException e)
             {
-                FMLLog.warning("query interrupted");
                 abort();
             }
 
@@ -98,8 +97,6 @@ public class StartupQuery {
 
         if (result != null && prop != null)
         {
-            FMLLog.info("Using fml.queryResult %s to answer the following query:\n%s", prop, text);
-
             if (prop.equalsIgnoreCase("confirm"))
             {
                 setResult(true);
@@ -110,8 +107,6 @@ public class StartupQuery {
                 setResult(false);
                 return;
             }
-
-            FMLLog.warning("Invalid value for fml.queryResult: %s, expected confirm or cancel", prop);
         }
 
         synchronous = false;
@@ -134,7 +129,6 @@ public class StartupQuery {
         }
         catch (InterruptedException e)
         {
-            FMLLog.warning("query interrupted");
             abort();
         }
     }

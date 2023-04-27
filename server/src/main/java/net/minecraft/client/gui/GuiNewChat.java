@@ -12,14 +12,10 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MathHelper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
-public class GuiNewChat extends Gui
-{
-    private static final Logger logger = LogManager.getLogger();
+public class GuiNewChat extends Gui {
     private final Minecraft mc;
     private final List sentMessages = new ArrayList();
     private final List chatLines = new ArrayList();
@@ -143,10 +139,8 @@ public class GuiNewChat extends Gui
         this.printChatMessageWithOptionalDeletion(p_146227_1_, 0);
     }
 
-    public void printChatMessageWithOptionalDeletion(IChatComponent p_146234_1_, int p_146234_2_)
-    {
+    public void printChatMessageWithOptionalDeletion(IChatComponent p_146234_1_, int p_146234_2_) {
         this.func_146237_a(p_146234_1_, p_146234_2_, this.mc.ingameGUI.getUpdateCounter(), false);
-        logger.info("[CHAT] " + p_146234_1_.getUnformattedText());
     }
 
     private String func_146235_b(String p_146235_1_)

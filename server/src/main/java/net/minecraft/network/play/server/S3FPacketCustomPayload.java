@@ -26,14 +26,6 @@ public class S3FPacketCustomPayload extends Packet
     {
         this.field_149172_a = p_i45190_1_;
         this.field_149171_b = p_i45190_2_;
-
-        //TODO: Remove this when FML protocol is re-written. To restore vanilla compatibility.
-        if (p_i45190_2_.length > 0x1FFF9A) // Max size of ANY MC packet is 0x1FFFFF minus max size of this packet (101)
-        {
-            org.apache.logging.log4j.Logger logger = org.apache.logging.log4j.LogManager.getLogger("NETWORKERROR");
-            logger.error("[Channel: "+ p_i45190_1_ +"] Payload may not be larger than 2097050 bytes");
-            p_i45190_2_ = new byte[1];
-        }
     }
 
     public void readPacketData(PacketBuffer p_148837_1_) throws IOException

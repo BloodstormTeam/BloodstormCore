@@ -10,13 +10,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
-public class ServerList
-{
-    private static final Logger logger = LogManager.getLogger();
+public class ServerList {
     private final Minecraft mc;
     private final List servers = new ArrayList();
     private static final String __OBFID = "CL_00000891";
@@ -46,10 +42,7 @@ public class ServerList
                 this.servers.add(ServerData.getServerDataFromNBTCompound(nbttaglist.getCompoundTagAt(i)));
             }
         }
-        catch (Exception exception)
-        {
-            logger.error("Couldn\'t load server list", exception);
-        }
+        catch (Exception ignored) {}
     }
 
     public void saveServerList()
@@ -57,22 +50,16 @@ public class ServerList
         try
         {
             NBTTagList nbttaglist = new NBTTagList();
-            Iterator iterator = this.servers.iterator();
 
-            while (iterator.hasNext())
-            {
-                ServerData serverdata = (ServerData)iterator.next();
+            for (Object server : this.servers) {
+                ServerData serverdata = (ServerData) server;
                 nbttaglist.appendTag(serverdata.getNBTCompound());
             }
 
             NBTTagCompound nbttagcompound = new NBTTagCompound();
             nbttagcompound.setTag("servers", nbttaglist);
             CompressedStreamTools.safeWrite(nbttagcompound, new File(this.mc.mcDataDir, "servers.dat"));
-        }
-        catch (Exception exception)
-        {
-            logger.error("Couldn\'t save server list", exception);
-        }
+        } catch (Exception ignored) {}
     }
 
     public ServerData getServerData(int p_78850_1_)

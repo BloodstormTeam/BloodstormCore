@@ -39,21 +39,17 @@ class ThreadPlayerLookupUUID extends Thread {
                 NetHandlerLoginServer.processPlayerLoginGameProfile(this.field_151292_a, profile);
                 fireLoginEvents(); // Spigot
             } else if (this.mcServer.isSinglePlayer()) {
-                NetHandlerLoginServer.getLogger().warn("Failed to verify username but will let them in anyway!");
                 NetHandlerLoginServer.processPlayerLoginGameProfile(this.field_151292_a, this.field_151292_a.func_152506_a(gameprofile));
                 NetHandlerLoginServer.setLoginState(this.field_151292_a, LoginState.READY_TO_ACCEPT);
             } else {
                 this.field_151292_a.func_147322_a("Failed to verify username!");
-                NetHandlerLoginServer.getLogger().error("Username '" + NetHandlerLoginServer.getGameProfile(this.field_151292_a).getName() + "' tried to join with an invalid session");
             }
         } catch (AuthenticationUnavailableException authenticationunavailableexception) {
             if (this.mcServer.isSinglePlayer()) {
-                NetHandlerLoginServer.getLogger().warn("Authentication servers are down but will let them in anyway!");
                 NetHandlerLoginServer.processPlayerLoginGameProfile(this.field_151292_a, this.field_151292_a.func_152506_a(gameprofile));
                 NetHandlerLoginServer.setLoginState(this.field_151292_a, LoginState.READY_TO_ACCEPT);
             } else {
                 this.field_151292_a.func_147322_a("Authentication servers are down. Please try again later, sorry!");
-                NetHandlerLoginServer.getLogger().error("Couldn't verify username because servers are unavailable");
             }
             // CraftBukkit start - catch all exceptions
         } catch (Exception exception) {
@@ -105,8 +101,6 @@ class ThreadPlayerLookupUUID extends Thread {
             }
         }
         // CraftBukkit end
-
-        NetHandlerLoginServer.getLogger().info("UUID of player " + NetHandlerLoginServer.getGameProfile(this.field_151292_a).getName() + " is " + NetHandlerLoginServer.getGameProfile(this.field_151292_a).getId());
         NetHandlerLoginServer.setLoginState(this.field_151292_a, LoginState.READY_TO_ACCEPT);
     }
 }

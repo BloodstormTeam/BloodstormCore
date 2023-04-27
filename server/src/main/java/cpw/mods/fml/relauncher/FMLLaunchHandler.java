@@ -13,7 +13,6 @@
 package cpw.mods.fml.relauncher;
 
 import java.io.File;
-import org.apache.logging.log4j.Level;
 
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
@@ -62,14 +61,12 @@ public class FMLLaunchHandler
 
     private void setupClient()
     {
-        FMLRelaunchLog.side = Side.CLIENT;
         side = Side.CLIENT;
         setupHome();
     }
 
     private void setupServer()
     {
-        FMLRelaunchLog.side = Side.SERVER;
         side = Side.SERVER;
         setupHome();
 
@@ -78,13 +75,6 @@ public class FMLLaunchHandler
     private void setupHome()
     {
         FMLInjectionData.build(minecraftHome, classLoader);
-        FMLRelaunchLog.minecraftHome = minecraftHome;
-        FMLRelaunchLog.info("Forge Mod Loader version %s.%s.%s.%s for Minecraft %s loading", FMLInjectionData.major, FMLInjectionData.minor,
-                FMLInjectionData.rev, FMLInjectionData.build, FMLInjectionData.mccversion, FMLInjectionData.mcpversion);
-        FMLRelaunchLog.info("Java is %s, version %s, running on %s:%s:%s, installed at %s", System.getProperty("java.vm.name"), System.getProperty("java.version"), System.getProperty("os.name"), System.getProperty("os.arch"), System.getProperty("os.version"), System.getProperty("java.home"));
-        FMLRelaunchLog.fine("Java classpath at launch is %s", System.getProperty("java.class.path"));
-        FMLRelaunchLog.fine("Java library path at launch is %s", System.getProperty("java.library.path"));
-
         try
         {
             CoreModManager.handleLaunch(minecraftHome, classLoader, tweaker);
@@ -92,8 +82,7 @@ public class FMLLaunchHandler
         catch (Throwable t)
         {
             t.printStackTrace();
-            FMLRelaunchLog.log(Level.ERROR, t, "An error occurred trying to configure the minecraft home at %s for Forge Mod Loader", minecraftHome.getAbsolutePath());
-            throw Throwables.propagate(t);
+            Throwables.throwIfUnchecked(t);
         }
     }
 

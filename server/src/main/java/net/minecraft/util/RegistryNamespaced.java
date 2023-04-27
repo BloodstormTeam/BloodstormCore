@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 // Cauldron start
-import cpw.mods.fml.common.FMLLog;
 import io.github.crucible.CrucibleConfigs;
 import net.minecraft.block.Block;
 // Cauldron end
@@ -26,18 +25,7 @@ public class RegistryNamespaced extends RegistrySimple implements IObjectIntIter
     {
         // Cauldron start - register item/block materials for Bukkit
         boolean isForgeBlock = p_148756_3_ instanceof Block && (p_148756_3_.getClass().getName().length() > 3 && !p_148756_3_.getClass().getName().startsWith("net.minecraft.block")) ? true : false;
-        org.bukkit.Material material = org.bukkit.Material.addMaterial(p_148756_1_, p_148756_2_, isForgeBlock);
-        if (material != null && CrucibleConfigs.configs.thermos_logging_materialInjection)
-        {
-            if (isForgeBlock)
-            {
-                FMLLog.info("Injected new Forge block material %s with ID %d.", material.name(), material.getId());
-            }
-            else
-            {
-                FMLLog.info("Injected new Forge item material %s with ID %d.", material.name(), material.getId());
-            }
-        }
+        org.bukkit.Material.addMaterial(p_148756_1_, p_148756_2_, isForgeBlock);
         // Cauldron end
         this.underlyingIntegerMap.func_148746_a(p_148756_3_, p_148756_1_);
         this.putObject(ensureNamespaced(p_148756_2_), p_148756_3_);

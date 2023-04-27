@@ -26,16 +26,12 @@ import net.minecraft.network.play.client.C15PacketClientSettings;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.EnumDifficulty;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
 @SideOnly(Side.CLIENT)
-public class GameSettings
-{
-    private static final Logger logger = LogManager.getLogger();
+public class GameSettings {
     private static final Gson gson = new Gson();
     private static final ParameterizedType typeListString = new ParameterizedType()
     {
@@ -1029,19 +1025,13 @@ public class GameSettings
                         }
                     }
                 }
-                catch (Exception exception)
-                {
-                    logger.warn("Skipping bad option: " + s);
-                }
+                catch (Exception ignored) {}
             }
 
             KeyBinding.resetKeyBindingArrayAndHash();
             bufferedreader.close();
         }
-        catch (Exception exception1)
-        {
-            logger.error("Failed to load options", exception1);
-        }
+        catch (Exception ignored) {}
     }
 
     private float parseFloat(String p_74305_1_)
@@ -1131,10 +1121,7 @@ public class GameSettings
 
             printwriter.close();
         }
-        catch (Exception exception)
-        {
-            logger.error("Failed to save options", exception);
-        }
+        catch (Exception ignored) {}
 
         this.sendSettingsToServer();
     }

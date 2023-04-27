@@ -18,8 +18,6 @@ import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.logging.log4j.Level;
-
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.EnumConnectionState;
@@ -34,7 +32,6 @@ import net.minecraft.network.play.server.S40PacketDisconnect;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.ChatComponentText;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.common.network.FMLNetworkException;
 import cpw.mods.fml.common.network.FMLOutboundHandler;
@@ -186,7 +183,6 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
     private void completeClientSideConnection(ConnectionType type)
     {
         this.connectionType = type;
-        FMLLog.info("[%s] Client side %s connection established", Thread.currentThread().getName(), this.connectionType.name().toLowerCase(Locale.ENGLISH));
         this.state = ConnectionState.CONNECTED;
         FMLCommonHandler.instance().bus().post(new FMLNetworkEvent.ClientConnectedToServerEvent(manager, this.connectionType.name()));
     }
@@ -194,7 +190,6 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
     private void completeServerSideConnection(ConnectionType type)
     {
         this.connectionType = type;
-        FMLLog.info("[%s] Server side %s connection established", Thread.currentThread().getName(), this.connectionType.name().toLowerCase(Locale.ENGLISH));
         this.state = ConnectionState.CONNECTED;
         FMLCommonHandler.instance().bus().post(new FMLNetworkEvent.ServerConnectionFromClientEvent(manager));
         scm.initializeConnectionToPlayer(manager, player, serverHandler);
@@ -227,10 +222,6 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
         {
             handshakeChannel.pipeline().fireUserEventTriggered(msg);
         }
-        else
-        {
-            // FMLLog.info("Unexpected packet during modded negotiation - assuming vanilla or keepalives : %s", msg.getClass().getName());
-        }
         return false;
     }
 
@@ -240,11 +231,9 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
     }
 
     @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception
-    {
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
         if (evt instanceof ConnectionType && side == Side.SERVER)
         {
-            FMLLog.info("Timeout occurred, assuming a vanilla client");
             kickVanilla();
         }
     }
@@ -349,19 +338,13 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
         private ScheduledFuture<Void> future;
 
         @Override
-        public void handlerAdded(final ChannelHandlerContext ctx) throws Exception
-        {
-            future = ctx.executor().schedule(new Callable<Void>() {
-                @Override
-                public Void call() throws Exception
+        public void handlerAdded(final ChannelHandlerContext ctx) {
+            future = ctx.executor().schedule(() -> {
+                if (state != ConnectionState.CONNECTED)
                 {
-                    if (state != ConnectionState.CONNECTED)
-                    {
-                        FMLLog.info("Timeout occurred waiting for response, assuming vanilla connection");
-                        ctx.fireUserEventTriggered(ConnectionType.VANILLA);
-                    }
-                    return null;
+                    ctx.fireUserEventTriggered(ConnectionType.VANILLA);
                 }
+                return null;
             }, 10, TimeUnit.HOURS);
         }
 
@@ -461,17 +444,11 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
 
     public void completeHandshake(Side target)
     {
-        if (state == ConnectionState.CONNECTED)
-        {
-            FMLLog.severe("Attempt to double complete the network connection!");
+        if (state == ConnectionState.CONNECTED) {
             throw new FMLNetworkException("Attempt to double complete!");
-        }
-        if (side == Side.CLIENT)
-        {
+        } if (side == Side.CLIENT) {
             completeClientSideConnection(ConnectionType.MODDED);
-        }
-        else
-        {
+        } else {
             completeServerSideConnection(ConnectionType.MODDED);
         }
     }
@@ -481,21 +458,13 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
         state = ConnectionState.HANDSHAKECOMPLETE;
     }
 
-    public void abortClientHandshake(String type)
-    {
-        FMLLog.log(Level.INFO, "Aborting client handshake \"%s\"", type);
+    public void abortClientHandshake(String type) {
         FMLCommonHandler.instance().waitForPlayClient();
         completeClientSideConnection(ConnectionType.valueOf(type));
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
-    {
-        // Stop the epic channel closed spam at close
-        if (!(cause instanceof ClosedChannelException))
-        {
-            // FMLLog.log(Level.ERROR, cause, "NetworkDispatcher exception");
-        }
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
     }
 
@@ -512,11 +481,9 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
 
     public void setOverrideDimension(int overrideDim) {
         this.overrideLoginDim = overrideDim;
-        FMLLog.fine("Received override dimension %d", overrideDim);
     }
 
     public int getOverrideDimension(S01PacketJoinGame p_147282_1_) {
-        FMLLog.fine("Overriding dimension: using %d", this.overrideLoginDim);
         return this.overrideLoginDim != 0 ? this.overrideLoginDim : p_147282_1_.func_149194_f();
     }
 }

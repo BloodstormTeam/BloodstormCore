@@ -21,16 +21,12 @@ import net.minecraft.client.util.JsonException;
 import net.minecraft.util.JsonUtils;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.ARBMultitexture;
 import org.lwjgl.opengl.GL13;
 
 @SideOnly(Side.CLIENT)
-public class ShaderManager
-{
-    private static final Logger logger = LogManager.getLogger();
+public class ShaderManager {
     private static final ShaderDefault defaultShaderUniform = new ShaderDefault();
     private static ShaderManager staticShaderManager = null;
     private static int field_147999_d = -1;
@@ -291,7 +287,6 @@ public class ShaderManager
 
             if (k == -1)
             {
-                logger.warn("Shader " + this.field_148007_m + "could not find sampler named " + s + " in the specified shader program.");
                 this.field_147997_f.remove(s);
                 this.field_147998_g.remove(j);
                 --j;
@@ -312,13 +307,9 @@ public class ShaderManager
             s = shaderuniform.func_148086_a();
             k = OpenGlHelper.func_153194_a(this.field_148006_l, s);
 
-            if (k == -1)
+            if (k != -1)
             {
-                logger.warn("Could not find uniform named " + s + " in the specified" + " shader program.");
-            }
-            else
-            {
-                this.field_148008_j.add(Integer.valueOf(k));
+                this.field_148008_j.add(k);
                 shaderuniform.func_148084_b(k);
                 this.field_148009_k.put(s, shaderuniform);
             }

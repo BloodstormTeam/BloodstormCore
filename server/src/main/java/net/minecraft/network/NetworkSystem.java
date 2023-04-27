@@ -40,12 +40,8 @@ import net.minecraft.util.MessageDeserializer2;
 import net.minecraft.util.MessageSerializer;
 import net.minecraft.util.MessageSerializer2;
 import net.minecraft.util.ReportedException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-public class NetworkSystem
-{
-    private static final Logger logger = LogManager.getLogger();
+public class NetworkSystem {
     private static final NioEventLoopGroup eventLoops = new NioEventLoopGroup(0, (new ThreadFactoryBuilder()).setNameFormat("Netty IO #%d").setDaemon(true).build());
     private final MinecraftServer mcServer;
     public volatile boolean isAlive;
@@ -186,28 +182,12 @@ public class NetworkSystem
                         {
                             CrashReport crashreport = CrashReport.makeCrashReport(exception, "Ticking memory connection");
                             CrashReportCategory crashreportcategory = crashreport.makeCategory("Ticking connection");
-                            crashreportcategory.addCrashSectionCallable("Connection", new Callable()
-                            {
-                                private static final String __OBFID = "CL_00001450";
-                                public String call()
-                                {
-                                    return networkmanager.toString();
-                                }
-                            });
+                            crashreportcategory.addCrashSectionCallable("Connection", () -> networkmanager.toString());
                             throw new ReportedException(crashreport);
                         }
 
-                        logger.warn("Failed to handle packet for " + networkmanager.getSocketAddress(), exception);
                         final ChatComponentText chatcomponenttext = new ChatComponentText("Internal server error");
-                        networkmanager.scheduleOutboundPacket(new S40PacketDisconnect(chatcomponenttext), new GenericFutureListener[] {new GenericFutureListener()
-                        {
-                            private static final String __OBFID = "CL_00001451";
-                            public void operationComplete(Future p_operationComplete_1_)
-                            {
-                                networkmanager.closeChannel(chatcomponenttext);
-                            }
-                        }
-                                                                                                      });
+                        networkmanager.scheduleOutboundPacket(new S40PacketDisconnect(chatcomponenttext), p_operationComplete_1_ -> networkmanager.closeChannel(chatcomponenttext));
                         networkmanager.disableAutoRead();
                     }
                 }

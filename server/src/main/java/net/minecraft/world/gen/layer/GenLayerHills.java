@@ -1,12 +1,7 @@
 package net.minecraft.world.gen.layer;
 
 import net.minecraft.world.biome.BiomeGenBase;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-public class GenLayerHills extends GenLayer
-{
-    private static final Logger logger = LogManager.getLogger();
+public class GenLayerHills extends GenLayer {
     private GenLayer field_151628_d;
     private static final String __OBFID = "CL_00000563";
 
@@ -31,11 +26,6 @@ public class GenLayerHills extends GenLayer
                 int k1 = aint[j1 + 1 + (i1 + 1) * (p_75904_3_ + 2)];
                 int l1 = aint1[j1 + 1 + (i1 + 1) * (p_75904_3_ + 2)];
                 boolean flag = (l1 - 2) % 29 == 0;
-
-                if (k1 > 255)
-                {
-                    logger.debug("old! " + k1);
-                }
 
                 if (k1 != 0 && l1 >= 2 && (l1 - 2) % 29 == 1 && k1 < 128)
                 {

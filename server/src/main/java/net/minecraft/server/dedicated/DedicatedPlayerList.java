@@ -3,20 +3,15 @@ package net.minecraft.server.dedicated;
 import com.mojang.authlib.GameProfile;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import io.github.crucible.CrucibleConfigs;
+import net.minecraft.server.management.ServerConfigurationManager;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import io.github.crucible.CrucibleConfigs;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.ServerConfigurationManager;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.SERVER)
-public class DedicatedPlayerList extends ServerConfigurationManager
-{
-    private static final Logger field_164439_d = LogManager.getLogger();
+public class DedicatedPlayerList extends ServerConfigurationManager {
     private static final String __OBFID = "CL_00001783";
 
     public DedicatedPlayerList(DedicatedServer p_i1503_1_)
@@ -88,10 +83,7 @@ public class DedicatedPlayerList extends ServerConfigurationManager
         {
             this.getBannedIPs().func_152678_f();
         }
-        catch (IOException ioexception)
-        {
-            field_164439_d.warn("Failed to save ip banlist: ", ioexception);
-        }
+        catch (IOException ignored) {}
     }
 
     private void func_152617_w()
@@ -100,10 +92,7 @@ public class DedicatedPlayerList extends ServerConfigurationManager
         {
             this.func_152608_h().func_152678_f();
         }
-        catch (IOException ioexception)
-        {
-            field_164439_d.warn("Failed to save user banlist: ", ioexception);
-        }
+        catch (IOException ignored) {}
     }
 
     private void func_152619_x()
@@ -112,12 +101,7 @@ public class DedicatedPlayerList extends ServerConfigurationManager
         {
             this.getBannedIPs().func_152679_g();
         }
-        catch (IOException ioexception)
-        {
-            if (ioexception instanceof FileNotFoundException && CrucibleConfigs.configs.crucible_logging_reduceSpam)
-                return;
-            field_164439_d.warn("Failed to load ip banlist: ", ioexception);
-        }
+        catch (IOException ignored) {}
     }
 
     private void func_152620_y()
@@ -126,12 +110,7 @@ public class DedicatedPlayerList extends ServerConfigurationManager
         {
             this.func_152608_h().func_152679_g();
         }
-        catch (IOException ioexception)
-        {
-            if (ioexception instanceof FileNotFoundException && CrucibleConfigs.configs.crucible_logging_reduceSpam)
-                return;
-            field_164439_d.warn("Failed to load user banlist: ", ioexception);
-        }
+        catch (IOException ignored) {}
     }
 
     private void loadOpsList()
@@ -140,12 +119,7 @@ public class DedicatedPlayerList extends ServerConfigurationManager
         {
             this.func_152603_m().func_152679_g();
         }
-        catch (Exception exception)
-        {
-            if (exception instanceof FileNotFoundException && CrucibleConfigs.configs.crucible_logging_reduceSpam)
-                return;
-            field_164439_d.warn("Failed to load operators list: ", exception);
-        }
+        catch (Exception ignored) {}
     }
 
     private void saveOpsList()
@@ -154,10 +128,7 @@ public class DedicatedPlayerList extends ServerConfigurationManager
         {
             this.func_152603_m().func_152678_f();
         }
-        catch (Exception exception)
-        {
-            field_164439_d.warn("Failed to save operators list: ", exception);
-        }
+        catch (Exception ignored) {}
     }
 
     private void readWhiteList()
@@ -166,12 +137,7 @@ public class DedicatedPlayerList extends ServerConfigurationManager
         {
             this.func_152599_k().func_152679_g();
         }
-        catch (Exception exception)
-        {
-            if (exception instanceof FileNotFoundException && CrucibleConfigs.configs.crucible_logging_reduceSpam)
-                return;
-            field_164439_d.warn("Failed to load white-list: ", exception);
-        }
+        catch (Exception ignored) {}
     }
 
     private void saveWhiteList()
@@ -180,10 +146,7 @@ public class DedicatedPlayerList extends ServerConfigurationManager
         {
             this.func_152599_k().func_152678_f();
         }
-        catch (Exception exception)
-        {
-            field_164439_d.warn("Failed to save white-list: ", exception);
-        }
+        catch (Exception ignored) {}
     }
 
     public boolean func_152607_e(GameProfile p_152607_1_)

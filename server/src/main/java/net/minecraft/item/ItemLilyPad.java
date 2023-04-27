@@ -80,7 +80,6 @@ public class ItemLilyPad extends ItemColored
     public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int par4, int par5, int par6, int par7, float par8,
             float par9, float par10)
     {
-        cpw.mods.fml.relauncher.FMLRelaunchLog.info("onItemUse par1ItemStack = " + par1ItemStack);
         return super.onItemUse(par1ItemStack, par2EntityPlayer, par3World, par4, par5, par6, par7, par8, par9, par10);
     }
     // Cauldron end

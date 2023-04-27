@@ -29,7 +29,6 @@ import static cpw.mods.fml.client.config.GuiUtils.INVALID;
 import static cpw.mods.fml.client.config.GuiUtils.VALID;
 
 import cpw.mods.fml.client.config.GuiConfigEntries.ArrayEntry;
-import cpw.mods.fml.common.FMLLog;
 
 /**
  * This class implements the scrolling list functionality of the GuiEditList screen. It also provides all the default controls
@@ -79,9 +78,7 @@ public class GuiEditArrayEntries extends GuiListExtended
                     listEntries.add(clazz.getConstructor(GuiEditArray.class, GuiEditArrayEntries.class, IConfigElement.class, Object.class)
                             .newInstance(this.owningGui, this, configElement, value.toString()));
                 }
-                catch (Throwable e)
-                {
-                    FMLLog.severe("There was a critical error instantiating the custom IGuiEditListEntry for property %s.", configElement.getName());
+                catch (Throwable e) {
                     e.printStackTrace();
                 }
             }

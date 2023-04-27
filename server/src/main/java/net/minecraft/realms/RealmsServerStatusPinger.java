@@ -20,13 +20,9 @@ import net.minecraft.network.status.server.S00PacketServerInfo;
 import net.minecraft.network.status.server.S01PacketPong;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
-public class RealmsServerStatusPinger
-{
-    private static final Logger LOGGER = LogManager.getLogger();
+public class RealmsServerStatusPinger {
     private final List connections = Collections.synchronizedList(new ArrayList());
     private static final String __OBFID = "CL_00001854";
 
@@ -57,13 +53,7 @@ public class RealmsServerStatusPinger
                 {
                     networkmanager.closeChannel(new ChatComponentText("Finished"));
                 }
-                public void onDisconnect(IChatComponent p_147231_1_)
-                {
-                    if (!this.field_154345_e)
-                    {
-                        RealmsServerStatusPinger.LOGGER.error("Can\'t ping " + p_pingServer_1_ + ": " + p_147231_1_.getUnformattedText());
-                    }
-                }
+                public void onDisconnect(IChatComponent p_147231_1_) {}
                 public void onConnectionStateTransition(EnumConnectionState p_147232_1_, EnumConnectionState p_147232_2_)
                 {
                     if (p_147232_2_ != EnumConnectionState.STATUS)
@@ -77,12 +67,9 @@ public class RealmsServerStatusPinger
             try
             {
                 networkmanager.scheduleOutboundPacket(new C00Handshake(RealmsSharedConstants.NETWORK_PROTOCOL_VERSION, realmsserveraddress.getHost(), realmsserveraddress.getPort(), EnumConnectionState.STATUS), new GenericFutureListener[0]);
-                networkmanager.scheduleOutboundPacket(new C00PacketServerQuery(), new GenericFutureListener[0]);
+                networkmanager.scheduleOutboundPacket(new C00PacketServerQuery());
             }
-            catch (Throwable throwable)
-            {
-                LOGGER.error(throwable);
-            }
+            catch (Throwable ignored) {}
         }
     }
 

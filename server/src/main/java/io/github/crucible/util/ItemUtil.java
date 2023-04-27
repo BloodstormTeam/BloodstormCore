@@ -1,6 +1,5 @@
 package io.github.crucible.util;
 
-import cpw.mods.fml.common.FMLLog;
 import io.github.crucible.nbt.Crucible_JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
@@ -32,7 +31,6 @@ public class ItemUtil {
             craftItemStack.getHandle().setTagCompound(nbtTagCompound);
             return craftItemStack;
         } catch (NBTException e) {
-            FMLLog.info("[Crucible-ItemStackSerializer] Failed to load NBT for " + itemStack + " and NBT[" + nbt + "]");
             e.printStackTrace();
         }
         return null;

@@ -15,7 +15,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -56,11 +55,6 @@ public abstract class FMLHandshakeMessage {
             if (serverProtocolVersion > 1)
             {
                 overrideDimension = buffer.readInt();
-                FMLLog.fine("Server FML protocol version %d, 4 byte dimension received %d", serverProtocolVersion, overrideDimension);
-            }
-            else
-            {
-                FMLLog.info("Server FML protocol version %d, no additional data received", serverProtocolVersion);
             }
         }
 

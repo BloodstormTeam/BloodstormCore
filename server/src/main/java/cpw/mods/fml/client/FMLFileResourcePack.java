@@ -1,22 +1,15 @@
 package cpw.mods.fml.client;
 
+import com.google.common.base.Charsets;
+import cpw.mods.fml.common.FMLContainerHolder;
+import cpw.mods.fml.common.ModContainer;
+import net.minecraft.client.resources.FileResourcePack;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.apache.logging.log4j.Level;
-
-import javax.imageio.ImageIO;
-
-import net.minecraft.client.resources.FileResourcePack;
-
-import com.google.common.base.Charsets;
-
-import cpw.mods.fml.common.FMLContainerHolder;
-import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.common.FMLModContainer;
-import cpw.mods.fml.common.ModContainer;
 
 public class FMLFileResourcePack extends FileResourcePack implements FMLContainerHolder {
 
@@ -44,7 +37,6 @@ public class FMLFileResourcePack extends FileResourcePack implements FMLContaine
         {
             if ("pack.mcmeta".equals(resourceName))
             {
-                FMLLog.log(container.getName(), Level.DEBUG, "Mod %s is missing a pack.mcmeta file, substituting a dummy one", container.getName());
                 return new ByteArrayInputStream(("{\n" +
                         " \"pack\": {\n"+
                         "   \"description\": \"dummy FML pack for "+container.getName()+"\",\n"+

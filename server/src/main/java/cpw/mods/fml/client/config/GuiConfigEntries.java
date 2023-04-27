@@ -30,7 +30,6 @@ import net.minecraft.util.EnumChatFormatting;
 
 import org.lwjgl.input.Keyboard;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 
@@ -124,9 +123,7 @@ public class GuiConfigEntries extends GuiListExtended
                                 .getConstructor(GuiConfig.class, GuiConfigEntries.class, IConfigElement.class)
                                 .newInstance(this.owningScreen, this, configElement));
                     }
-                    catch (Throwable e)
-                    {
-                        FMLLog.severe("There was a critical error instantiating the custom IConfigEntry for config element %s.", configElement.getName());
+                    catch (Throwable e) {
                         e.printStackTrace();
                     }
                 else if (configElement.isProperty())

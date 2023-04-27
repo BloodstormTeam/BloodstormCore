@@ -21,7 +21,6 @@ import org.lwjgl.opengl.PixelFormat;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.common.FMLLog;
 import net.minecraft.client.Minecraft;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
@@ -287,7 +286,6 @@ public class ForgeHooksClient
     {
         if (Tessellator.renderingWorldRenderer)
         {
-            FMLLog.warning("Warning: Texture %s not preloaded, will cause render glitches!", texture);
             if (Tessellator.class.getPackage() != null)
             {
                 if (Tessellator.class.getPackage().getName().startsWith("net.minecraft."))

@@ -29,22 +29,12 @@ import net.minecraft.world.storage.ThreadedFileIOBase;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.ChunkDataEvent;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import cpw.mods.fml.common.FMLLog;
-// Cauldron start
-import java.util.Map;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.cauldron.CauldronUtils;
 import net.minecraftforge.common.util.EnumHelper;
 import cpw.mods.fml.common.asm.transformers.SideTransformer;
-// Cauldron end
 
-public class AnvilChunkLoader implements IChunkLoader, IThreadedFileIO
-{
-    private static final Logger logger = LogManager.getLogger();
+public class AnvilChunkLoader implements IChunkLoader, IThreadedFileIO {
     private List chunksToRemove = new ArrayList();
     private Set pendingAnvilChunksCoordinates = new HashSet();
     private Object syncLockObject = new Object();
@@ -143,8 +133,7 @@ public class AnvilChunkLoader implements IChunkLoader, IThreadedFileIO
 
         if (data != null)
         {
-            Chunk chunk = (Chunk) data[0];
-            return chunk;
+            return (Chunk) data[0];
         }
 
         return null;
@@ -154,12 +143,10 @@ public class AnvilChunkLoader implements IChunkLoader, IThreadedFileIO
     {
         if (!p_75822_4_.hasKey("Level", 10))
         {
-            logger.error("Chunk file at " + p_75822_2_ + "," + p_75822_3_ + " is missing level data, skipping");
             return null;
         }
         else if (!p_75822_4_.getCompoundTag("Level").hasKey("Sections", 9))
         {
-            logger.error("Chunk file at " + p_75822_2_ + "," + p_75822_3_ + " is missing block data, skipping");
             return null;
         }
         else
@@ -168,7 +155,6 @@ public class AnvilChunkLoader implements IChunkLoader, IThreadedFileIO
 
             if (!chunk.isAtLocation(p_75822_2_, p_75822_3_))
             {
-                logger.error("Chunk file at " + p_75822_2_ + "," + p_75822_3_ + " is in the wrong location; relocating. (Expected " + p_75822_2_ + ", " + p_75822_3_ + ", got " + chunk.xPosition + ", " + chunk.zPosition + ")");
                 p_75822_4_.getCompoundTag("Level").setInteger("xPos", p_75822_2_); // CraftBukkit - .getCompound("Level")
                 p_75822_4_.getCompoundTag("Level").setInteger("zPos", p_75822_3_); // CraftBukkit - .getCompound("Level")
                 // Have to move tile entities since we don't load them at this stage
@@ -372,12 +358,7 @@ public class AnvilChunkLoader implements IChunkLoader, IThreadedFileIO
                         nbttaglist2.appendTag(nbttagcompound1);
                     }
                 }
-                catch (Exception e)
-                {
-                    FMLLog.log(Level.ERROR, e,
-                            "An Entity type %s has thrown an exception trying to write state. It will not persist. Report this to the mod author",
-                            entity.getClass().getName());
-                }
+                catch (Exception ignored) {}
             }
         }
 
@@ -393,16 +374,11 @@ public class AnvilChunkLoader implements IChunkLoader, IThreadedFileIO
             tileentity.writeToNBT(nbttagcompound1);
             nbttaglist3.appendTag(nbttagcompound1);
             }
-            catch (Exception e)
-            {
-                FMLLog.log(Level.ERROR, e,
-                        "A TileEntity type %s has throw an exception trying to write state. It will not persist. Report this to the mod author",
-                        tileentity.getClass().getName());
-            }
+            catch (Exception ignored) {}
         }
 
         p_75820_3_.setTag("TileEntities", nbttaglist3);
-        Collection<NextTickListEntry> list = p_75820_2_.getPendingBlockUpdates(p_75820_1_, false);
+        List list = p_75820_2_.getPendingBlockUpdates(p_75820_1_, false);
         if(list == null)
         {
         	return;
@@ -536,10 +512,6 @@ public class AnvilChunkLoader implements IChunkLoader, IThreadedFileIO
                             SideTransformer.allowInvalidSide = true;
                             if (!CauldronUtils.isOverridingUpdateEntity(tileentity.getClass()) && CauldronUtils.canTileEntityUpdate(tileentity.getClass()))
                             {
-                                if (MinecraftServer.getServer().tileEntityConfig.enableTECanUpdateWarning.getValue())
-                                {
-                                    MinecraftServer.getServer().logInfo("Detected TE " + tileentity.getClass().getName() + " with canUpdate set to true and no updateEntity override!. Please report to mod author as this can hurt performance.");
-                                }
                                 MinecraftServer.getServer().bannedTileEntityUpdates.add(tileentity.getClass());
                             }
                             SideTransformer.allowInvalidSide = false;

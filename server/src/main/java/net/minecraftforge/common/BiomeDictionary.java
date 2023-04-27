@@ -2,7 +2,6 @@ package net.minecraftforge.common;
 
 import java.util.*;
 
-import cpw.mods.fml.common.FMLLog;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.biome.*;
 import net.minecraftforge.common.util.EnumHelper;
@@ -272,10 +271,6 @@ public class BiomeDictionary
         return biomeList[biomeID] != null;
     }
 
-    public static void registerAllBiomes()
-    {
-        FMLLog.warning("Redundant call to BiomeDictionary.registerAllBiomes ignored");
-    }
     /**
      * Loops through the biome list and automatically adds tags to any biome that does not have any
      * This is called by Forge at postinit time. It will additionally dispatch any deferred decorator

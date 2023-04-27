@@ -11,9 +11,6 @@ import net.minecraft.client.gui.GuiYesNo;
 import net.minecraft.client.gui.GuiYesNoCallback;
 import net.minecraft.world.WorldSettings;
 
-import org.apache.logging.log4j.Level;
-
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.common.StartupQuery;
 import cpw.mods.fml.common.ZipperUtil;
@@ -60,25 +57,15 @@ public class GuiOldSaveLoadConfirm extends GuiYesNo implements GuiYesNoCallback 
         {
             ObfuscationReflectionHelper.setPrivateValue(GuiSelectWorld.class, (GuiSelectWorld)parentScreen, false, "field_"+"146634_i");
             FMLClientHandler.instance().showGuiScreen(parent);
-        }
-        else
-        {
-            FMLLog.info("Capturing current state of world %s into file %s", saveName, zip.getAbsolutePath());
+        } else {
             try
             {
                 String skip = System.getProperty("fml.doNotBackup");
-                if (skip == null || !"true".equals(skip))
+                if (!"true".equals(skip))
                 {
                     ZipperUtil.zip(new File(FMLClientHandler.instance().getSavesDir(), dirName), zip);
                 }
-                else
-                {
-                    for (int x = 0; x < 10; x++)
-                        FMLLog.severe("!!!!!!!!!! UPDATING WORLD WITHOUT DOING BACKUP !!!!!!!!!!!!!!!!");
-                }
-            } catch (IOException e)
-            {
-                FMLLog.log(Level.WARN, e, "There was a problem saving the backup %s. Please fix and try again", zip.getName());
+            } catch (IOException e) {
                 FMLClientHandler.instance().showGuiScreen(new GuiBackupFailed(parent, zip));
                 return;
             }

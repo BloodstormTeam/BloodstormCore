@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import org.apache.logging.log4j.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -103,11 +102,7 @@ public class FMLModContainer implements ModContainer
             try
             {
                 this.languageAdapter = (ILanguageAdapter)Class.forName(languageAdapterType, true, Loader.instance().getModClassLoader()).newInstance();
-                FMLLog.finer("Using custom language adapter %s (type %s) for %s (modid %s)", this.languageAdapter, languageAdapterType, this.className, getModId());
-            }
-            catch (Exception ex)
-            {
-                FMLLog.log(Level.ERROR, ex, "Error constructing custom mod language adapter %s (referenced by %s) (modid: %s)", languageAdapterType, this.className, getModId());
+            } catch (Exception ex) {
                 throw new LoaderException(ex);
             }
         }
@@ -148,17 +143,14 @@ public class FMLModContainer implements ModContainer
     }
 
     @Override
-    public void bindMetadata(MetadataCollection mc)
-    {
+    public void bindMetadata(MetadataCollection mc) {
         modMetadata = mc.getMetadataForId(getModId(), descriptor);
 
-        if (descriptor.containsKey("useMetadata"))
-        {
-            overridesMetadata = !((Boolean)descriptor.get("useMetadata")).booleanValue();
+        if (descriptor.containsKey("useMetadata")) {
+            overridesMetadata = !((Boolean) descriptor.get("useMetadata")).booleanValue();
         }
 
-        if (overridesMetadata || !modMetadata.useDependencyInformation)
-        {
+        if (overridesMetadata || !modMetadata.useDependencyInformation) {
             Set<ArtifactVersion> requirements = Sets.newHashSet();
             List<ArtifactVersion> dependencies = Lists.newArrayList();
             List<ArtifactVersion> dependants = Lists.newArrayList();
@@ -169,72 +161,46 @@ public class FMLModContainer implements ModContainer
             modMetadata.requiredMods = requirements;
             modMetadata.dependencies = dependencies;
             modMetadata.dependants = dependants;
-            FMLLog.log(getModId(), Level.TRACE, "Parsed dependency info : %s %s %s", requirements, dependencies, dependants);
         }
-        else
-        {
-            FMLLog.log(getModId(), Level.TRACE, "Using mcmod dependency info : %s %s %s", modMetadata.requiredMods, modMetadata.dependencies, modMetadata.dependants);
-        }
-        if (Strings.isNullOrEmpty(modMetadata.name))
-        {
-            FMLLog.log(getModId(), Level.INFO,"Mod %s is missing the required element 'name'. Substituting %s", getModId(), getModId());
+        if (Strings.isNullOrEmpty(modMetadata.name)) {
             modMetadata.name = getModId();
         }
         internalVersion = (String) descriptor.get("version");
-        if (Strings.isNullOrEmpty(internalVersion))
-        {
+        if (Strings.isNullOrEmpty(internalVersion)) {
             Properties versionProps = searchForVersionProperties();
-            if (versionProps != null)
-            {
-                internalVersion = versionProps.getProperty(getModId()+".version");
-                FMLLog.log(getModId(), Level.DEBUG, "Found version %s for mod %s in version.properties, using", internalVersion, getModId());
+            if (versionProps != null) {
+                internalVersion = versionProps.getProperty(getModId() + ".version");
             }
-
         }
-        if (Strings.isNullOrEmpty(internalVersion) && !Strings.isNullOrEmpty(modMetadata.version))
-        {
-            FMLLog.log(getModId(), Level.WARN, "Mod %s is missing the required element 'version' and a version.properties file could not be found. Falling back to metadata version %s", getModId(), modMetadata.version);
+        if (Strings.isNullOrEmpty(internalVersion) && !Strings.isNullOrEmpty(modMetadata.version)) {
             internalVersion = modMetadata.version;
         }
-        if (Strings.isNullOrEmpty(internalVersion))
-        {
-            FMLLog.log(getModId(), Level.WARN, "Mod %s is missing the required element 'version' and no fallback can be found. Substituting '1.0'.", getModId());
+        if (Strings.isNullOrEmpty(internalVersion)) {
             modMetadata.version = internalVersion = "1.0";
         }
 
         String mcVersionString = (String) descriptor.get("acceptedMinecraftVersions");
-        if (!Strings.isNullOrEmpty(mcVersionString))
-        {
+        if (!Strings.isNullOrEmpty(mcVersionString)) {
             minecraftAccepted = VersionParser.parseRange(mcVersionString);
-        }
-        else
-        {
+        } else {
             minecraftAccepted = Loader.instance().getMinecraftModContainer().getStaticVersionRange();
         }
     }
 
-    public Properties searchForVersionProperties()
-    {
-        try
-        {
-            FMLLog.log(getModId(), Level.DEBUG,"Attempting to load the file version.properties from %s to locate a version number for %s", getSource().getName(), getModId());
+    public Properties searchForVersionProperties() {
+        try {;
             Properties version = null;
-            if (getSource().isFile())
-            {
+            if (getSource().isFile()) {
                 ZipFile source = new ZipFile(getSource());
                 ZipEntry versionFile = source.getEntry("version.properties");
-                if (versionFile!=null)
-                {
+                if (versionFile!=null) {
                     version = new Properties();
                     version.load(source.getInputStream(versionFile));
                 }
                 source.close();
-            }
-            else if (getSource().isDirectory())
-            {
+            } else if (getSource().isDirectory()) {
                 File propsFile = new File(getSource(),"version.properties");
-                if (propsFile.exists() && propsFile.isFile())
-                {
+                if (propsFile.exists() && propsFile.isFile()) {
                     version = new Properties();
                     FileInputStream fis = new FileInputStream(propsFile);
                     version.load(fis);
@@ -245,8 +211,7 @@ public class FMLModContainer implements ModContainer
         }
         catch (Exception e)
         {
-            Throwables.propagateIfPossible(e);
-            FMLLog.log(getModId(), Level.TRACE, "Failed to find a usable version.properties file");
+            Throwables.throwIfUnchecked(e);
             return null;
         }
     }
@@ -298,7 +263,6 @@ public class FMLModContainer implements ModContainer
     {
         if (this.enabled)
         {
-            FMLLog.log(getModId(), Level.DEBUG, "Enabling mod %s", getModId());
             this.eventBus = bus;
             this.controller = controller;
             eventBus.register(this);
@@ -325,10 +289,6 @@ public class FMLModContainer implements ModContainer
                         m.setAccessible(true);
                         eventMethods.put((Class<? extends FMLEvent>) m.getParameterTypes()[0],m);
                     }
-                    else
-                    {
-                        FMLLog.log(getModId(), Level.ERROR,"The mod %s appears to have an invalid event annotation %s. This annotation can only apply to methods with recognized event arguments - it will not be called", getModId(), a.annotationType().getSimpleName());
-                    }
                 }
                 else if (a.annotationType().equals(Mod.InstanceFactory.class))
                 {
@@ -336,14 +296,6 @@ public class FMLModContainer implements ModContainer
                     {
                         m.setAccessible(true);
                         factoryMethod = m;
-                    }
-                    else if (!(Modifier.isStatic(m.getModifiers()) && m.getParameterTypes().length == 0))
-                    {
-                        FMLLog.log(getModId(),  Level.ERROR, "The InstanceFactory annotation can only apply to a static method, taking zero arguments - it will be ignored on %s(%s)", m.getName(), Arrays.asList(m.getParameterTypes()));
-                    }
-                    else if (factoryMethod != null)
-                    {
-                        FMLLog.log(getModId(), Level.ERROR, "The InstanceFactory annotation can only be used once, the application to %s(%s) will be ignored", m.getName(), Arrays.asList(m.getParameterTypes()));
                     }
                 }
             }
@@ -408,8 +360,7 @@ public class FMLModContainer implements ModContainer
                 }
                 catch (Exception e)
                 {
-                    Throwables.propagateIfPossible(e);
-                    FMLLog.log(getModId(), Level.WARN, e, "Attempting to load @%s in class %s for %s and failing", annotationName, targets.getClassName(), mc.getModId());
+                    Throwables.throwIfUnchecked(e);
                 }
             }
             if (f != null)
@@ -420,7 +371,6 @@ public class FMLModContainer implements ModContainer
                     target = modInstance;
                     if (!modInstance.getClass().equals(clz))
                     {
-                        FMLLog.log(getModId(), Level.WARN, "Unable to inject @%s in non-static field %s.%s for %s as it is NOT the primary mod instance", annotationName, targets.getClassName(), targets.getObjectName(), mc.getModId());
                         continue;
                     }
                 }
@@ -460,20 +410,8 @@ public class FMLModContainer implements ModContainer
 
             if (expectedFingerprint != null && !expectedFingerprint.isEmpty())
             {
-                if (!sourceFingerprints.contains(expectedFingerprint))
-                {
-                    Level warnLevel = Level.ERROR;
-                    if (source.isDirectory())
-                    {
-                        warnLevel = Level.TRACE;
-                    }
-                    FMLLog.log(getModId(), warnLevel, "The mod %s is expecting signature %s for source %s, however there is no signature matching that description", getModId(), expectedFingerprint, source.getName());
-                }
-                else
-                {
-                    certificate = certificates[certList.indexOf(expectedFingerprint)];
-                    fingerprintNotPresent = false;
-                }
+                certificate = certificates[certList.indexOf(expectedFingerprint)];
+                fingerprintNotPresent = false;
             }
 
             @SuppressWarnings("unchecked")

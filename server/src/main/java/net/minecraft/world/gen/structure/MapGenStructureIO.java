@@ -4,12 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-public class MapGenStructureIO
-{
-    private static final Logger logger = LogManager.getLogger();
+public class MapGenStructureIO {
     private static Map field_143040_a = new HashMap();
     private static Map field_143038_b = new HashMap();
     private static Map field_143039_c = new HashMap();
@@ -51,19 +47,12 @@ public class MapGenStructureIO
                 structurestart = (StructureStart)oclass.newInstance();
             }
         }
-        catch (Exception exception)
-        {
-            logger.warn("Failed Start with id " + p_143035_0_.getString("id"));
+        catch (Exception exception) {
             exception.printStackTrace();
         }
 
-        if (structurestart != null)
-        {
+        if (structurestart != null) {
             structurestart.func_143020_a(p_143035_1_, p_143035_0_);
-        }
-        else
-        {
-            logger.warn("Skipping Structure with id " + p_143035_0_.getString("id"));
         }
 
         return structurestart;
@@ -82,19 +71,12 @@ public class MapGenStructureIO
                 structurecomponent = (StructureComponent)oclass.newInstance();
             }
         }
-        catch (Exception exception)
-        {
-            logger.warn("Failed Piece with id " + p_143032_0_.getString("id"));
+        catch (Exception exception) {
             exception.printStackTrace();
         }
 
-        if (structurecomponent != null)
-        {
+        if (structurecomponent != null) {
             structurecomponent.func_143009_a(p_143032_1_, p_143032_0_);
-        }
-        else
-        {
-            logger.warn("Skipping Piece with id " + p_143032_0_.getString("id"));
         }
 
         return structurecomponent;

@@ -1,7 +1,6 @@
 package net.minecraftforge.oredict;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,11 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.RandomAccess;
-import java.util.Map.Entry;
 import java.util.Set;
-
-import org.apache.logging.log4j.Level;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -30,7 +25,6 @@ import net.minecraftforge.common.MinecraftForge;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.registry.GameData;
@@ -252,10 +246,6 @@ public class OreDictionary
 
         recipes.removeAll(recipesToRemove);
         recipes.addAll(recipesToAdd);
-        if (recipesToRemove.size() > 0)
-        {
-            FMLLog.info("Replaced %d ore recipies", recipesToRemove.size());
-        }
     }
 
     /**
@@ -309,7 +299,6 @@ public class OreDictionary
         int id;
         if (registryName == null)
         {
-            FMLLog.log(Level.DEBUG, "Attempted to find the oreIDs for an unregistered object (%s). This won't work very well.", stack);
             return -1;
         }
         else
@@ -344,7 +333,6 @@ public class OreDictionary
         int id;
         if (registryName == null)
         {
-            FMLLog.log(Level.DEBUG, "Attempted to find the oreIDs for an unregistered object (%s). This won't work very well.", stack);
             return new int[0];
         }
         else
@@ -528,7 +516,6 @@ public class OreDictionary
      * Raises the registerOre function in all registered handlers.
      *
      * @param name The name of the ore
-     * @param id The ID of the ore
      * @param ore The ore's ItemStack
      */
     private static void registerOreImpl(String name, ItemStack ore)
@@ -536,7 +523,6 @@ public class OreDictionary
         if (name == null || name.isEmpty() || "Unknown".equals(name)) return; //prevent bad IDs.
         if (ore == null || ore.getItem() == null)
         {
-            FMLLog.bigWarning("Invalid registration attempt for an Ore Dictionary item with name %s has occurred. The registration has been denied to prevent crashes. The mod responsible for the registration needs to correct this.", name);
             return; //prevent bad ItemStacks.
         }
 
@@ -546,15 +532,9 @@ public class OreDictionary
         // APPARENTLY it's quite common to do this. OreDictionary should be considered alongside Recipes - you can't make them properly until you've registered with the game.
         String registryName = ore.getItem().delegate.name();
         int hash;
-        if (registryName == null)
-        {
-            FMLLog.bigWarning("A broken ore dictionary registration with name %s has occurred. It adds an item (type: %s) which is currently unknown to the game registry. This dictionary item can only support a single value when"
-                    + " registered with ores like this, and NO I am not going to turn this spam off. Just register your ore dictionary entries after the GameRegistry.\n"
-                    + "TO USERS: YES this is a BUG in the mod "+Loader.instance().activeModContainer().getName()+" report it to them!", name, ore.getItem().getClass());
+        if (registryName == null) {
             hash = -1;
-        }
-        else
-        {
+        } else {
             hash = GameData.getItemRegistry().getId(registryName);
         }
         if (ore.getItemDamage() != WILDCARD_VALUE)
@@ -605,7 +585,6 @@ public class OreDictionary
                 int hash;
                 if (name == null)
                 {
-                    FMLLog.log(Level.DEBUG, "Defaulting unregistered ore dictionary entry for ore dictionary %s: type %s to -1", getOreName(id), ore.getItem().getClass());
                     hash = -1;
                 }
                 else

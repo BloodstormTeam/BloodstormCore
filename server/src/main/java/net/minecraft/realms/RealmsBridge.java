@@ -5,13 +5,9 @@ import cpw.mods.fml.relauncher.SideOnly;
 import java.lang.reflect.Constructor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @SideOnly(Side.CLIENT)
-public class RealmsBridge extends RealmsScreen
-{
-    private static final Logger LOGGER = LogManager.getLogger();
+public class RealmsBridge extends RealmsScreen {
     private GuiScreen previousScreen;
     private static final String __OBFID = "CL_00001869";
 
@@ -27,10 +23,7 @@ public class RealmsBridge extends RealmsScreen
             Object object = constructor.newInstance(new Object[] {this});
             Minecraft.getMinecraft().displayGuiScreen(((RealmsScreen)object).getProxy());
         }
-        catch (Exception exception)
-        {
-            LOGGER.error("Realms module missing", exception);
-        }
+        catch (Exception ignored) {}
     }
 
     public void init()
