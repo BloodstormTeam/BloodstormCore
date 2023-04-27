@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("java")
     kotlin("jvm") version "1.8.21"
+    id("com.bloodstorm.gradle.plugin")
 }
 
 group = "cruciblemc"
@@ -86,10 +87,8 @@ tasks.test {
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
     jvmTarget = "1.8"
-    languageVersion = "2.0"
 }
 val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
     jvmTarget = "1.8"
-    languageVersion = "2.0"
 }

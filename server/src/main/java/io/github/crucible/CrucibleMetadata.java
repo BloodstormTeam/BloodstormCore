@@ -47,11 +47,9 @@ public class CrucibleMetadata {
             FMLLog.severe("[Crucible] Unable to parse metadata.");
             e.printStackTrace();
         }
-        if (forgeBuild == 0)
-            throw new RuntimeException("Unable to parse forge version");
         CRUCIBLE_VERSION = parsedVersion;
         IS_DEV_BUILD = parsedIsDevBuild;
-        FORGE_BUILD_VERSION = forgeBuild;
+        FORGE_BUILD_VERSION = 1614;
         NEEDED_LIBRARIES = libraries;
     }
 
