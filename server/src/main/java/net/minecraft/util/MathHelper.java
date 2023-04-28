@@ -6,90 +6,141 @@ import java.util.Random;
 
 public class MathHelper
 {
+    private static final int SIN_BITS = 12;
+    private static final int SIN_MASK = 4095;
+    private static final int SIN_COUNT = 4096;
+    public static final float PI = (float)Math.PI;
+    public static final float PI2 = ((float)Math.PI * 2F);
+    public static final float PId2 = ((float)Math.PI / 2F);
+    private static final float radFull = ((float)Math.PI * 2F);
+    private static final float degFull = 360.0F;
+    private static final float radToIndex = 651.8986F;
+    private static final float degToIndex = 11.377778F;
+    public static final float deg2Rad = 0.017453292F;
+    private static final float[] SIN_TABLE_FAST = new float[4096];
+    public static boolean fastMath = false;
+
+    /**
+     * A table of sin values computed from 0 (inclusive) to 2*pi (exclusive), with steps of 2*PI / 65536.
+     */
     private static float[] SIN_TABLE = new float[65536];
+
+    /**
+     * Though it looks like an array, this is really more like a mapping.  Key (index of this array) is the upper 5 bits
+     * of the result of multiplying a 32-bit unsigned integer by the B(2, 5) De Bruijn sequence 0x077CB531.  Value
+     * (value stored in the array) is the unique index (from the right) of the leftmost one-bit in a 32-bit unsigned
+     * integer that can cause the upper 5 bits to get that value.  Used for highly optimized "find the log-base-2 of
+     * this number" calculations.
+     */
     private static final int[] multiplyDeBruijnBitPosition;
-    private static final String __OBFID = "CL_00001496";
 
-    public static final float sin(float p_76126_0_)
+    /**
+     * sin looked up in a table
+     */
+    public static final float sin(float par0)
     {
-        return SIN_TABLE[(int)(p_76126_0_ * 10430.378F) & 65535];
+        return fastMath ? SIN_TABLE_FAST[(int)(par0 * 651.8986F) & 4095] : SIN_TABLE[(int)(par0 * 10430.378F) & 65535];
     }
 
-    public static final float cos(float p_76134_0_)
+    /**
+     * cos looked up in the sin table with the appropriate offset
+     */
+    public static final float cos(float par0)
     {
-        return SIN_TABLE[(int)(p_76134_0_ * 10430.378F + 16384.0F) & 65535];
+        return fastMath ? SIN_TABLE_FAST[(int)((par0 + ((float)Math.PI / 2F)) * 651.8986F) & 4095] : SIN_TABLE[(int)(par0 * 10430.378F + 16384.0F) & 65535];
     }
 
-    public static final float sqrt_float(float p_76129_0_)
+    public static final float sqrt_float(float par0)
     {
-        return (float)Math.sqrt((double)p_76129_0_);
+        return (float)Math.sqrt((double)par0);
     }
 
-    public static final float sqrt_double(double p_76133_0_)
+    public static final float sqrt_double(double par0)
     {
-        return (float)Math.sqrt(p_76133_0_);
+        return (float)Math.sqrt(par0);
     }
 
-    public static int floor_float(float p_76141_0_)
+    /**
+     * Returns the greatest integer less than or equal to the float argument
+     */
+    public static int floor_float(float par0)
     {
-        int i = (int)p_76141_0_;
-        return p_76141_0_ < (float)i ? i - 1 : i;
+        int var1 = (int)par0;
+        return par0 < (float)var1 ? var1 - 1 : var1;
     }
 
-    @SideOnly(Side.CLIENT)
-    public static int truncateDoubleToInt(double p_76140_0_)
+    /**
+     * returns par0 cast as an int, and no greater than Integer.MAX_VALUE-1024
+     */
+    public static int truncateDoubleToInt(double par0)
     {
-        return (int)(p_76140_0_ + 1024.0D) - 1024;
+        return (int)(par0 + 1024.0D) - 1024;
     }
 
-    public static int floor_double(double p_76128_0_)
+    /**
+     * Returns the greatest integer less than or equal to the double argument
+     */
+    public static int floor_double(double par0)
     {
-        int i = (int)p_76128_0_;
-        return p_76128_0_ < (double)i ? i - 1 : i;
+        int var2 = (int)par0;
+        return par0 < (double)var2 ? var2 - 1 : var2;
     }
 
-    public static long floor_double_long(double p_76124_0_)
+    /**
+     * Long version of floor_double
+     */
+    public static long floor_double_long(double par0)
     {
-        long i = (long)p_76124_0_;
-        return p_76124_0_ < (double)i ? i - 1L : i;
+        long var2 = (long)par0;
+        return par0 < (double)var2 ? var2 - 1L : var2;
     }
 
-    @SideOnly(Side.CLIENT)
     public static int func_154353_e(double p_154353_0_)
     {
         return (int)(p_154353_0_ >= 0.0D ? p_154353_0_ : -p_154353_0_ + 1.0D);
     }
 
-    public static float abs(float p_76135_0_)
+    public static float abs(float par0)
     {
-        return p_76135_0_ >= 0.0F ? p_76135_0_ : -p_76135_0_;
+        return par0 >= 0.0F ? par0 : -par0;
     }
 
-    public static int abs_int(int p_76130_0_)
+    /**
+     * Returns the unsigned value of an int.
+     */
+    public static int abs_int(int par0)
     {
-        return p_76130_0_ >= 0 ? p_76130_0_ : -p_76130_0_;
+        return par0 >= 0 ? par0 : -par0;
     }
 
-    public static int ceiling_float_int(float p_76123_0_)
+    public static int ceiling_float_int(float par0)
     {
-        int i = (int)p_76123_0_;
-        return p_76123_0_ > (float)i ? i + 1 : i;
+        int var1 = (int)par0;
+        return par0 > (float)var1 ? var1 + 1 : var1;
     }
 
-    public static int ceiling_double_int(double p_76143_0_)
+    public static int ceiling_double_int(double par0)
     {
-        int i = (int)p_76143_0_;
-        return p_76143_0_ > (double)i ? i + 1 : i;
+        int var2 = (int)par0;
+        return par0 > (double)var2 ? var2 + 1 : var2;
     }
 
-    public static int clamp_int(int p_76125_0_, int p_76125_1_, int p_76125_2_)
+    /**
+     * Returns the value of the first parameter, clamped to be within the lower and upper limits given by the second and
+     * third parameters.
+     */
+    public static int clamp_int(int par0, int par1, int par2)
     {
-        return p_76125_0_ < p_76125_1_ ? p_76125_1_ : (p_76125_0_ > p_76125_2_ ? p_76125_2_ : p_76125_0_);
+        return par0 < par1 ? par1 : (par0 > par2 ? par2 : par0);
     }
 
-    public static float clamp_float(float p_76131_0_, float p_76131_1_, float p_76131_2_)
+    /**
+     * Returns the value of the first parameter, clamped to be within the lower and upper limits given by the second and
+     * third parameters
+     */
+    public static float clamp_float(float par0, float par1, float par2)
     {
-        return p_76131_0_ < p_76131_1_ ? p_76131_1_ : (p_76131_0_ > p_76131_2_ ? p_76131_2_ : p_76131_0_);
+        return par0 < par1 ? par1 : (par0 > par2 ? par2 : par0);
     }
 
     public static double clamp_double(double p_151237_0_, double p_151237_2_, double p_151237_4_)
@@ -102,36 +153,43 @@ public class MathHelper
         return p_151238_4_ < 0.0D ? p_151238_0_ : (p_151238_4_ > 1.0D ? p_151238_2_ : p_151238_0_ + (p_151238_2_ - p_151238_0_) * p_151238_4_);
     }
 
-    public static double abs_max(double p_76132_0_, double p_76132_2_)
+    /**
+     * Maximum of the absolute value of two numbers.
+     */
+    public static double abs_max(double par0, double par2)
     {
-        if (p_76132_0_ < 0.0D)
+        if (par0 < 0.0D)
         {
-            p_76132_0_ = -p_76132_0_;
+            par0 = -par0;
         }
 
-        if (p_76132_2_ < 0.0D)
+        if (par2 < 0.0D)
         {
-            p_76132_2_ = -p_76132_2_;
+            par2 = -par2;
         }
 
-        return p_76132_0_ > p_76132_2_ ? p_76132_0_ : p_76132_2_;
+        return par0 > par2 ? par0 : par2;
     }
 
-    @SideOnly(Side.CLIENT)
-    public static int bucketInt(int p_76137_0_, int p_76137_1_)
+    /**
+     * Buckets an integer with specifed bucket sizes.  Args: i, bucketSize
+     */
+    public static int bucketInt(int par0, int par1)
     {
-        return p_76137_0_ < 0 ? -((-p_76137_0_ - 1) / p_76137_1_) - 1 : p_76137_0_ / p_76137_1_;
+        return par0 < 0 ? -((-par0 - 1) / par1) - 1 : par0 / par1;
     }
 
-    @SideOnly(Side.CLIENT)
-    public static boolean stringNullOrLengthZero(String p_76139_0_)
+    /**
+     * Tests if a string is null or of length zero
+     */
+    public static boolean stringNullOrLengthZero(String par0Str)
     {
-        return p_76139_0_ == null || p_76139_0_.length() == 0;
+        return par0Str == null || par0Str.length() == 0;
     }
 
-    public static int getRandomIntegerInRange(Random p_76136_0_, int p_76136_1_, int p_76136_2_)
+    public static int getRandomIntegerInRange(Random par0Random, int par1, int par2)
     {
-        return p_76136_1_ >= p_76136_2_ ? p_76136_1_ : p_76136_0_.nextInt(p_76136_2_ - p_76136_1_ + 1) + p_76136_1_;
+        return par1 >= par2 ? par1 : par0Random.nextInt(par2 - par1 + 1) + par1;
     }
 
     public static float randomFloatClamp(Random p_151240_0_, float p_151240_1_, float p_151240_2_)
@@ -139,166 +197,191 @@ public class MathHelper
         return p_151240_1_ >= p_151240_2_ ? p_151240_1_ : p_151240_0_.nextFloat() * (p_151240_2_ - p_151240_1_) + p_151240_1_;
     }
 
-    public static double getRandomDoubleInRange(Random p_82716_0_, double p_82716_1_, double p_82716_3_)
+    public static double getRandomDoubleInRange(Random par0Random, double par1, double par3)
     {
-        return p_82716_1_ >= p_82716_3_ ? p_82716_1_ : p_82716_0_.nextDouble() * (p_82716_3_ - p_82716_1_) + p_82716_1_;
+        return par1 >= par3 ? par1 : par0Random.nextDouble() * (par3 - par1) + par1;
     }
 
-    public static double average(long[] p_76127_0_)
+    public static double average(long[] par0ArrayOfLong)
     {
-        long i = 0L;
-        long[] along1 = p_76127_0_;
-        int j = p_76127_0_.length;
+        long var1 = 0L;
+        long[] var3 = par0ArrayOfLong;
+        int var4 = par0ArrayOfLong.length;
 
-        for (int k = 0; k < j; ++k)
+        for (int var5 = 0; var5 < var4; ++var5)
         {
-            long l = along1[k];
-            i += l;
+            long var6 = var3[var5];
+            var1 += var6;
         }
 
-        return (double)i / (double)p_76127_0_.length;
+        return (double)var1 / (double)par0ArrayOfLong.length;
     }
 
-    public static float wrapAngleTo180_float(float p_76142_0_)
+    /**
+     * the angle is reduced to an angle between -180 and +180 by mod, and a 360 check
+     */
+    public static float wrapAngleTo180_float(float par0)
     {
-        p_76142_0_ %= 360.0F;
+        par0 %= 360.0F;
 
-        if (p_76142_0_ >= 180.0F)
+        if (par0 >= 180.0F)
         {
-            p_76142_0_ -= 360.0F;
+            par0 -= 360.0F;
         }
 
-        if (p_76142_0_ < -180.0F)
+        if (par0 < -180.0F)
         {
-            p_76142_0_ += 360.0F;
+            par0 += 360.0F;
         }
 
-        return p_76142_0_;
+        return par0;
     }
 
-    public static double wrapAngleTo180_double(double p_76138_0_)
+    /**
+     * the angle is reduced to an angle between -180 and +180 by mod, and a 360 check
+     */
+    public static double wrapAngleTo180_double(double par0)
     {
-        p_76138_0_ %= 360.0D;
+        par0 %= 360.0D;
 
-        if (p_76138_0_ >= 180.0D)
+        if (par0 >= 180.0D)
         {
-            p_76138_0_ -= 360.0D;
+            par0 -= 360.0D;
         }
 
-        if (p_76138_0_ < -180.0D)
+        if (par0 < -180.0D)
         {
-            p_76138_0_ += 360.0D;
+            par0 += 360.0D;
         }
 
-        return p_76138_0_;
+        return par0;
     }
 
-    public static int parseIntWithDefault(String p_82715_0_, int p_82715_1_)
+    /**
+     * parses the string as integer or returns the second parameter if it fails
+     */
+    public static int parseIntWithDefault(String par0Str, int par1)
     {
-        int j = p_82715_1_;
+        int var2 = par1;
 
         try
         {
-            j = Integer.parseInt(p_82715_0_);
+            var2 = Integer.parseInt(par0Str);
         }
-        catch (Throwable throwable)
+        catch (Throwable var4)
         {
             ;
         }
 
-        return j;
+        return var2;
     }
 
-    public static int parseIntWithDefaultAndMax(String p_82714_0_, int p_82714_1_, int p_82714_2_)
+    /**
+     * parses the string as integer or returns the second parameter if it fails. this value is capped to par2
+     */
+    public static int parseIntWithDefaultAndMax(String par0Str, int par1, int par2)
     {
-        int k = p_82714_1_;
+        int var3 = par1;
 
         try
         {
-            k = Integer.parseInt(p_82714_0_);
+            var3 = Integer.parseInt(par0Str);
         }
-        catch (Throwable throwable)
+        catch (Throwable var5)
         {
             ;
         }
 
-        if (k < p_82714_2_)
+        if (var3 < par2)
         {
-            k = p_82714_2_;
+            var3 = par2;
         }
 
-        return k;
+        return var3;
     }
 
-    public static double parseDoubleWithDefault(String p_82712_0_, double p_82712_1_)
+    /**
+     * parses the string as double or returns the second parameter if it fails.
+     */
+    public static double parseDoubleWithDefault(String par0Str, double par1)
     {
-        double d1 = p_82712_1_;
+        double var3 = par1;
 
         try
         {
-            d1 = Double.parseDouble(p_82712_0_);
+            var3 = Double.parseDouble(par0Str);
         }
-        catch (Throwable throwable)
+        catch (Throwable var6)
         {
             ;
         }
 
-        return d1;
+        return var3;
     }
 
-    public static double parseDoubleWithDefaultAndMax(String p_82713_0_, double p_82713_1_, double p_82713_3_)
+    public static double parseDoubleWithDefaultAndMax(String par0Str, double par1, double par3)
     {
-        double d2 = p_82713_1_;
+        double var5 = par1;
 
         try
         {
-            d2 = Double.parseDouble(p_82713_0_);
+            var5 = Double.parseDouble(par0Str);
         }
-        catch (Throwable throwable)
+        catch (Throwable var8)
         {
             ;
         }
 
-        if (d2 < p_82713_3_)
+        if (var5 < par3)
         {
-            d2 = p_82713_3_;
+            var5 = par3;
         }
 
-        return d2;
+        return var5;
     }
 
-    @SideOnly(Side.CLIENT)
+    /**
+     * Returns the input value rounded up to the next highest power of two.
+     */
     public static int roundUpToPowerOfTwo(int p_151236_0_)
     {
-        int j = p_151236_0_ - 1;
-        j |= j >> 1;
-        j |= j >> 2;
-        j |= j >> 4;
-        j |= j >> 8;
-        j |= j >> 16;
-        return j + 1;
+        int var1 = p_151236_0_ - 1;
+        var1 |= var1 >> 1;
+        var1 |= var1 >> 2;
+        var1 |= var1 >> 4;
+        var1 |= var1 >> 8;
+        var1 |= var1 >> 16;
+        return var1 + 1;
     }
 
-    @SideOnly(Side.CLIENT)
+    /**
+     * Is the given value a power of two?  (1, 2, 4, 8, 16, ...)
+     */
     private static boolean isPowerOfTwo(int p_151235_0_)
     {
         return p_151235_0_ != 0 && (p_151235_0_ & p_151235_0_ - 1) == 0;
     }
 
-    @SideOnly(Side.CLIENT)
+    /**
+     * Uses a B(2, 5) De Bruijn sequence and a lookup table to efficiently calculate the log-base-two of the given
+     * value.  Optimized for cases where the input value is a power-of-two.  If the input value is not a power-of-two,
+     * then subtract 1 from the return value.
+     */
     private static int calculateLogBaseTwoDeBruijn(int p_151241_0_)
     {
         p_151241_0_ = isPowerOfTwo(p_151241_0_) ? p_151241_0_ : roundUpToPowerOfTwo(p_151241_0_);
         return multiplyDeBruijnBitPosition[(int)((long)p_151241_0_ * 125613361L >> 27) & 31];
     }
 
-    @SideOnly(Side.CLIENT)
+    /**
+     * Efficiently calculates the floor of the base-2 log of an integer value.  This is effectively the index of the
+     * highest bit that is set.  For example, if the number in binary is 0...100101, this will return 5.
+     */
     public static int calculateLogBaseTwo(int p_151239_0_)
     {
         return calculateLogBaseTwoDeBruijn(p_151239_0_) - (isPowerOfTwo(p_151239_0_) ? 0 : 1);
     }
 
-    @SideOnly(Side.CLIENT)
     public static int func_154354_b(int p_154354_0_, int p_154354_1_)
     {
         if (p_154354_1_ == 0)
@@ -312,18 +395,30 @@ public class MathHelper
                 p_154354_1_ *= -1;
             }
 
-            int k = p_154354_0_ % p_154354_1_;
-            return k == 0 ? p_154354_0_ : p_154354_0_ + p_154354_1_ - k;
+            int var2 = p_154354_0_ % p_154354_1_;
+            return var2 == 0 ? p_154354_0_ : p_154354_0_ + p_154354_1_ - var2;
         }
     }
 
     static
     {
-        for (int var0 = 0; var0 < 65536; ++var0)
+        int i;
+
+        for (i = 0; i < 65536; ++i)
         {
-            SIN_TABLE[var0] = (float)Math.sin((double)var0 * Math.PI * 2.0D / 65536.0D);
+            SIN_TABLE[i] = (float)Math.sin((double)i * Math.PI * 2.0D / 65536.0D);
         }
 
         multiplyDeBruijnBitPosition = new int[] {0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9};
+
+        for (i = 0; i < 4096; ++i)
+        {
+            SIN_TABLE_FAST[i] = (float)Math.sin((double)(((float)i + 0.5F) / 4096.0F * ((float)Math.PI * 2F)));
+        }
+
+        for (i = 0; i < 360; i += 90)
+        {
+            SIN_TABLE_FAST[(int)((float)i * 11.377778F) & 4095] = (float)Math.sin((double)((float)i * 0.017453292F));
+        }
     }
 }

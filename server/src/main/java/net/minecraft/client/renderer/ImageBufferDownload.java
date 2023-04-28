@@ -1,23 +1,19 @@
 package net.minecraft.client.renderer;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.awt.image.ImageObserver;
 
-@SideOnly(Side.CLIENT)
 public class ImageBufferDownload implements IImageBuffer
 {
     private int[] imageData;
     private int imageWidth;
     private int imageHeight;
-    private static final String __OBFID = "CL_00000956";
 
-    public BufferedImage parseUserSkin(BufferedImage p_78432_1_)
+    public BufferedImage parseUserSkin(BufferedImage par1BufferedImage)
     {
-        if (p_78432_1_ == null)
+        if (par1BufferedImage == null)
         {
             return null;
         }
@@ -25,54 +21,79 @@ public class ImageBufferDownload implements IImageBuffer
         {
             this.imageWidth = 64;
             this.imageHeight = 32;
-            BufferedImage bufferedimage1 = new BufferedImage(this.imageWidth, this.imageHeight, 2);
-            Graphics graphics = bufferedimage1.getGraphics();
-            graphics.drawImage(p_78432_1_, 0, 0, (ImageObserver)null);
-            graphics.dispose();
-            this.imageData = ((DataBufferInt)bufferedimage1.getRaster().getDataBuffer()).getData();
-            this.setAreaOpaque(0, 0, 32, 16);
-            this.setAreaTransparent(32, 0, 64, 32);
-            this.setAreaOpaque(0, 16, 64, 32);
-            return bufferedimage1;
+            int srcWidth = par1BufferedImage.getWidth();
+            int srcHeight = par1BufferedImage.getHeight();
+
+            if (srcWidth != 64 || srcHeight != 32 && srcHeight != 64)
+            {
+                while (this.imageWidth < srcWidth || this.imageHeight < srcHeight)
+                {
+                    this.imageWidth *= 2;
+                    this.imageHeight *= 2;
+                }
+            }
+
+            BufferedImage bufferedimage = new BufferedImage(this.imageWidth, this.imageHeight, 2);
+            Graphics g = bufferedimage.getGraphics();
+            g.drawImage(par1BufferedImage, 0, 0, (ImageObserver)null);
+            g.dispose();
+            this.imageData = ((DataBufferInt)bufferedimage.getRaster().getDataBuffer()).getData();
+            int w = this.imageWidth;
+            int h = this.imageHeight;
+            this.setAreaOpaque(0, 0, w / 2, h / 2);
+            this.setAreaTransparent(w / 2, 0, w, h);
+            this.setAreaOpaque(0, h / 2, w, h);
+            return bufferedimage;
         }
     }
 
     public void func_152634_a() {}
 
-    private void setAreaTransparent(int p_78434_1_, int p_78434_2_, int p_78434_3_, int p_78434_4_)
+    /**
+     * Makes the given area of the image transparent if it was previously completely opaque (used to remove the outer
+     * layer of a skin around the head if it was saved all opaque; this would be redundant so it's assumed that the skin
+     * maker is just using an image editor without an alpha channel)
+     */
+    private void setAreaTransparent(int par1, int par2, int par3, int par4)
     {
-        if (!this.hasTransparency(p_78434_1_, p_78434_2_, p_78434_3_, p_78434_4_))
+        if (!this.hasTransparency(par1, par2, par3, par4))
         {
-            for (int i1 = p_78434_1_; i1 < p_78434_3_; ++i1)
+            for (int var5 = par1; var5 < par3; ++var5)
             {
-                for (int j1 = p_78434_2_; j1 < p_78434_4_; ++j1)
+                for (int var6 = par2; var6 < par4; ++var6)
                 {
-                    this.imageData[i1 + j1 * this.imageWidth] &= 16777215;
+                    this.imageData[var5 + var6 * this.imageWidth] &= 16777215;
                 }
             }
         }
     }
 
-    private void setAreaOpaque(int p_78433_1_, int p_78433_2_, int p_78433_3_, int p_78433_4_)
+    /**
+     * Makes the given area of the image opaque
+     */
+    private void setAreaOpaque(int par1, int par2, int par3, int par4)
     {
-        for (int i1 = p_78433_1_; i1 < p_78433_3_; ++i1)
+        for (int var5 = par1; var5 < par3; ++var5)
         {
-            for (int j1 = p_78433_2_; j1 < p_78433_4_; ++j1)
+            for (int var6 = par2; var6 < par4; ++var6)
             {
-                this.imageData[i1 + j1 * this.imageWidth] |= -16777216;
+                this.imageData[var5 + var6 * this.imageWidth] |= -16777216;
             }
         }
     }
 
-    private boolean hasTransparency(int p_78435_1_, int p_78435_2_, int p_78435_3_, int p_78435_4_)
+    /**
+     * Returns true if the given area of the image contains transparent pixels
+     */
+    private boolean hasTransparency(int par1, int par2, int par3, int par4)
     {
-        for (int i1 = p_78435_1_; i1 < p_78435_3_; ++i1)
+        for (int var5 = par1; var5 < par3; ++var5)
         {
-            for (int j1 = p_78435_2_; j1 < p_78435_4_; ++j1)
+            for (int var6 = par2; var6 < par4; ++var6)
             {
-                int k1 = this.imageData[i1 + j1 * this.imageWidth];
+                int var7 = this.imageData[var5 + var6 * this.imageWidth];
 
-                if ((k1 >> 24 & 255) < 128)
+                if ((var7 >> 24 & 255) < 128)
                 {
                     return true;
                 }

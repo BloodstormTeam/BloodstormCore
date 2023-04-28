@@ -19,11 +19,11 @@ public class PositionTextureVertex
         return new PositionTextureVertex(this, p_78240_1_, p_78240_2_);
     }
 
-    public PositionTextureVertex(PositionTextureVertex p_i1159_1_, float p_i1159_2_, float p_i1159_3_)
+    public PositionTextureVertex(PositionTextureVertex p_i46363_1_, float p_i46363_2_, float p_i46363_3_)
     {
-        this.vector3D = p_i1159_1_.vector3D;
-        this.texturePositionX = p_i1159_2_;
-        this.texturePositionY = p_i1159_3_;
+        this.vector3D = p_i46363_1_.vector3D;
+        this.texturePositionX = p_i46363_2_;
+        this.texturePositionY = p_i46363_3_;
     }
 
     public PositionTextureVertex(Vec3 p_i1160_1_, float p_i1160_2_, float p_i1160_3_)

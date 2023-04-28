@@ -15,6 +15,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StringUtils;
 import net.minecraft.world.World;
+import net.optifine.CapeUtils;
+import net.optifine.Config;
+import net.optifine.PlayerConfigurations;
 
 @SideOnly(Side.CLIENT)
 public abstract class AbstractClientPlayer extends EntityPlayer implements SkinManager.SkinAvailableCallback
@@ -22,23 +25,34 @@ public abstract class AbstractClientPlayer extends EntityPlayer implements SkinM
     public static final ResourceLocation locationStevePng = new ResourceLocation("textures/entity/steve.png");
     private ResourceLocation locationSkin;
     private ResourceLocation locationCape;
-    private static final String __OBFID = "CL_00000935";
+    private ResourceLocation locationOfCape = null;
+    private String nameClear = null;
 
     public AbstractClientPlayer(World p_i45074_1_, GameProfile p_i45074_2_)
     {
         super(p_i45074_1_, p_i45074_2_);
-        String s = this.getCommandSenderName();
+        String var3 = this.getCommandSenderName();
 
-        if (!s.isEmpty())
+        if (!var3.isEmpty())
         {
-            SkinManager skinmanager = Minecraft.getMinecraft().func_152342_ad();
-            skinmanager.func_152790_a(p_i45074_2_, this, true);
+            SkinManager var4 = Minecraft.getMinecraft().func_152342_ad();
+            var4.func_152790_a(p_i45074_2_, this, true);
         }
+
+        this.nameClear = p_i45074_2_.getName();
+
+        if (this.nameClear != null && !this.nameClear.isEmpty())
+        {
+            this.nameClear = StringUtils.stripControlCodes(this.nameClear);
+        }
+
+        CapeUtils.downloadCape(this);
+        PlayerConfigurations.getPlayerConfiguration(this);
     }
 
     public boolean func_152122_n()
     {
-        return this.locationCape != null;
+        return !Config.isShowCapes() ? false : (this.locationOfCape != null || this.locationCape != null);
     }
 
     public boolean func_152123_o()
@@ -53,26 +67,26 @@ public abstract class AbstractClientPlayer extends EntityPlayer implements SkinM
 
     public ResourceLocation getLocationCape()
     {
-        return this.locationCape;
+        return !Config.isShowCapes() ? null : (this.locationOfCape != null ? this.locationOfCape : this.locationCape);
     }
 
-    public static ThreadDownloadImageData getDownloadImageSkin(ResourceLocation p_110304_0_, String p_110304_1_)
+    public static ThreadDownloadImageData getDownloadImageSkin(ResourceLocation par0ResourceLocation, String par1Str)
     {
-        TextureManager texturemanager = Minecraft.getMinecraft().getTextureManager();
-        Object object = texturemanager.getTexture(p_110304_0_);
+        TextureManager var2 = Minecraft.getMinecraft().getTextureManager();
+        Object var3 = var2.getTexture(par0ResourceLocation);
 
-        if (object == null)
+        if (var3 == null)
         {
-            object = new ThreadDownloadImageData((File)null, String.format("http://skins.minecraft.net/MinecraftSkins/%s.png", new Object[] {StringUtils.stripControlCodes(p_110304_1_)}), locationStevePng, new ImageBufferDownload());
-            texturemanager.loadTexture(p_110304_0_, (ITextureObject)object);
+            var3 = new ThreadDownloadImageData((File)null, String.format("http://skins.minecraft.net/MinecraftSkins/%s.png", new Object[] {StringUtils.stripControlCodes(par1Str)}), locationStevePng, new ImageBufferDownload());
+            var2.loadTexture(par0ResourceLocation, (ITextureObject)var3);
         }
 
-        return (ThreadDownloadImageData)object;
+        return (ThreadDownloadImageData)var3;
     }
 
-    public static ResourceLocation getLocationSkin(String p_110311_0_)
+    public static ResourceLocation getLocationSkin(String par0Str)
     {
-        return new ResourceLocation("skins/" + StringUtils.stripControlCodes(p_110311_0_));
+        return new ResourceLocation("skins/" + StringUtils.stripControlCodes(par0Str));
     }
 
     public void func_152121_a(Type p_152121_1_, ResourceLocation p_152121_2_)
@@ -82,37 +96,50 @@ public abstract class AbstractClientPlayer extends EntityPlayer implements SkinM
             case 1:
                 this.locationSkin = p_152121_2_;
                 break;
+
             case 2:
                 this.locationCape = p_152121_2_;
         }
     }
 
-    @SideOnly(Side.CLIENT)
+    public String getNameClear()
+    {
+        return this.nameClear;
+    }
+
+    public ResourceLocation getLocationOfCape()
+    {
+        return this.locationOfCape;
+    }
+
+    public void setLocationOfCape(ResourceLocation locationOfCape)
+    {
+        this.locationOfCape = locationOfCape;
+    }
 
     static final class SwitchType
+    {
+        static final int[] field_152630_a = new int[Type.values().length];
+
+        static
         {
-            static final int[] field_152630_a = new int[Type.values().length];
-            private static final String __OBFID = "CL_00001832";
-
-            static
+            try
             {
-                try
-                {
-                    field_152630_a[Type.SKIN.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
+                field_152630_a[Type.SKIN.ordinal()] = 1;
+            }
+            catch (NoSuchFieldError var2)
+            {
+                ;
+            }
 
-                try
-                {
-                    field_152630_a[Type.CAPE.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
+            try
+            {
+                field_152630_a[Type.CAPE.ordinal()] = 2;
+            }
+            catch (NoSuchFieldError var1)
+            {
+                ;
             }
         }
+    }
 }

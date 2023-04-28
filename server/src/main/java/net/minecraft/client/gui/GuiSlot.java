@@ -294,7 +294,16 @@ public abstract class GuiSlot
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_FOG);
         Tessellator tessellator = Tessellator.instance;
-        drawContainerBackground(tessellator);
+        this.mc.getTextureManager().bindTexture(Gui.optionsBackground);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        float f1 = 32.0F;
+        tessellator.startDrawingQuads();
+        tessellator.setColorOpaque_I(2105376);
+        tessellator.addVertexWithUV((double)this.left, (double)this.bottom, 0.0D, (double)((float)this.left / f1), (double)((float)(this.bottom + (int)this.amountScrolled) / f1));
+        tessellator.addVertexWithUV((double)this.right, (double)this.bottom, 0.0D, (double)((float)this.right / f1), (double)((float)(this.bottom + (int)this.amountScrolled) / f1));
+        tessellator.addVertexWithUV((double)this.right, (double)this.top, 0.0D, (double)((float)this.right / f1), (double)((float)(this.top + (int)this.amountScrolled) / f1));
+        tessellator.addVertexWithUV((double)this.left, (double)this.top, 0.0D, (double)((float)this.left / f1), (double)((float)(this.top + (int)this.amountScrolled) / f1));
+        tessellator.draw();
         l1 = this.left + this.width / 2 - this.getListWidth() / 2 + 2;
         i2 = this.top + 4 - (int)this.amountScrolled;
 
@@ -465,19 +474,5 @@ public abstract class GuiSlot
     public int getSlotHeight()
     {
         return this.slotHeight;
-    }
-
-    protected void drawContainerBackground(Tessellator tessellator)
-    {
-        this.mc.getTextureManager().bindTexture(Gui.optionsBackground);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        float f1 = 32.0F;
-        tessellator.startDrawingQuads();
-        tessellator.setColorOpaque_I(2105376);
-        tessellator.addVertexWithUV((double)this.left, (double)this.bottom, 0.0D, (double)((float)this.left / f1), (double)((float)(this.bottom + (int)this.amountScrolled) / f1));
-        tessellator.addVertexWithUV((double)this.right, (double)this.bottom, 0.0D, (double)((float)this.right / f1), (double)((float)(this.bottom + (int)this.amountScrolled) / f1));
-        tessellator.addVertexWithUV((double)this.right, (double)this.top, 0.0D, (double)((float)this.right / f1), (double)((float)(this.top + (int)this.amountScrolled) / f1));
-        tessellator.addVertexWithUV((double)this.left, (double)this.top, 0.0D, (double)((float)this.left / f1), (double)((float)(this.top + (int)this.amountScrolled) / f1));
-        tessellator.draw();
     }
 }

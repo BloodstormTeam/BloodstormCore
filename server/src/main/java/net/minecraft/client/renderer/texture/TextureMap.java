@@ -2,10 +2,13 @@ package net.minecraft.client.renderer.texture;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,6 +16,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import javax.imageio.ImageIO;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -25,389 +34,557 @@ import net.minecraft.client.resources.data.TextureMetadataSection;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.item.Item;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.optifine.*;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.ForgeHooksClient;
+import shadersmod.client.ShadersTex;
 
-@SideOnly(Side.CLIENT)
 public class TextureMap extends AbstractTexture implements ITickableTextureObject, IIconRegister
 {
     private static final boolean ENABLE_SKIP = Boolean.parseBoolean(System.getProperty("fml.skipFirstTextureLoad", "true"));
     public static final ResourceLocation locationBlocksTexture = new ResourceLocation("textures/atlas/blocks.png");
     public static final ResourceLocation locationItemsTexture = new ResourceLocation("textures/atlas/items.png");
-    private final List listAnimatedSprites = Lists.newArrayList();
-    private final Map mapRegisteredSprites = Maps.newHashMap();
-    private final Map mapUploadedSprites = Maps.newHashMap();
-    private final int textureType;
-    private final String basePath;
-    private int mipmapLevels;
-    private int anisotropicFiltering = 1;
-    private final TextureAtlasSprite missingImage = new TextureAtlasSprite("missingno");
-    private static final String __OBFID = "CL_00001058";
-    private boolean skipFirst = false;
+    private final ObjectList<TextureAtlasSprite> listAnimatedSprites;
+    private final Object2ObjectMap<String, TextureAtlasSprite> mapRegisteredSprites;
+    private final Object2ObjectMap<String, TextureAtlasSprite> mapUploadedSprites;
 
-    public TextureMap(int p_i1281_1_, String p_i1281_2_)
+    /** 0 = terrain.png, 1 = items.png */
+    public final int textureType;
+    public final String basePath;
+    private int mipmapLevels;
+    private int anisotropicFiltering;
+    private final TextureAtlasSprite missingImage;
+    private boolean skipFirst;
+    public static TextureMap textureMapBlocks = null;
+    public static TextureMap textureMapItems = null;
+    private TextureAtlasSprite[] iconGrid;
+    private int iconGridSize;
+    private int iconGridCountX;
+    private int iconGridCountY;
+    private double iconGridSizeU;
+    private double iconGridSizeV;
+    private int counterIndexInMap;
+    public int atlasWidth;
+    public int atlasHeight;
+
+    public TextureMap(int par1, String par2Str)
     {
-        this(p_i1281_1_, p_i1281_2_, false);
+        this(par1, par2Str, false);
     }
-    public TextureMap(int p_i1281_1_, String p_i1281_2_, boolean skipFirst)
+
+    public TextureMap(int par1, String par2Str, boolean skipFirst)
     {
-        this.textureType = p_i1281_1_;
-        this.basePath = p_i1281_2_;
+        this.listAnimatedSprites = new ObjectArrayList<>();
+        this.mapRegisteredSprites = new Object2ObjectOpenHashMap<>();
+        this.mapUploadedSprites = new Object2ObjectOpenHashMap<>();
+        this.anisotropicFiltering = 1;
+        this.missingImage = new TextureAtlasSprite("missingno");
+        this.skipFirst = false;
+        this.iconGrid = null;
+        this.iconGridSize = -1;
+        this.iconGridCountX = -1;
+        this.iconGridCountY = -1;
+        this.iconGridSizeU = -1.0D;
+        this.iconGridSizeV = -1.0D;
+        this.counterIndexInMap = 0;
+        this.atlasWidth = 0;
+        this.atlasHeight = 0;
+        this.textureType = par1;
+        this.basePath = par2Str;
+
+        if (this.textureType == 0)
+        {
+            textureMapBlocks = this;
+        }
+
+        if (this.textureType == 1)
+        {
+            textureMapItems = this;
+        }
+
         this.registerIcons();
         this.skipFirst = skipFirst && ENABLE_SKIP;
     }
 
     private void initMissingImage()
     {
-        int[] aint;
+        int[] var1;
 
         if ((float)this.anisotropicFiltering > 1.0F)
         {
-            boolean flag = true;
-            boolean flag1 = true;
-            boolean flag2 = true;
+            boolean var5 = true;
+            boolean var3 = true;
+            boolean var4 = true;
             this.missingImage.setIconWidth(32);
             this.missingImage.setIconHeight(32);
-            aint = new int[1024];
-            System.arraycopy(TextureUtil.missingTextureData, 0, aint, 0, TextureUtil.missingTextureData.length);
-            TextureUtil.prepareAnisotropicData(aint, 16, 16, 8);
+            var1 = new int[1024];
+            System.arraycopy(TextureUtil.missingTextureData, 0, var1, 0, TextureUtil.missingTextureData.length);
+            TextureUtil.func_147948_a(var1, 16, 16, 8);
         }
         else
         {
-            aint = TextureUtil.missingTextureData;
+            var1 = TextureUtil.missingTextureData;
             this.missingImage.setIconWidth(16);
             this.missingImage.setIconHeight(16);
         }
 
-        int[][] aint1 = new int[this.mipmapLevels + 1][];
-        aint1[0] = aint;
-        this.missingImage.setFramesTextureData(Lists.newArrayList(new int[][][] {aint1}));
+        int[][] var51 = new int[this.mipmapLevels + 1][];
+        var51[0] = var1;
+        this.missingImage.setFramesTextureData(Lists.newArrayList(new int[][][] {var51}));
+        this.missingImage.setIndexInMap(this.counterIndexInMap++);
     }
 
-    public void loadTexture(IResourceManager p_110551_1_) throws IOException
+    public void loadTexture(IResourceManager par1ResourceManager) throws IOException
     {
+        ShadersTex.resManager = par1ResourceManager;
+        this.counterIndexInMap = 0;
         this.initMissingImage();
-        this.deleteGlTexture();
-        this.loadTextureAtlas(p_110551_1_);
+        this.func_147631_c();
+        this.loadTextureAtlas(par1ResourceManager);
     }
 
-    public void loadTextureAtlas(IResourceManager p_110571_1_)
+    public void loadTextureAtlas(IResourceManager par1ResourceManager)
     {
-        registerIcons(); //Re-gather list of Icons, allows for addition/removal of blocks/items after this map was initially constructed.
-
-        int i = Minecraft.getGLMaximumTextureSize();
-        Stitcher stitcher = new Stitcher(i, i, true, 0, this.mipmapLevels);
+        ShadersTex.resManager = par1ResourceManager;
+        WrUpdates.finishCurrentUpdate();
+        this.registerIcons();
+        int var2 = TextureUtils.getGLMaximumTextureSize();
+        Stitcher var3 = new Stitcher(var2, var2, true, 0, this.mipmapLevels);
         this.mapUploadedSprites.clear();
         this.listAnimatedSprites.clear();
-        int j = Integer.MAX_VALUE;
-        ForgeHooksClient.onTextureStitchedPre(this);
-        cpw.mods.fml.common.ProgressManager.ProgressBar bar = cpw.mods.fml.common.ProgressManager.push("Texture Loading", skipFirst ? 0 : this.mapRegisteredSprites.size());
-        Iterator iterator = this.mapRegisteredSprites.entrySet().iterator();
-        TextureAtlasSprite textureatlassprite;
+        int var4 = Integer.MAX_VALUE;
+        ForgeHooksClient.onTextureStitchedPre(textureMapBlocks);
+        Iterator var5 = this.mapRegisteredSprites.entrySet().iterator();
+        TextureAtlasSprite var8;
 
-        while (!skipFirst && iterator.hasNext())
+        while (var5.hasNext() && !this.skipFirst)
         {
-            Entry entry = (Entry)iterator.next();
-            ResourceLocation resourcelocation = new ResourceLocation((String)entry.getKey());
-            textureatlassprite = (TextureAtlasSprite)entry.getValue();
-            ResourceLocation resourcelocation1 = this.completeResourceLocation(resourcelocation, 0);
-            bar.step(resourcelocation1.getResourcePath());
+            Entry var24 = (Entry)var5.next();
+            ResourceLocation var25 = new ResourceLocation((String)var24.getKey());
+            var8 = (TextureAtlasSprite)var24.getValue();
+            ResourceLocation sheetWidth = this.func_147634_a(var25, 0);
 
-            if (textureatlassprite.hasCustomLoader(p_110571_1_, resourcelocation))
+            if (var8.getIndexInMap() < 0)
             {
-                if (!textureatlassprite.load(p_110571_1_, resourcelocation))
+                var8.setIndexInMap(this.counterIndexInMap++);
+            }
+
+            if (var8.hasCustomLoader(par1ResourceManager, var25))
+            {
+                if (!var8.load(par1ResourceManager, var25))
                 {
-                    j = Math.min(j, Math.min(textureatlassprite.getIconWidth(), textureatlassprite.getIconHeight()));
-                    stitcher.addSprite(textureatlassprite);
+                    var4 = Math.min(var4, Math.min(var8.getIconWidth(), var8.getIconHeight()));
+                    var3.addSprite(var8);
                 }
-                continue;
-            }
-
-            try
-            {
-                IResource iresource = p_110571_1_.getResource(resourcelocation1);
-                BufferedImage[] abufferedimage = new BufferedImage[1 + this.mipmapLevels];
-                abufferedimage[0] = ImageIO.read(iresource.getInputStream());
-                TextureMetadataSection texturemetadatasection = (TextureMetadataSection)iresource.getMetadata("texture");
-
-                if (texturemetadatasection != null)
-                {
-                    List list = texturemetadatasection.getListMipmaps();
-                    int l;
-
-                    if (!list.isEmpty())
-                    {
-                        int k = abufferedimage[0].getWidth();
-                        l = abufferedimage[0].getHeight();
-
-                        if (MathHelper.roundUpToPowerOfTwo(k) != k || MathHelper.roundUpToPowerOfTwo(l) != l)
-                        {
-                            throw new RuntimeException("Unable to load extra miplevels, source-texture is not power of two");
-                        }
-                    }
-
-                    Iterator iterator3 = list.iterator();
-
-                    while (iterator3.hasNext())
-                    {
-                        l = ((Integer)iterator3.next()).intValue();
-
-                        if (l > 0 && l < abufferedimage.length - 1 && abufferedimage[l] == null)
-                        {
-                            ResourceLocation resourcelocation2 = this.completeResourceLocation(resourcelocation, l);
-
-                            try
-                            {
-                                abufferedimage[l] = ImageIO.read(p_110571_1_.getResource(resourcelocation2).getInputStream());
-                            } catch (IOException ignored) {}
-                        }
-                    }
-                }
-
-                AnimationMetadataSection animationmetadatasection = (AnimationMetadataSection)iresource.getMetadata("animation");
-                textureatlassprite.loadSprite(abufferedimage, animationmetadatasection, (float)this.anisotropicFiltering > 1.0F);
-            }
-            catch (RuntimeException runtimeexception)
-            {
-                //logger.error("Unable to parse metadata from " + resourcelocation1, runtimeexception);
-                cpw.mods.fml.client.FMLClientHandler.instance().trackBrokenTexture(resourcelocation1, runtimeexception.getMessage());
-                continue;
-            }
-            catch (IOException ioexception1)
-            {
-                //logger.error("Using missing texture, unable to load " + resourcelocation1, ioexception1);
-                cpw.mods.fml.client.FMLClientHandler.instance().trackMissingTexture(resourcelocation1);
-                continue;
-            }
-
-            j = Math.min(j, Math.min(textureatlassprite.getIconWidth(), textureatlassprite.getIconHeight()));
-            stitcher.addSprite(textureatlassprite);
-        }
-
-        cpw.mods.fml.common.ProgressManager.pop(bar);
-        int i1 = MathHelper.calculateLogBaseTwo(j);
-
-        if (i1 < this.mipmapLevels)
-        {
-            this.mipmapLevels = i1;
-        }
-
-        Iterator iterator1 = this.mapRegisteredSprites.values().iterator();
-        bar = cpw.mods.fml.common.ProgressManager.push("Mipmap generation", skipFirst ? 0 : this.mapRegisteredSprites.size());
-
-        while (!skipFirst && iterator1.hasNext())
-        {
-            final TextureAtlasSprite textureatlassprite1 = (TextureAtlasSprite)iterator1.next();
-            bar.step(textureatlassprite1.getIconName());
-
-            try
-            {
-                textureatlassprite1.generateMipmaps(this.mipmapLevels);
-            }
-            catch (Throwable throwable1)
-            {
-                CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Applying mipmap");
-                CrashReportCategory crashreportcategory = crashreport.makeCategory("Sprite being mipmapped");
-                crashreportcategory.addCrashSectionCallable("Sprite name", new Callable()
-                {
-                    private static final String __OBFID = "CL_00001059";
-                    public String call()
-                    {
-                        return textureatlassprite1.getIconName();
-                    }
-                });
-                crashreportcategory.addCrashSectionCallable("Sprite size", new Callable()
-                {
-                    private static final String __OBFID = "CL_00001060";
-                    public String call()
-                    {
-                        return textureatlassprite1.getIconWidth() + " x " + textureatlassprite1.getIconHeight();
-                    }
-                });
-                crashreportcategory.addCrashSectionCallable("Sprite frames", new Callable()
-                {
-                    private static final String __OBFID = "CL_00001061";
-                    public String call()
-                    {
-                        return textureatlassprite1.getFrameCount() + " frames";
-                    }
-                });
-                crashreportcategory.addCrashSection("Mipmap levels", Integer.valueOf(this.mipmapLevels));
-                throw new ReportedException(crashreport);
-            }
-        }
-
-        this.missingImage.generateMipmaps(this.mipmapLevels);
-        stitcher.addSprite(this.missingImage);
-        cpw.mods.fml.common.ProgressManager.pop(bar);
-        skipFirst = false;
-        bar = cpw.mods.fml.common.ProgressManager.push("Texture creation", 3);
-
-        try
-        {
-            bar.step("Stitching");
-            stitcher.doStitch();
-        }
-        catch (StitcherException stitcherexception)
-        {
-            throw stitcherexception;
-        }
-
-        bar.step("Allocating GL texture");
-        TextureUtil.allocateTextureImpl(this.getGlTextureId(), this.mipmapLevels, stitcher.getCurrentWidth(), stitcher.getCurrentHeight(), (float)this.anisotropicFiltering);
-        HashMap hashmap = Maps.newHashMap(this.mapRegisteredSprites);
-        Iterator iterator2 = stitcher.getStichSlots().iterator();
-
-        bar.step("Uploading GL texture");
-        while (iterator2.hasNext())
-        {
-            textureatlassprite = (TextureAtlasSprite)iterator2.next();
-            String s = textureatlassprite.getIconName();
-            hashmap.remove(s);
-            this.mapUploadedSprites.put(s, textureatlassprite);
-
-            try
-            {
-                TextureUtil.uploadTextureMipmap(textureatlassprite.getFrameTextureData(0), textureatlassprite.getIconWidth(), textureatlassprite.getIconHeight(), textureatlassprite.getOriginX(), textureatlassprite.getOriginY(), false, false);
-            }
-            catch (Throwable throwable)
-            {
-                CrashReport crashreport1 = CrashReport.makeCrashReport(throwable, "Stitching texture atlas");
-                CrashReportCategory crashreportcategory1 = crashreport1.makeCategory("Texture being stitched together");
-                crashreportcategory1.addCrashSection("Atlas path", this.basePath);
-                crashreportcategory1.addCrashSection("Sprite", textureatlassprite);
-                throw new ReportedException(crashreport1);
-            }
-
-            if (textureatlassprite.hasAnimationMetadata())
-            {
-                this.listAnimatedSprites.add(textureatlassprite);
             }
             else
             {
-                textureatlassprite.clearFramesTextureData();
+                try
+                {
+                    IResource sheetHeight = ShadersTex.loadResource(par1ResourceManager, sheetWidth);
+                    BufferedImage[] debugImage = new BufferedImage[1 + this.mipmapLevels];
+                    debugImage[0] = ImageIO.read(sheetHeight.getInputStream());
+                    TextureMetadataSection var26 = (TextureMetadataSection)sheetHeight.getMetadata("texture");
+
+                    if (var26 != null)
+                    {
+                        List var28 = var26.getListMipmaps();
+                        int var30;
+
+                        if (!var28.isEmpty())
+                        {
+                            int var18 = debugImage[0].getWidth();
+                            var30 = debugImage[0].getHeight();
+
+                            if (MathHelper.roundUpToPowerOfTwo(var18) != var18 || MathHelper.roundUpToPowerOfTwo(var30) != var30)
+                            {
+                                throw new RuntimeException("Unable to load extra miplevels, source-texture is not power of two");
+                            }
+                        }
+
+                        Iterator var182 = var28.iterator();
+
+                        while (var182.hasNext())
+                        {
+                            var30 = ((Integer)var182.next()).intValue();
+
+                            if (var30 > 0 && var30 < debugImage.length - 1 && debugImage[var30] == null)
+                            {
+                                ResourceLocation var32 = this.func_147634_a(var25, var30);
+
+                                try
+                                {
+                                    debugImage[var30] = ImageIO.read(ShadersTex.loadResource(par1ResourceManager, var32).getInputStream());
+                                }
+                                catch (IOException ignored) {}
+                            }
+                        }
+                    }
+
+                    AnimationMetadataSection var281 = (AnimationMetadataSection)sheetHeight.getMetadata("animation");
+                    var8.func_147964_a(debugImage, var281, (float)this.anisotropicFiltering > 1.0F);
+                }
+                catch (RuntimeException var22) {
+                    FMLClientHandler.instance().trackBrokenTexture(sheetWidth, var22.getMessage());
+                    continue;
+                } catch (IOException var23) {
+                    FMLClientHandler.instance().trackMissingTexture(sheetWidth);
+                    continue;
+                }
+
+                var4 = Math.min(var4, Math.min(var8.getIconWidth(), var8.getIconHeight()));
+                var3.addSprite(var8);
             }
         }
 
-        iterator2 = hashmap.values().iterator();
+        int var241 = MathHelper.calculateLogBaseTwo(var4);
 
-        while (iterator2.hasNext())
+        if (var241 < 0)
         {
-            textureatlassprite = (TextureAtlasSprite)iterator2.next();
-            textureatlassprite.copyFrom(this.missingImage);
+            var241 = 0;
         }
+
+        if (var241 < this.mipmapLevels) {
+            this.mipmapLevels = var241;
+        }
+
+        Iterator var251 = this.mapRegisteredSprites.values().iterator();
+
+        while (var251.hasNext() && !this.skipFirst)
+        {
+            final TextureAtlasSprite sheetWidth1 = (TextureAtlasSprite)var251.next();
+
+            try
+            {
+                sheetWidth1.func_147963_d(this.mipmapLevels);
+            }
+            catch (Throwable var19)
+            {
+                CrashReport debugImage1 = CrashReport.makeCrashReport(var19, "Applying mipmap");
+                CrashReportCategory var261 = debugImage1.makeCategory("Sprite being mipmapped");
+                var261.addCrashSectionCallable("Sprite name", () -> sheetWidth1.getIconName());
+                var261.addCrashSectionCallable("Sprite size", () -> sheetWidth1.getIconWidth() + " x " + sheetWidth1.getIconHeight());
+                var261.addCrashSectionCallable("Sprite frames", () -> sheetWidth1.getFrameCount() + " frames");
+                var261.addCrashSection("Mipmap levels", this.mipmapLevels);
+                throw new ReportedException(debugImage1);
+            }
+        }
+
+        this.missingImage.func_147963_d(this.mipmapLevels);
+        var3.addSprite(this.missingImage);
+        this.skipFirst = false;
+
+        try
+        {
+            var3.doStitch();
+        }
+        catch (StitcherException var181)
+        {
+            throw var181;
+        }
+
+        int sheetWidth2 = var3.getCurrentWidth();
+        int sheetHeight1 = var3.getCurrentHeight();
+        BufferedImage debugImage2 = null;
+
+        if (System.getProperty("saveTextureMap", "false").equalsIgnoreCase("true"))
+        {
+            debugImage2 = this.makeDebugImage(sheetWidth2, sheetHeight1);
+        }
+
+        if (Config.isShaders())
+        {
+            ShadersTex.allocateTextureMap(this.getGlTextureId(), this.mipmapLevels, var3.getCurrentWidth(), var3.getCurrentHeight(), var3, this);
+        }
+        else
+        {
+            TextureUtil.func_147946_a(this.getGlTextureId(), this.mipmapLevels, var3.getCurrentWidth(), var3.getCurrentHeight(), (float)this.anisotropicFiltering);
+        }
+
+        HashMap var262 = Maps.newHashMap(this.mapRegisteredSprites);
+        Iterator var282 = var3.getStichSlots().iterator();
+
+        while (var282.hasNext())
+        {
+            var8 = (TextureAtlasSprite)var282.next();
+
+            if (Config.isShaders())
+            {
+                ShadersTex.setIconName(ShadersTex.setSprite(var8).getIconName());
+            }
+
+            String var301 = var8.getIconName();
+            var262.remove(var301);
+            this.mapUploadedSprites.put(var301, var8);
+
+            try
+            {
+                if (Config.isShaders())
+                {
+                    ShadersTex.uploadTexSubForLoadAtlas(var8.func_147965_a(0), var8.getIconWidth(), var8.getIconHeight(), var8.getOriginX(), var8.getOriginY(), false, false);
+                }
+                else
+                {
+                    TextureUtil.func_147955_a(var8.func_147965_a(0), var8.getIconWidth(), var8.getIconHeight(), var8.getOriginX(), var8.getOriginY(), false, false);
+                }
+
+                if (debugImage2 != null)
+                {
+                    this.addDebugSprite(var8, debugImage2);
+                }
+            }
+            catch (Throwable var21)
+            {
+                CrashReport var321 = CrashReport.makeCrashReport(var21, "Stitching texture atlas");
+                CrashReportCategory var33 = var321.makeCategory("Texture being stitched together");
+                var33.addCrashSection("Atlas path", this.basePath);
+                var33.addCrashSection("Sprite", var8);
+                throw new ReportedException(var321);
+            }
+
+            if (var8.hasAnimationMetadata())
+            {
+                this.listAnimatedSprites.add(var8);
+            }
+            else
+            {
+                var8.clearFramesTextureData();
+            }
+        }
+
+        var282 = var262.values().iterator();
+
+        while (var282.hasNext())
+        {
+            var8 = (TextureAtlasSprite)var282.next();
+            var8.copyFrom(this.missingImage);
+        }
+
+        if (debugImage2 != null)
+        {
+            this.writeDebugImage(debugImage2, "debug_" + this.basePath.replace('/', '_') + ".png");
+        }
+
         ForgeHooksClient.onTextureStitchedPost(this);
-        cpw.mods.fml.common.ProgressManager.pop(bar);
     }
 
-    private ResourceLocation completeResourceLocation(ResourceLocation p_147634_1_, int p_147634_2_)
+    public ResourceLocation func_147634_a(ResourceLocation p_147634_1_, int p_147634_2_)
     {
-        return p_147634_2_ == 0 ? new ResourceLocation(p_147634_1_.getResourceDomain(), String.format("%s/%s%s", new Object[] {this.basePath, p_147634_1_.getResourcePath(), ".png"})): new ResourceLocation(p_147634_1_.getResourceDomain(), String.format("%s/mipmaps/%s.%d%s", new Object[] {this.basePath, p_147634_1_.getResourcePath(), Integer.valueOf(p_147634_2_), ".png"}));
+        return this.isAbsoluteLocation(p_147634_1_) ? (p_147634_2_ == 0 ? new ResourceLocation(p_147634_1_.getResourceDomain(), p_147634_1_.getResourcePath() + ".png") : new ResourceLocation(p_147634_1_.getResourceDomain(), p_147634_1_.getResourcePath() + "mipmap" + p_147634_2_ + ".png")) : (p_147634_2_ == 0 ? new ResourceLocation(p_147634_1_.getResourceDomain(), String.format("%s/%s%s", new Object[] {this.basePath, p_147634_1_.getResourcePath(), ".png"})): new ResourceLocation(p_147634_1_.getResourceDomain(), String.format("%s/mipmaps/%s.%d%s", new Object[] {this.basePath, p_147634_1_.getResourcePath(), Integer.valueOf(p_147634_2_), ".png"})));
     }
 
     private void registerIcons()
     {
         this.mapRegisteredSprites.clear();
-        Iterator iterator;
+        Iterator var1;
 
         if (this.textureType == 0)
         {
-            iterator = Block.blockRegistry.iterator();
+            var1 = Block.blockRegistry.iterator();
 
-            while (iterator.hasNext())
+            while (var1.hasNext())
             {
-                Block block = (Block)iterator.next();
+                Block var3 = (Block)var1.next();
 
-                if (block.getMaterial() != Material.air)
+                if (var3.getMaterial() != Material.air)
                 {
-                    block.registerBlockIcons(this);
+                    var3.registerBlockIcons(this);
                 }
             }
 
             Minecraft.getMinecraft().renderGlobal.registerDestroyBlockIcons(this);
             RenderManager.instance.updateIcons(this);
+            ConnectedTextures.updateIcons(this);
         }
 
-        iterator = Item.itemRegistry.iterator();
-
-        while (iterator.hasNext())
+        if (this.textureType == 1)
         {
-            Item item = (Item)iterator.next();
+            CustomItems.updateIcons(this);
+        }
 
-            if (item != null && item.getSpriteNumber() == this.textureType)
+        var1 = Item.itemRegistry.iterator();
+
+        while (var1.hasNext())
+        {
+            Item var31 = (Item)var1.next();
+
+            if (var31 != null && var31.getSpriteNumber() == this.textureType)
             {
-                item.registerIcons(this);
+                var31.registerIcons(this);
             }
         }
     }
 
-    public TextureAtlasSprite getAtlasSprite(String p_110572_1_)
+    public TextureAtlasSprite getAtlasSprite(String par1Str)
     {
-        TextureAtlasSprite textureatlassprite = (TextureAtlasSprite)this.mapUploadedSprites.get(p_110572_1_);
+        TextureAtlasSprite var2 = (TextureAtlasSprite)this.mapUploadedSprites.get(par1Str);
 
-        if (textureatlassprite == null)
+        if (var2 == null)
         {
-            textureatlassprite = this.missingImage;
+            var2 = this.missingImage;
         }
 
-        return textureatlassprite;
+        return var2;
     }
 
     public void updateAnimations()
     {
-        TextureUtil.bindTexture(this.getGlTextureId());
-        Iterator iterator = this.listAnimatedSprites.iterator();
-
-        while (iterator.hasNext())
+        if (Config.isShaders())
         {
-            TextureAtlasSprite textureatlassprite = (TextureAtlasSprite)iterator.next();
-            textureatlassprite.updateAnimation();
+            ShadersTex.updatingTex = this.getMultiTexID();
+        }
+
+        boolean hasNormal = false;
+        boolean hasSpecular = false;
+        TextureUtil.bindTexture(this.getGlTextureId());
+        Iterator var1 = this.listAnimatedSprites.iterator();
+
+        while (var1.hasNext())
+        {
+            TextureAtlasSprite i$ = (TextureAtlasSprite)var1.next();
+
+            if (this.textureType == 0)
+            {
+                if (!this.isTerrainAnimationActive(i$))
+                {
+                    continue;
+                }
+            }
+            else if (this.textureType == 1 && !this.isItemAnimationActive(i$))
+            {
+                continue;
+            }
+
+            i$.updateAnimation();
+
+            if (i$.spriteNormal != null)
+            {
+                hasNormal = true;
+            }
+
+            if (i$.spriteSpecular != null)
+            {
+                hasSpecular = true;
+            }
+        }
+
+        if (Config.isShaders())
+        {
+            TextureAtlasSprite textureatlassprite;
+            Iterator i$1;
+
+            if (hasNormal)
+            {
+                TextureUtil.bindTexture(this.getMultiTexID().norm);
+                i$1 = this.listAnimatedSprites.iterator();
+
+                while (i$1.hasNext())
+                {
+                    textureatlassprite = (TextureAtlasSprite)i$1.next();
+
+                    if (textureatlassprite.spriteNormal != null && this.isTerrainAnimationActive(textureatlassprite))
+                    {
+                        if (textureatlassprite == TextureUtils.iconClock || textureatlassprite == TextureUtils.iconCompass)
+                        {
+                            textureatlassprite.spriteNormal.frameCounter = textureatlassprite.frameCounter;
+                        }
+
+                        textureatlassprite.spriteNormal.updateAnimation();
+                    }
+                }
+            }
+
+            if (hasSpecular)
+            {
+                TextureUtil.bindTexture(this.getMultiTexID().spec);
+                i$1 = this.listAnimatedSprites.iterator();
+
+                while (i$1.hasNext())
+                {
+                    textureatlassprite = (TextureAtlasSprite)i$1.next();
+
+                    if (textureatlassprite.spriteSpecular != null && this.isTerrainAnimationActive(textureatlassprite))
+                    {
+                        if (textureatlassprite == TextureUtils.iconClock || textureatlassprite == TextureUtils.iconCompass)
+                        {
+                            textureatlassprite.spriteNormal.frameCounter = textureatlassprite.frameCounter;
+                        }
+
+                        textureatlassprite.spriteSpecular.updateAnimation();
+                    }
+                }
+            }
+
+            if (hasNormal || hasSpecular)
+            {
+                TextureUtil.bindTexture(this.getGlTextureId());
+            }
+        }
+
+        if (Config.isShaders())
+        {
+            ShadersTex.updatingTex = null;
         }
     }
 
-    public IIcon registerIcon(String p_94245_1_)
+    private boolean isItemAnimationActive(TextureAtlasSprite ts)
     {
-        if (p_94245_1_ == null)
+        return ts == TextureUtils.iconClock || ts == TextureUtils.iconCompass || Config.isAnimatedItems();
+    }
+
+    public IIcon registerIcon(String par1Str)
+    {
+        if (par1Str == null)
         {
             throw new IllegalArgumentException("Name cannot be null!");
         }
-        else if (p_94245_1_.indexOf(92) == -1) // Disable backslashes (\) in texture asset paths.
+        else if (par1Str.indexOf(92) != -1 && !this.isAbsoluteLocationPath(par1Str))
         {
-            Object object = (TextureAtlasSprite)this.mapRegisteredSprites.get(p_94245_1_);
+            throw new IllegalArgumentException("Name cannot contain slashes!");
+        }
+        else
+        {
+            TextureAtlasSprite var2 = this.mapRegisteredSprites.get(par1Str);
 
-            if (object == null)
+            if (var2 == null)
             {
                 if (this.textureType == 1)
                 {
-                    if ("clock".equals(p_94245_1_))
+                    if ("clock".equals(par1Str))
                     {
-                        object = new TextureClock(p_94245_1_);
+                        var2 = new TextureClock(par1Str);
                     }
-                    else if ("compass".equals(p_94245_1_))
+                    else if ("compass".equals(par1Str))
                     {
-                        object = new TextureCompass(p_94245_1_);
+                        var2 = new TextureCompass(par1Str);
                     }
                     else
                     {
-                        object = new TextureAtlasSprite(p_94245_1_);
+                        var2 = new TextureAtlasSprite(par1Str);
                     }
                 }
                 else
                 {
-                    object = new TextureAtlasSprite(p_94245_1_);
+                    var2 = new TextureAtlasSprite(par1Str);
                 }
 
-                this.mapRegisteredSprites.put(p_94245_1_, object);
+                this.mapRegisteredSprites.put(par1Str, var2);
+
+                if (var2 instanceof TextureAtlasSprite)
+                {
+                    TextureAtlasSprite tas = (TextureAtlasSprite)var2;
+
+                    if (tas.getIndexInMap() < 0)
+                    {
+                        tas.setIndexInMap(this.counterIndexInMap++);
+                    }
+                }
             }
 
-            return (IIcon)object;
-        }
-        else
-        {
-            throw new IllegalArgumentException("Name cannot contain slashes!");
+            return (IIcon)var2;
         }
     }
 
@@ -431,36 +608,227 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
         this.anisotropicFiltering = p_147632_1_;
     }
 
-    //===================================================================================================
-    //                                           Forge Start
-    //===================================================================================================
-    /**
-     * Grabs the registered entry for the specified name, returning null if there was not a entry.
-     * Opposed to registerIcon, this will not instantiate the entry, useful to test if a mapping exists.
-     *
-     * @param name The name of the entry to find
-     * @return The registered entry, null if nothing was registered.
-     */
     public TextureAtlasSprite getTextureExtry(String name)
     {
-        return (TextureAtlasSprite)mapRegisteredSprites.get(name);
+        return (TextureAtlasSprite)this.mapRegisteredSprites.get(name);
     }
 
-    /**
-     * Adds a texture registry entry to this map for the specified name if one does not already exist.
-     * Returns false if the map already contains a entry for the specified name.
-     *
-     * @param name Entry name
-     * @param entry Entry instance
-     * @return True if the entry was added to the map, false otherwise.
-     */
     public boolean setTextureEntry(String name, TextureAtlasSprite entry)
     {
-        if (!mapRegisteredSprites.containsKey(name))
+        if (!this.mapRegisteredSprites.containsKey(name))
         {
-            mapRegisteredSprites.put(name, entry);
+            this.mapRegisteredSprites.put(name, entry);
+
+            if (entry.getIndexInMap() < 0)
+            {
+                entry.setIndexInMap(this.counterIndexInMap++);
+            }
+
             return true;
         }
-        return false;
+        else
+        {
+            return false;
+        }
+    }
+
+    public boolean setTextureEntry(TextureAtlasSprite entry)
+    {
+        return this.setTextureEntry(entry.getIconName(), entry);
+    }
+
+    public String getBasePath()
+    {
+        return this.basePath;
+    }
+
+    public int getMipmapLevels()
+    {
+        return this.mipmapLevels;
+    }
+
+    private boolean isAbsoluteLocation(ResourceLocation loc)
+    {
+        String path = loc.getResourcePath();
+        return this.isAbsoluteLocationPath(path);
+    }
+
+    private boolean isAbsoluteLocationPath(String resPath)
+    {
+        String path = resPath.toLowerCase();
+        return path.startsWith("mcpatcher/") || path.startsWith("optifine/");
+    }
+
+    public TextureAtlasSprite getIconSafe(String name)
+    {
+        return (TextureAtlasSprite)this.mapRegisteredSprites.get(name);
+    }
+
+    private int getStandardTileSize(Collection icons)
+    {
+        int[] sizeCounts = new int[16];
+        Iterator mostUsedPo2 = icons.iterator();
+        int value;
+        int count;
+
+        while (mostUsedPo2.hasNext())
+        {
+            TextureAtlasSprite mostUsedCount = (TextureAtlasSprite)mostUsedPo2.next();
+
+            if (mostUsedCount != null)
+            {
+                value = TextureUtils.getPowerOfTwo(mostUsedCount.getWidth());
+                count = TextureUtils.getPowerOfTwo(mostUsedCount.getHeight());
+                int po2 = Math.max(value, count);
+
+                if (po2 < sizeCounts.length)
+                {
+                    ++sizeCounts[po2];
+                }
+            }
+        }
+
+        int var8 = 4;
+        int var9 = 0;
+
+        for (value = 0; value < sizeCounts.length; ++value)
+        {
+            count = sizeCounts[value];
+
+            if (count > var9)
+            {
+                var8 = value;
+                var9 = count;
+            }
+        }
+
+        if (var8 < 4)
+        {
+            var8 = 4;
+        }
+
+        value = TextureUtils.twoToPower(var8);
+        return value;
+    }
+
+    private void updateIconGrid(int sheetWidth, int sheetHeight)
+    {
+        this.iconGridCountX = -1;
+        this.iconGridCountY = -1;
+        this.iconGrid = null;
+
+        if (this.iconGridSize > 0)
+        {
+            this.iconGridCountX = sheetWidth / this.iconGridSize;
+            this.iconGridCountY = sheetHeight / this.iconGridSize;
+            this.iconGrid = new TextureAtlasSprite[this.iconGridCountX * this.iconGridCountY];
+            this.iconGridSizeU = 1.0D / (double)this.iconGridCountX;
+            this.iconGridSizeV = 1.0D / (double)this.iconGridCountY;
+            Iterator it = this.mapUploadedSprites.values().iterator();
+
+            while (it.hasNext())
+            {
+                TextureAtlasSprite ts = (TextureAtlasSprite)it.next();
+                double deltaU = 0.5D / (double)sheetWidth;
+                double deltaV = 0.5D / (double)sheetHeight;
+                double uMin = (double)Math.min(ts.getMinU(), ts.getMaxU()) + deltaU;
+                double vMin = (double)Math.min(ts.getMinV(), ts.getMaxV()) + deltaV;
+                double uMax = (double)Math.max(ts.getMinU(), ts.getMaxU()) - deltaU;
+                double vMax = (double)Math.max(ts.getMinV(), ts.getMaxV()) - deltaV;
+                int iuMin = (int)(uMin / this.iconGridSizeU);
+                int ivMin = (int)(vMin / this.iconGridSizeV);
+                int iuMax = (int)(uMax / this.iconGridSizeU);
+                int ivMax = (int)(vMax / this.iconGridSizeV);
+
+                for (int iu = iuMin; iu <= iuMax; ++iu)
+                {
+                    if (iu >= 0 && iu < this.iconGridCountX)
+                    {
+                        for (int iv = ivMin; iv <= ivMax; ++iv)
+                        {
+                            if (iv >= 0 && iv < this.iconGridCountX)
+                            {
+                                int index = iv * this.iconGridCountX + iu;
+                                this.iconGrid[index] = ts;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public TextureAtlasSprite getIconByUV(double u, double v)
+    {
+        if (this.iconGrid == null)
+        {
+            return null;
+        }
+        else
+        {
+            int iu = (int)(u / this.iconGridSizeU);
+            int iv = (int)(v / this.iconGridSizeV);
+            int index = iv * this.iconGridCountX + iu;
+            return index >= 0 && index <= this.iconGrid.length ? this.iconGrid[index] : null;
+        }
+    }
+
+    public TextureAtlasSprite getMissingSprite()
+    {
+        return this.missingImage;
+    }
+
+    public int getMaxTextureIndex()
+    {
+        return this.mapRegisteredSprites.size();
+    }
+
+    private boolean isTerrainAnimationActive(TextureAtlasSprite ts)
+    {
+        return ts != TextureUtils.iconWaterStill && ts != TextureUtils.iconWaterFlow ? (ts != TextureUtils.iconLavaStill && ts != TextureUtils.iconLavaFlow ? (ts != TextureUtils.iconFireLayer0 && ts != TextureUtils.iconFireLayer1 ? (ts == TextureUtils.iconPortal ? Config.isAnimatedPortal() : (ts != TextureUtils.iconClock && ts != TextureUtils.iconCompass ? Config.isAnimatedTerrain() : true)) : Config.isAnimatedFire()) : Config.isAnimatedLava()) : Config.isAnimatedWater();
+    }
+
+    public int getCountRegisteredSprites()
+    {
+        return this.counterIndexInMap;
+    }
+
+    public void loadTextureSafe(IResourceManager rm)
+    {
+        try
+        {
+            this.loadTexture(rm);
+        }
+        catch (IOException var3)
+        {
+            var3.printStackTrace();
+        }
+    }
+
+    private BufferedImage makeDebugImage(int sheetWidth, int sheetHeight)
+    {
+        BufferedImage image = new BufferedImage(sheetWidth, sheetHeight, 2);
+        Graphics2D g = image.createGraphics();
+        g.setPaint(new Color(255, 255, 0));
+        g.fillRect(0, 0, image.getWidth(), image.getHeight());
+        return image;
+    }
+
+    private void addDebugSprite(TextureAtlasSprite ts, BufferedImage image)
+    {
+        int[] data = ts.func_147965_a(0)[0];
+        image.setRGB(ts.getOriginX(), ts.getOriginY(), ts.getIconWidth(), ts.getIconHeight(), data, 0, ts.getIconWidth());
+    }
+
+    private void writeDebugImage(BufferedImage image, String pngPath)
+    {
+        try
+        {
+            ImageIO.write(image, "png", new File(Config.getMinecraft().mcDataDir, pngPath));
+        }
+        catch (Exception var4)
+        {
+            var4.printStackTrace();
+        }
     }
 }

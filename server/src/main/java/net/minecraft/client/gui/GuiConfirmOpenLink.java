@@ -7,7 +7,9 @@ import net.minecraft.client.resources.I18n;
 @SideOnly(Side.CLIENT)
 public class GuiConfirmOpenLink extends GuiYesNo
 {
+    /** Text to warn players from opening unsafe links. */
     private final String openLinkWarning;
+    /** Label for the Copy to Clipboard button. */
     private final String copyLinkButtonText;
     private final String field_146361_t;
     private boolean field_146360_u = true;
@@ -23,6 +25,9 @@ public class GuiConfirmOpenLink extends GuiYesNo
         this.field_146361_t = p_i1084_2_;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         this.buttonList.add(new GuiButton(0, this.width / 3 - 83 + 0, this.height / 6 + 96, 100, 20, this.confirmButtonText));
@@ -40,11 +45,17 @@ public class GuiConfirmOpenLink extends GuiYesNo
         this.parentScreen.confirmClicked(p_146284_1_.id == 0, this.field_146357_i);
     }
 
+    /**
+     * Copies the link to the system clipboard.
+     */
     public void copyLinkToClipboard()
     {
         setClipboardString(this.field_146361_t);
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         super.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);

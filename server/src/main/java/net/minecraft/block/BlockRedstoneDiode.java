@@ -1,5 +1,6 @@
 package net.minecraft.block;
 
+import com.bloodstorm.core.api.event.EventFactory;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Random;
@@ -14,8 +15,6 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
-import org.bukkit.craftbukkit.event.CraftEventFactory; // CraftBukkit
 
 
 public abstract class BlockRedstoneDiode extends BlockDirectional
@@ -60,23 +59,19 @@ public abstract class BlockRedstoneDiode extends BlockDirectional
 
             if (this.isRepeaterPowered && !flag)
             {
-                // CraftBukkit start
-                if (CraftEventFactory.callRedstoneChange(p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, 15, 0).getNewCurrent() != 0)
-                {
+                if (EventFactory.postRedstoneEvent(p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, 15, 0).getNewValue() != 0) {
                     return;
                 }
 
-                // CraftBukkit end
                 p_149674_1_.setBlock(p_149674_2_, p_149674_3_, p_149674_4_, this.getBlockUnpowered(), l, 2);
             }
             else if (!this.isRepeaterPowered)
             {
-                // CraftBukkit start
-                if (CraftEventFactory.callRedstoneChange(p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, 0, 15).getNewCurrent() != 15)
+                if (EventFactory.postRedstoneEvent(p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, 0, 15).getNewValue() != 15)
                 {
                     return;
                 }
-                // CraftBukkit end
+
                 p_149674_1_.setBlock(p_149674_2_, p_149674_3_, p_149674_4_, this.getBlockPowered(), l, 2);
                 if (!flag)
                 {

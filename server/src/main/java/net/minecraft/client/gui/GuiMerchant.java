@@ -37,6 +37,9 @@ public class GuiMerchant extends GuiContainer {
         this.field_147040_A = p_i1096_4_ != null && p_i1096_4_.length() >= 1 ? p_i1096_4_ : I18n.format("entity.Villager.name", new Object[0]);
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         super.initGui();
@@ -48,12 +51,18 @@ public class GuiMerchant extends GuiContainer {
         this.field_147042_y.enabled = false;
     }
 
+    /**
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
+     */
     protected void drawGuiContainerForegroundLayer(int p_146979_1_, int p_146979_2_)
     {
         this.fontRendererObj.drawString(this.field_147040_A, this.xSize / 2 - this.fontRendererObj.getStringWidth(this.field_147040_A) / 2, 6, 4210752);
         this.fontRendererObj.drawString(I18n.format("container.inventory", new Object[0]), 8, this.ySize - 96 + 2, 4210752);
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         super.updateScreen();
@@ -123,6 +132,9 @@ public class GuiMerchant extends GuiContainer {
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         super.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
@@ -195,6 +207,9 @@ public class GuiMerchant extends GuiContainer {
                 this.field_146157_o = p_i1095_4_;
             }
 
+            /**
+             * Draws this button to the screen.
+             */
             public void drawButton(Minecraft p_146112_1_, int p_146112_2_, int p_146112_3_)
             {
                 if (this.visible)

@@ -75,6 +75,9 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter
         }
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         this.mc.getNetHandler().addToSendQueue(new C16PacketClientStatus(C16PacketClientStatus.EnumState.REQUEST_STATS));
@@ -104,6 +107,9 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter
         }
     }
 
+    /**
+     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
+     */
     protected void keyTyped(char p_73869_1_, int p_73869_2_)
     {
         if (p_73869_2_ == this.mc.gameSettings.keyBindInventory.getKeyCode())
@@ -117,6 +123,9 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         if (this.field_146558_F)
@@ -224,6 +233,9 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter
         }
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         if (!this.field_146558_F)
@@ -588,6 +600,9 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter
         RenderHelper.disableStandardItemLighting();
     }
 
+    /**
+     * Returns true if this GUI should pause the game when it is displayed in single-player
+     */
     public boolean doesGuiPauseGame()
     {
         return !this.field_146558_F;

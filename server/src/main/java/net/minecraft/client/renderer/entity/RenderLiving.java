@@ -1,140 +1,171 @@
 package net.minecraft.client.renderer.entity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityHanging;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.optifine.Config;
 import org.lwjgl.opengl.GL11;
+import shadersmod.client.Shaders;
 
-@SideOnly(Side.CLIENT)
 public abstract class RenderLiving extends RendererLivingEntity
 {
-    private static final String __OBFID = "CL_00001015";
 
-    public RenderLiving(ModelBase p_i1262_1_, float p_i1262_2_)
+    public RenderLiving(ModelBase par1ModelBase, float par2)
     {
-        super(p_i1262_1_, p_i1262_2_);
+        super(par1ModelBase, par2);
     }
 
-    protected boolean func_110813_b(EntityLiving p_110813_1_)
+    protected boolean func_110813_b(EntityLiving par1EntityLivingBase)
     {
-        return super.func_110813_b(p_110813_1_) && (p_110813_1_.getAlwaysRenderNameTagForRender() || p_110813_1_.hasCustomNameTag() && p_110813_1_ == this.renderManager.field_147941_i);
+        return super.func_110813_b(par1EntityLivingBase) && (par1EntityLivingBase.getAlwaysRenderNameTagForRender() || par1EntityLivingBase.hasCustomNameTag() && par1EntityLivingBase == this.renderManager.field_147941_i);
     }
 
-    public void doRender(EntityLiving p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
+    public void doRender(EntityLiving par1Entity, double par2, double par4, double par6, float par8, float par9)
     {
-        super.doRender((EntityLivingBase)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
-        this.func_110827_b(p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+        super.doRender((EntityLivingBase)par1Entity, par2, par4, par6, par8, par9);
+        this.func_110827_b(par1Entity, par2, par4, par6, par8, par9);
     }
 
-    private double func_110828_a(double p_110828_1_, double p_110828_3_, double p_110828_5_)
+    private double func_110828_a(double par1, double par3, double par5)
     {
-        return p_110828_1_ + (p_110828_3_ - p_110828_1_) * p_110828_5_;
+        return par1 + (par3 - par1) * par5;
     }
 
-    protected void func_110827_b(EntityLiving p_110827_1_, double p_110827_2_, double p_110827_4_, double p_110827_6_, float p_110827_8_, float p_110827_9_)
+    protected void func_110827_b(EntityLiving par1EntityLiving, double par2, double par4, double par6, float par8, float par9)
     {
-        Entity entity = p_110827_1_.getLeashedToEntity();
-
-        if (entity != null)
+        if (!Config.isShaders() || !Shaders.isShadowPass)
         {
-            p_110827_4_ -= (1.6D - (double)p_110827_1_.height) * 0.5D;
-            Tessellator tessellator = Tessellator.instance;
-            double d3 = this.func_110828_a((double)entity.prevRotationYaw, (double)entity.rotationYaw, (double)(p_110827_9_ * 0.5F)) * 0.01745329238474369D;
-            double d4 = this.func_110828_a((double)entity.prevRotationPitch, (double)entity.rotationPitch, (double)(p_110827_9_ * 0.5F)) * 0.01745329238474369D;
-            double d5 = Math.cos(d3);
-            double d6 = Math.sin(d3);
-            double d7 = Math.sin(d4);
+            Entity var10 = par1EntityLiving.getLeashedToEntity();
 
-            if (entity instanceof EntityHanging)
+            if (var10 != null)
             {
-                d5 = 0.0D;
-                d6 = 0.0D;
-                d7 = -1.0D;
+                par4 -= (1.6D - (double)par1EntityLiving.height) * 0.5D;
+                Tessellator var11 = Tessellator.instance;
+                double var12 = this.func_110828_a((double)var10.prevRotationYaw, (double)var10.rotationYaw, (double)(par9 * 0.5F)) * 0.01745329238474369D;
+                double var14 = this.func_110828_a((double)var10.prevRotationPitch, (double)var10.rotationPitch, (double)(par9 * 0.5F)) * 0.01745329238474369D;
+                double var16 = Math.cos(var12);
+                double var18 = Math.sin(var12);
+                double var20 = Math.sin(var14);
+
+                if (var10 instanceof EntityHanging)
+                {
+                    var16 = 0.0D;
+                    var18 = 0.0D;
+                    var20 = -1.0D;
+                }
+
+                double var22 = Math.cos(var14);
+                double var24 = this.func_110828_a(var10.prevPosX, var10.posX, (double)par9) - var16 * 0.7D - var18 * 0.5D * var22;
+                double var26 = this.func_110828_a(var10.prevPosY + (double)var10.getEyeHeight() * 0.7D, var10.posY + (double)var10.getEyeHeight() * 0.7D, (double)par9) - var20 * 0.5D - 0.25D;
+                double var28 = this.func_110828_a(var10.prevPosZ, var10.posZ, (double)par9) - var18 * 0.7D + var16 * 0.5D * var22;
+                double var30 = this.func_110828_a((double)par1EntityLiving.prevRenderYawOffset, (double)par1EntityLiving.renderYawOffset, (double)par9) * 0.01745329238474369D + (Math.PI / 2D);
+                var16 = Math.cos(var30) * (double)par1EntityLiving.width * 0.4D;
+                var18 = Math.sin(var30) * (double)par1EntityLiving.width * 0.4D;
+                double var32 = this.func_110828_a(par1EntityLiving.prevPosX, par1EntityLiving.posX, (double)par9) + var16;
+                double var34 = this.func_110828_a(par1EntityLiving.prevPosY, par1EntityLiving.posY, (double)par9);
+                double var36 = this.func_110828_a(par1EntityLiving.prevPosZ, par1EntityLiving.posZ, (double)par9) + var18;
+                par2 += var16;
+                par6 += var18;
+                double var38 = (double)((float)(var24 - var32));
+                double var40 = (double)((float)(var26 - var34));
+                double var42 = (double)((float)(var28 - var36));
+                GL11.glDisable(GL11.GL_TEXTURE_2D);
+                GL11.glDisable(GL11.GL_LIGHTING);
+                GL11.glDisable(GL11.GL_CULL_FACE);
+
+                if (Config.isShaders())
+                {
+                    Shaders.beginLeash();
+                }
+
+                boolean var44 = true;
+                double var45 = 0.025D;
+                var11.startDrawing(5);
+                int var47;
+                float var48;
+
+                for (var47 = 0; var47 <= 24; ++var47)
+                {
+                    if (var47 % 2 == 0)
+                    {
+                        var11.setColorRGBA_F(0.5F, 0.4F, 0.3F, 1.0F);
+                    }
+                    else
+                    {
+                        var11.setColorRGBA_F(0.35F, 0.28F, 0.21000001F, 1.0F);
+                    }
+
+                    var48 = (float)var47 / 24.0F;
+                    var11.addVertex(par2 + var38 * (double)var48 + 0.0D, par4 + var40 * (double)(var48 * var48 + var48) * 0.5D + (double)((24.0F - (float)var47) / 18.0F + 0.125F), par6 + var42 * (double)var48);
+                    var11.addVertex(par2 + var38 * (double)var48 + 0.025D, par4 + var40 * (double)(var48 * var48 + var48) * 0.5D + (double)((24.0F - (float)var47) / 18.0F + 0.125F) + 0.025D, par6 + var42 * (double)var48);
+                }
+
+                var11.draw();
+                var11.startDrawing(5);
+
+                for (var47 = 0; var47 <= 24; ++var47)
+                {
+                    if (var47 % 2 == 0)
+                    {
+                        var11.setColorRGBA_F(0.5F, 0.4F, 0.3F, 1.0F);
+                    }
+                    else
+                    {
+                        var11.setColorRGBA_F(0.35F, 0.28F, 0.21000001F, 1.0F);
+                    }
+
+                    var48 = (float)var47 / 24.0F;
+                    var11.addVertex(par2 + var38 * (double)var48 + 0.0D, par4 + var40 * (double)(var48 * var48 + var48) * 0.5D + (double)((24.0F - (float)var47) / 18.0F + 0.125F) + 0.025D, par6 + var42 * (double)var48);
+                    var11.addVertex(par2 + var38 * (double)var48 + 0.025D, par4 + var40 * (double)(var48 * var48 + var48) * 0.5D + (double)((24.0F - (float)var47) / 18.0F + 0.125F), par6 + var42 * (double)var48 + 0.025D);
+                }
+
+                var11.draw();
+
+                if (Config.isShaders())
+                {
+                    Shaders.endLeash();
+                }
+
+                GL11.glEnable(GL11.GL_LIGHTING);
+                GL11.glEnable(GL11.GL_TEXTURE_2D);
+                GL11.glEnable(GL11.GL_CULL_FACE);
             }
-
-            double d8 = Math.cos(d4);
-            double d9 = this.func_110828_a(entity.prevPosX, entity.posX, (double)p_110827_9_) - d5 * 0.7D - d6 * 0.5D * d8;
-            double d10 = this.func_110828_a(entity.prevPosY + (double)entity.getEyeHeight() * 0.7D, entity.posY + (double)entity.getEyeHeight() * 0.7D, (double)p_110827_9_) - d7 * 0.5D - 0.25D;
-            double d11 = this.func_110828_a(entity.prevPosZ, entity.posZ, (double)p_110827_9_) - d6 * 0.7D + d5 * 0.5D * d8;
-            double d12 = this.func_110828_a((double)p_110827_1_.prevRenderYawOffset, (double)p_110827_1_.renderYawOffset, (double)p_110827_9_) * 0.01745329238474369D + (Math.PI / 2D);
-            d5 = Math.cos(d12) * (double)p_110827_1_.width * 0.4D;
-            d6 = Math.sin(d12) * (double)p_110827_1_.width * 0.4D;
-            double d13 = this.func_110828_a(p_110827_1_.prevPosX, p_110827_1_.posX, (double)p_110827_9_) + d5;
-            double d14 = this.func_110828_a(p_110827_1_.prevPosY, p_110827_1_.posY, (double)p_110827_9_);
-            double d15 = this.func_110828_a(p_110827_1_.prevPosZ, p_110827_1_.posZ, (double)p_110827_9_) + d6;
-            p_110827_2_ += d5;
-            p_110827_6_ += d6;
-            double d16 = (double)((float)(d9 - d13));
-            double d17 = (double)((float)(d10 - d14));
-            double d18 = (double)((float)(d11 - d15));
-            GL11.glDisable(GL11.GL_TEXTURE_2D);
-            GL11.glDisable(GL11.GL_LIGHTING);
-            GL11.glDisable(GL11.GL_CULL_FACE);
-            boolean flag = true;
-            double d19 = 0.025D;
-            tessellator.startDrawing(5);
-            int i;
-            float f2;
-
-            for (i = 0; i <= 24; ++i)
-            {
-                if (i % 2 == 0)
-                {
-                    tessellator.setColorRGBA_F(0.5F, 0.4F, 0.3F, 1.0F);
-                }
-                else
-                {
-                    tessellator.setColorRGBA_F(0.35F, 0.28F, 0.21000001F, 1.0F);
-                }
-
-                f2 = (float)i / 24.0F;
-                tessellator.addVertex(p_110827_2_ + d16 * (double)f2 + 0.0D, p_110827_4_ + d17 * (double)(f2 * f2 + f2) * 0.5D + (double)((24.0F - (float)i) / 18.0F + 0.125F), p_110827_6_ + d18 * (double)f2);
-                tessellator.addVertex(p_110827_2_ + d16 * (double)f2 + 0.025D, p_110827_4_ + d17 * (double)(f2 * f2 + f2) * 0.5D + (double)((24.0F - (float)i) / 18.0F + 0.125F) + 0.025D, p_110827_6_ + d18 * (double)f2);
-            }
-
-            tessellator.draw();
-            tessellator.startDrawing(5);
-
-            for (i = 0; i <= 24; ++i)
-            {
-                if (i % 2 == 0)
-                {
-                    tessellator.setColorRGBA_F(0.5F, 0.4F, 0.3F, 1.0F);
-                }
-                else
-                {
-                    tessellator.setColorRGBA_F(0.35F, 0.28F, 0.21000001F, 1.0F);
-                }
-
-                f2 = (float)i / 24.0F;
-                tessellator.addVertex(p_110827_2_ + d16 * (double)f2 + 0.0D, p_110827_4_ + d17 * (double)(f2 * f2 + f2) * 0.5D + (double)((24.0F - (float)i) / 18.0F + 0.125F) + 0.025D, p_110827_6_ + d18 * (double)f2);
-                tessellator.addVertex(p_110827_2_ + d16 * (double)f2 + 0.025D, p_110827_4_ + d17 * (double)(f2 * f2 + f2) * 0.5D + (double)((24.0F - (float)i) / 18.0F + 0.125F), p_110827_6_ + d18 * (double)f2 + 0.025D);
-            }
-
-            tessellator.draw();
-            GL11.glEnable(GL11.GL_LIGHTING);
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
-            GL11.glEnable(GL11.GL_CULL_FACE);
         }
     }
 
-    protected boolean func_110813_b(EntityLivingBase p_110813_1_)
+    protected boolean func_110813_b(EntityLivingBase par1EntityLivingBase)
     {
-        return this.func_110813_b((EntityLiving)p_110813_1_);
+        return this.func_110813_b((EntityLiving)par1EntityLivingBase);
     }
 
-    public void doRender(EntityLivingBase p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
+    public void doRender(EntityLivingBase par1Entity, double par2, double par4, double par6, float par8, float par9)
     {
-        this.doRender((EntityLiving)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+        this.doRender((EntityLiving)par1Entity, par2, par4, par6, par8, par9);
     }
 
-    public void doRender(Entity p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
+    public void doRender(Entity par1Entity, double par2, double par4, double par6, float par8, float par9)
     {
-        this.doRender((EntityLiving)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+        this.doRender((EntityLiving)par1Entity, par2, par4, par6, par8, par9);
     }
 }

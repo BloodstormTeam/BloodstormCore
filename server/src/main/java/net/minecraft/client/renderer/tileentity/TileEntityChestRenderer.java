@@ -1,7 +1,5 @@
 package net.minecraft.client.renderer.tileentity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Calendar;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
@@ -13,7 +11,6 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-@SideOnly(Side.CLIENT)
 public class TileEntityChestRenderer extends TileEntitySpecialRenderer
 {
     private static final ResourceLocation field_147507_b = new ResourceLocation("textures/entity/chest/trapped_double.png");
@@ -29,9 +26,9 @@ public class TileEntityChestRenderer extends TileEntitySpecialRenderer
 
     public TileEntityChestRenderer()
     {
-        Calendar calendar = Calendar.getInstance();
+        Calendar var1 = Calendar.getInstance();
 
-        if (calendar.get(2) + 1 == 12 && calendar.get(5) >= 24 && calendar.get(5) <= 26)
+        if (var1.get(2) + 1 == 12 && var1.get(5) >= 24 && var1.get(5) <= 26)
         {
             this.field_147509_j = true;
         }
@@ -39,25 +36,21 @@ public class TileEntityChestRenderer extends TileEntitySpecialRenderer
 
     public void renderTileEntityAt(TileEntityChest p_147500_1_, double p_147500_2_, double p_147500_4_, double p_147500_6_, float p_147500_8_)
     {
-        int i;
+        int var9;
 
         if (!p_147500_1_.hasWorldObj())
         {
-            i = 0;
+            var9 = 0;
         }
         else
         {
-            Block block = p_147500_1_.getBlockType();
-            i = p_147500_1_.getBlockMetadata();
+            Block var10 = p_147500_1_.getBlockType();
+            var9 = p_147500_1_.getBlockMetadata();
 
-            if (block instanceof BlockChest && i == 0)
+            if (var10 instanceof BlockChest && var9 == 0)
             {
-                try
-                {
-                ((BlockChest)block).func_149954_e(p_147500_1_.getWorldObj(), p_147500_1_.xCoord, p_147500_1_.yCoord, p_147500_1_.zCoord);
-                }
-                catch (ClassCastException ignored) {}
-                i = p_147500_1_.getBlockMetadata();
+                ((BlockChest)var10).func_149954_e(p_147500_1_.getWorldObj(), p_147500_1_.xCoord, p_147500_1_.yCoord, p_147500_1_.zCoord);
+                var9 = p_147500_1_.getBlockMetadata();
             }
 
             p_147500_1_.checkForAdjacentChests();
@@ -65,11 +58,11 @@ public class TileEntityChestRenderer extends TileEntitySpecialRenderer
 
         if (p_147500_1_.adjacentChestZNeg == null && p_147500_1_.adjacentChestXNeg == null)
         {
-            ModelChest modelchest;
+            ModelChest var14;
 
             if (p_147500_1_.adjacentChestXPos == null && p_147500_1_.adjacentChestZPos == null)
             {
-                modelchest = this.field_147510_h;
+                var14 = this.field_147510_h;
 
                 if (p_147500_1_.func_145980_j() == 1)
                 {
@@ -86,7 +79,7 @@ public class TileEntityChestRenderer extends TileEntitySpecialRenderer
             }
             else
             {
-                modelchest = this.field_147511_i;
+                var14 = this.field_147511_i;
 
                 if (p_147500_1_.func_145980_j() == 1)
                 {
@@ -108,67 +101,67 @@ public class TileEntityChestRenderer extends TileEntitySpecialRenderer
             GL11.glTranslatef((float)p_147500_2_, (float)p_147500_4_ + 1.0F, (float)p_147500_6_ + 1.0F);
             GL11.glScalef(1.0F, -1.0F, -1.0F);
             GL11.glTranslatef(0.5F, 0.5F, 0.5F);
-            short short1 = 0;
+            short var11 = 0;
 
-            if (i == 2)
+            if (var9 == 2)
             {
-                short1 = 180;
+                var11 = 180;
             }
 
-            if (i == 3)
+            if (var9 == 3)
             {
-                short1 = 0;
+                var11 = 0;
             }
 
-            if (i == 4)
+            if (var9 == 4)
             {
-                short1 = 90;
+                var11 = 90;
             }
 
-            if (i == 5)
+            if (var9 == 5)
             {
-                short1 = -90;
+                var11 = -90;
             }
 
-            if (i == 2 && p_147500_1_.adjacentChestXPos != null)
+            if (var9 == 2 && p_147500_1_.adjacentChestXPos != null)
             {
                 GL11.glTranslatef(1.0F, 0.0F, 0.0F);
             }
 
-            if (i == 5 && p_147500_1_.adjacentChestZPos != null)
+            if (var9 == 5 && p_147500_1_.adjacentChestZPos != null)
             {
                 GL11.glTranslatef(0.0F, 0.0F, -1.0F);
             }
 
-            GL11.glRotatef((float)short1, 0.0F, 1.0F, 0.0F);
+            GL11.glRotatef((float)var11, 0.0F, 1.0F, 0.0F);
             GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
-            float f1 = p_147500_1_.prevLidAngle + (p_147500_1_.lidAngle - p_147500_1_.prevLidAngle) * p_147500_8_;
-            float f2;
+            float var12 = p_147500_1_.prevLidAngle + (p_147500_1_.lidAngle - p_147500_1_.prevLidAngle) * p_147500_8_;
+            float var13;
 
             if (p_147500_1_.adjacentChestZNeg != null)
             {
-                f2 = p_147500_1_.adjacentChestZNeg.prevLidAngle + (p_147500_1_.adjacentChestZNeg.lidAngle - p_147500_1_.adjacentChestZNeg.prevLidAngle) * p_147500_8_;
+                var13 = p_147500_1_.adjacentChestZNeg.prevLidAngle + (p_147500_1_.adjacentChestZNeg.lidAngle - p_147500_1_.adjacentChestZNeg.prevLidAngle) * p_147500_8_;
 
-                if (f2 > f1)
+                if (var13 > var12)
                 {
-                    f1 = f2;
+                    var12 = var13;
                 }
             }
 
             if (p_147500_1_.adjacentChestXNeg != null)
             {
-                f2 = p_147500_1_.adjacentChestXNeg.prevLidAngle + (p_147500_1_.adjacentChestXNeg.lidAngle - p_147500_1_.adjacentChestXNeg.prevLidAngle) * p_147500_8_;
+                var13 = p_147500_1_.adjacentChestXNeg.prevLidAngle + (p_147500_1_.adjacentChestXNeg.lidAngle - p_147500_1_.adjacentChestXNeg.prevLidAngle) * p_147500_8_;
 
-                if (f2 > f1)
+                if (var13 > var12)
                 {
-                    f1 = f2;
+                    var12 = var13;
                 }
             }
 
-            f1 = 1.0F - f1;
-            f1 = 1.0F - f1 * f1 * f1;
-            modelchest.chestLid.rotateAngleX = -(f1 * (float)Math.PI / 2.0F);
-            modelchest.renderAll();
+            var12 = 1.0F - var12;
+            var12 = 1.0F - var12 * var12 * var12;
+            var14.chestLid.rotateAngleX = -(var12 * (float)Math.PI / 2.0F);
+            var14.renderAll();
             GL11.glDisable(GL12.GL_RESCALE_NORMAL);
             GL11.glPopMatrix();
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);

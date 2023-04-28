@@ -132,7 +132,9 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
                 nbttagcompound1 = nbttagcompound.getCompoundTag("Data");
                 worldInfo = new WorldInfo(nbttagcompound1);
                 FMLCommonHandler.instance().handleWorldDataLoad(this, worldInfo, nbttagcompound);
-                this.initBukkitData(worldInfo); // Cauldron
+                if (FMLCommonHandler.instance().getEffectiveSide().isServer()) {
+                    this.initBukkitData(worldInfo); // Cauldron
+                }
                 return worldInfo;
             }
             catch (StartupQuery.AbortedException e)
@@ -156,7 +158,9 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
                 nbttagcompound1 = nbttagcompound.getCompoundTag("Data");
                 worldInfo = new WorldInfo(nbttagcompound1);
                 FMLCommonHandler.instance().handleWorldDataLoad(this, worldInfo, nbttagcompound);
-                this.initBukkitData(worldInfo); // Cauldron
+                if (FMLCommonHandler.instance().getEffectiveSide().isServer()) {
+                    this.initBukkitData(worldInfo); // Cauldron
+                }
                 return worldInfo;
             }
             catch (StartupQuery.AbortedException e)
@@ -168,8 +172,9 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
                 exception.printStackTrace();
             }
         }
-
-        this.initBukkitData(worldInfo); // Cauldron
+        if (FMLCommonHandler.instance().getEffectiveSide().isServer()) {
+            this.initBukkitData(worldInfo); // Cauldron
+        }
         return null;
     }
 

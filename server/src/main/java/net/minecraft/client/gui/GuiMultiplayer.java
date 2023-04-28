@@ -5,13 +5,14 @@ import com.google.common.collect.Lists;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import java.util.List;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.network.LanServerDetector;
 import net.minecraft.client.network.OldServerPinger;
 import net.minecraft.client.resources.I18n;
 import org.lwjgl.input.Keyboard;
+
+import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
@@ -39,6 +40,9 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
         FMLClientHandler.instance().setupServerList();
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         Keyboard.enableRepeatEvents(true);
@@ -55,8 +59,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
             {
                 this.field_146800_B = new LanServerDetector.ThreadLanServerFind(this.field_146799_A);
                 this.field_146800_B.start();
-            }
-            catch (Exception ignored) {}
+            } catch (Exception ignored) {}
 
             this.field_146803_h = new ServerSelectionList(this, this.mc, this.width, this.height, 32, this.height - 64, 36);
             this.field_146803_h.func_148195_a(this.field_146804_i);
@@ -81,6 +84,9 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
         this.func_146790_a(this.field_146803_h.func_148193_k());
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         super.updateScreen();
@@ -95,6 +101,9 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
         this.field_146797_f.func_147223_a();
     }
 
+    /**
+     * Called when the screen is unloaded. Used to disable keyboard repeat events
+     */
     public void onGuiClosed()
     {
         Keyboard.enableRepeatEvents(false);
@@ -230,6 +239,9 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
         }
     }
 
+    /**
+     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
+     */
     protected void keyTyped(char p_73869_1_, int p_73869_2_)
     {
         int j = this.field_146803_h.func_148193_k();
@@ -329,6 +341,9 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.field_146812_y = null;
@@ -393,12 +408,19 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
         this.field_146812_y = p_146793_1_;
     }
 
+    /**
+     * Called when the mouse is clicked.
+     */
     protected void mouseClicked(int p_73864_1_, int p_73864_2_, int p_73864_3_)
     {
         super.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
         this.field_146803_h.func_148179_a(p_73864_1_, p_73864_2_, p_73864_3_);
     }
 
+    /**
+     * Called when the mouse is moved or a mouse button is released.  Signature: (mouseX, mouseY, which) which==-1 is
+     * mouseMove, which==0 or which==1 is mouseUp
+     */
     protected void mouseMovedOrUp(int p_146286_1_, int p_146286_2_, int p_146286_3_)
     {
         super.mouseMovedOrUp(p_146286_1_, p_146286_2_, p_146286_3_);

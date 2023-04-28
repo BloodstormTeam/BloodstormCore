@@ -25,6 +25,9 @@ public class ServerSelectionList extends GuiListExtended
         this.field_148200_k = p_i45049_1_;
     }
 
+    /**
+     * Gets the IGuiListEntry object for the given index
+     */
     public GuiListExtended.IGuiListEntry getListEntry(int p_148180_1_)
     {
         if (p_148180_1_ < this.field_148198_l.size())
@@ -57,6 +60,9 @@ public class ServerSelectionList extends GuiListExtended
         this.field_148197_o = p_148192_1_;
     }
 
+    /**
+     * Returns true if the element passed in is currently selected
+     */
     protected boolean isSelected(int p_148131_1_)
     {
         return p_148131_1_ == this.field_148197_o;
@@ -94,6 +100,9 @@ public class ServerSelectionList extends GuiListExtended
         return super.getScrollBarX() + 30;
     }
 
+    /**
+     * Gets the width of the list
+     */
     public int getListWidth()
     {
         return super.getListWidth() + 85;

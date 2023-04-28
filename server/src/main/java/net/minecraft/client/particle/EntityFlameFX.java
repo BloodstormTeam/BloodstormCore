@@ -1,13 +1,11 @@
 package net.minecraft.client.particle;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.World;
 
-@SideOnly(Side.CLIENT)
 public class EntityFlameFX extends EntityFX
 {
+    /** the scale of the flame FX */
     private float flameScale;
     private static final String __OBFID = "CL_00000907";
 
@@ -17,9 +15,9 @@ public class EntityFlameFX extends EntityFX
         this.motionX = this.motionX * 0.009999999776482582D + p_i1209_8_;
         this.motionY = this.motionY * 0.009999999776482582D + p_i1209_10_;
         this.motionZ = this.motionZ * 0.009999999776482582D + p_i1209_12_;
-        double d6 = p_i1209_2_ + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.05F);
-        d6 = p_i1209_4_ + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.05F);
-        d6 = p_i1209_6_ + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.05F);
+        double var10000 = p_i1209_2_ + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.05F);
+        var10000 = p_i1209_4_ + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.05F);
+        var10000 = p_i1209_6_ + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.05F);
         this.flameScale = this.particleScale;
         this.particleRed = this.particleGreen = this.particleBlue = 1.0F;
         this.particleMaxAge = (int)(8.0D / (Math.random() * 0.8D + 0.2D)) + 4;
@@ -29,56 +27,62 @@ public class EntityFlameFX extends EntityFX
 
     public void renderParticle(Tessellator p_70539_1_, float p_70539_2_, float p_70539_3_, float p_70539_4_, float p_70539_5_, float p_70539_6_, float p_70539_7_)
     {
-        float f6 = ((float)this.particleAge + p_70539_2_) / (float)this.particleMaxAge;
-        this.particleScale = this.flameScale * (1.0F - f6 * f6 * 0.5F);
+        float var8 = ((float)this.particleAge + p_70539_2_) / (float)this.particleMaxAge;
+        this.particleScale = this.flameScale * (1.0F - var8 * var8 * 0.5F);
         super.renderParticle(p_70539_1_, p_70539_2_, p_70539_3_, p_70539_4_, p_70539_5_, p_70539_6_, p_70539_7_);
     }
 
     public int getBrightnessForRender(float p_70070_1_)
     {
-        float f1 = ((float)this.particleAge + p_70070_1_) / (float)this.particleMaxAge;
+        float var2 = ((float)this.particleAge + p_70070_1_) / (float)this.particleMaxAge;
 
-        if (f1 < 0.0F)
+        if (var2 < 0.0F)
         {
-            f1 = 0.0F;
+            var2 = 0.0F;
         }
 
-        if (f1 > 1.0F)
+        if (var2 > 1.0F)
         {
-            f1 = 1.0F;
+            var2 = 1.0F;
         }
 
-        int i = super.getBrightnessForRender(p_70070_1_);
-        int j = i & 255;
-        int k = i >> 16 & 255;
-        j += (int)(f1 * 15.0F * 16.0F);
+        int var3 = super.getBrightnessForRender(p_70070_1_);
+        int var4 = var3 & 255;
+        int var5 = var3 >> 16 & 255;
+        var4 += (int)(var2 * 15.0F * 16.0F);
 
-        if (j > 240)
+        if (var4 > 240)
         {
-            j = 240;
+            var4 = 240;
         }
 
-        return j | k << 16;
+        return var4 | var5 << 16;
     }
 
+    /**
+     * Gets how bright this entity is.
+     */
     public float getBrightness(float p_70013_1_)
     {
-        float f1 = ((float)this.particleAge + p_70013_1_) / (float)this.particleMaxAge;
+        float var2 = ((float)this.particleAge + p_70013_1_) / (float)this.particleMaxAge;
 
-        if (f1 < 0.0F)
+        if (var2 < 0.0F)
         {
-            f1 = 0.0F;
+            var2 = 0.0F;
         }
 
-        if (f1 > 1.0F)
+        if (var2 > 1.0F)
         {
-            f1 = 1.0F;
+            var2 = 1.0F;
         }
 
-        float f2 = super.getBrightness(p_70013_1_);
-        return f2 * f1 + (1.0F - f1);
+        float var3 = super.getBrightness(p_70013_1_);
+        return var3 * var2 + (1.0F - var2);
     }
 
+    /**
+     * Called to update the entity's position/logic.
+     */
     public void onUpdate()
     {
         this.prevPosX = this.posX;

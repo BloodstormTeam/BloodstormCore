@@ -1,6 +1,8 @@
 package net.minecraft.network;
 
 import co.aikar.timings.MinecraftTimings;
+import com.bloodstorm.core.api.event.EventFactory;
+import com.bloodstorm.core.api.event.block.SignChangeEvent;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import io.github.crucible.CrucibleConfigs;
@@ -125,7 +127,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryAction;
@@ -357,7 +358,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer {
 
                 trigger = !trigger;
                 if(trigger)
-                	this.server.getPluginManager().callEvent(event);
+                    this.server.getPluginManager().callEvent(event);
                 
                 // If the event is cancelled we move the player back to their old location.
                 if (event.isCancelled())
@@ -1115,34 +1116,29 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer {
             }
             else if (true)
             {
-            	String[] bits = s.split(" ");
-            	
-            	HashSet<String> possibilities = new HashSet<String>(); // No duplicates allowed
-            	for (String str: bits)
-            	{
-            		if (str.length() <= 17 && str.length() >= 4)
-            		{
-            			if(str.charAt(0) != '@')
-            				continue;
-            			possibilities.add(str.substring(1));
+                String[] bits = s.split(" ");
 
-            		}
-            	}
-            	
-    			for (Object o : MinecraftServer.getServer().getConfigurationManager().playerEntityList)
-    			{
-    				if (! (o instanceof EntityPlayerMP))
-    				{
-    					continue;
-    				}
-    				EntityPlayerMP ep = (EntityPlayerMP)o;
-    				if (possibilities.contains(ep.getCommandSenderName()))
-    				{
-    					ep.worldObj.playSoundAtEntity(ep, "random.orb", 4.0F, 4.0F);
-    				}
-    				
-    			}
-            	
+                HashSet<String> possibilities = new HashSet<String>(); // No duplicates allowed
+                for (String str: bits) {
+                    if (str.length() <= 17 && str.length() >= 4) {
+                        if(str.charAt(0) != '@')
+                            continue;
+                        possibilities.add(str.substring(1));
+
+                    }
+                }
+
+                for (Object o : MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
+                    if (! (o instanceof EntityPlayerMP)) {
+                        continue;
+                    }
+                    EntityPlayerMP ep = (EntityPlayerMP)o;
+                    if (possibilities.contains(ep.getCommandSenderName())) {
+                        ep.worldObj.playSoundAtEntity(ep, "random.orb", 4.0F, 4.0F);
+                    }
+
+                }
+
                 this.chat(s, true);
                 // CraftBukkit end - the below is for reference. :)
             }
@@ -1326,10 +1322,10 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer {
         
         if (CrucibleConfigs.configs.cauldron_protection_noFallbackAlias)
         {
-        	int ind = p_147361_1_.indexOf(':');
-        	int spc = p_147361_1_.indexOf(' ');
-        	if (ind != -1 && ( ind < spc || spc == -1))
-        		p_147361_1_ = "/" + p_147361_1_.substring(ind);
+            int ind = p_147361_1_.indexOf(':');
+            int spc = p_147361_1_.indexOf(' ');
+            if (ind != -1 && ( ind < spc || spc == -1))
+                p_147361_1_ = "/" + p_147361_1_.substring(ind);
         }        
         
         PlayerCommandPreprocessEvent event = new PlayerCommandPreprocessEvent(player, p_147361_1_, new LazyPlayerSet());
@@ -1621,7 +1617,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer {
                 else
                 // not coming from end
                 {
-                	this.playerEntity = this.serverController.getConfigurationManager().respawnPlayer(this.playerEntity, 0, false, null, isDead);
+                    this.playerEntity = this.serverController.getConfigurationManager().respawnPlayer(this.playerEntity, 0, false, null, isDead);
                 }
                 // Cauldron end
                 }
@@ -2319,29 +2315,18 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer {
                 int k = p_147343_1_.func_149586_d();
                 i = p_147343_1_.func_149585_e();
                 TileEntitySign tileentitysign1 = (TileEntitySign)tileentity;
-                // CraftBukkit start
-                Player player = this.server.getPlayer(this.playerEntity);
-                SignChangeEvent event = new SignChangeEvent((org.bukkit.craftbukkit.block.CraftBlock) player.getWorld().getBlockAt(j, k, i),
-                        this.server.getPlayer(this.playerEntity), p_147343_1_.func_149589_f());
-                this.server.getPluginManager().callEvent(event);
 
-                if (!event.isCancelled())
-                {
-                    for (int l = 0; l < 4; ++l)
-                    {
-                        tileentitysign1.signText[l] = event.getLine(l);
+                SignChangeEvent signChangeEvent = EventFactory.postSignChangeEvent(this.playerEntity.worldObj, j, k, i, this.playerEntity, p_147343_1_.func_149589_f());
+                if (!signChangeEvent.getCancelled()) {
+                    for (int lineIndex = 0; lineIndex < 4; lineIndex++) {
+                        tileentitysign1.signText[lineIndex] = signChangeEvent.getLine(lineIndex);
 
-                        if (tileentitysign1.signText[l] == null)
-                        {
-                            tileentitysign1.signText[l] = "";
+                        if (tileentitysign1.signText[lineIndex] == null) {
+                            tileentitysign1.signText[lineIndex] = "";
                         }
                     }
-
-                    tileentitysign1.field_145916_j = false;
                 }
 
-                // System.arraycopy(p_147343_1_.func_149589_f(), 0, tileentitysign1.signText, 0, 4);
-                // CraftBukkit end
                 tileentitysign1.markDirty();
                 worldserver.markBlockForUpdate(j, k, i);
             }

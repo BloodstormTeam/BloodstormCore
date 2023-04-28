@@ -27,6 +27,9 @@ public class GuiScreenRealmsProxy extends GuiScreen
         return this.field_154330_a;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         this.field_154330_a.init();
@@ -43,22 +46,34 @@ public class GuiScreenRealmsProxy extends GuiScreen
         super.drawString(this.fontRendererObj, p_154322_1_, p_154322_2_, p_154322_3_, p_154322_4_);
     }
 
+    /**
+     * Draws a textured rectangle at the stored z-value. Args: x, y, u, v, width, height
+     */
     public void drawTexturedModalRect(int p_73729_1_, int p_73729_2_, int p_73729_3_, int p_73729_4_, int p_73729_5_, int p_73729_6_)
     {
         this.field_154330_a.blit(p_73729_1_, p_73729_2_, p_73729_3_, p_73729_4_, p_73729_5_, p_73729_6_);
         super.drawTexturedModalRect(p_73729_1_, p_73729_2_, p_73729_3_, p_73729_4_, p_73729_5_, p_73729_6_);
     }
 
+    /**
+     * Draws a rectangle with a vertical gradient between the specified colors.
+     */
     public void drawGradientRect(int p_73733_1_, int p_73733_2_, int p_73733_3_, int p_73733_4_, int p_73733_5_, int p_73733_6_)
     {
         super.drawGradientRect(p_73733_1_, p_73733_2_, p_73733_3_, p_73733_4_, p_73733_5_, p_73733_6_);
     }
 
+    /**
+     * Draws either a gradient over the background screen (when it exists) or a flat gradient over background.png
+     */
     public void drawDefaultBackground()
     {
         super.drawDefaultBackground();
     }
 
+    /**
+     * Returns true if this GUI should pause the game when it is displayed in single-player
+     */
     public boolean doesGuiPauseGame()
     {
         return super.doesGuiPauseGame();
@@ -69,6 +84,9 @@ public class GuiScreenRealmsProxy extends GuiScreen
         super.drawWorldBackground(p_146270_1_);
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.field_154330_a.render(p_73863_1_, p_73863_2_, p_73863_3_);
@@ -79,6 +97,10 @@ public class GuiScreenRealmsProxy extends GuiScreen
         super.renderToolTip(p_146285_1_, p_146285_2_, p_146285_3_);
     }
 
+    /**
+     * Draws the text when mouse is over creative inventory tab. Params: current creative tab to be checked, current
+     * mouse x position, current mouse y position.
+     */
     public void drawCreativeTabHoveringText(String p_146279_1_, int p_146279_2_, int p_146279_3_)
     {
         super.drawCreativeTabHoveringText(p_146279_1_, p_146279_2_, p_146279_3_);
@@ -89,6 +111,9 @@ public class GuiScreenRealmsProxy extends GuiScreen
         super.func_146283_a(p_146283_1_, p_146283_2_, p_146283_3_);
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         this.field_154330_a.tick();
@@ -149,34 +174,54 @@ public class GuiScreenRealmsProxy extends GuiScreen
         super.buttonList.remove(p_154328_1_);
     }
 
+    /**
+     * Called when the mouse is clicked.
+     */
     public void mouseClicked(int p_73864_1_, int p_73864_2_, int p_73864_3_)
     {
         this.field_154330_a.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
         super.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
     }
 
+    /**
+     * Handles mouse input.
+     */
     public void handleMouseInput()
     {
         this.field_154330_a.mouseEvent();
         super.handleMouseInput();
     }
 
+    /**
+     * Handles keyboard input.
+     */
     public void handleKeyboardInput()
     {
         this.field_154330_a.keyboardEvent();
         super.handleKeyboardInput();
     }
 
+    /**
+     * Called when the mouse is moved or a mouse button is released.  Signature: (mouseX, mouseY, which) which==-1 is
+     * mouseMove, which==0 or which==1 is mouseUp
+     */
     public void mouseMovedOrUp(int p_146286_1_, int p_146286_2_, int p_146286_3_)
     {
         this.field_154330_a.mouseReleased(p_146286_1_, p_146286_2_, p_146286_3_);
     }
 
+    /**
+     * Called when a mouse button is pressed and the mouse is moved around. Parameters are : mouseX, mouseY,
+     * lastButtonClicked & timeSinceMouseClick.
+     */
     public void mouseClickMove(int p_146273_1_, int p_146273_2_, int p_146273_3_, long p_146273_4_)
     {
         this.field_154330_a.mouseDragged(p_146273_1_, p_146273_2_, p_146273_3_, p_146273_4_);
     }
 
+    /**
+     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
+     */
     public void keyTyped(char p_73869_1_, int p_73869_2_)
     {
         this.field_154330_a.keyPressed(p_73869_1_, p_73869_2_);
@@ -187,6 +232,9 @@ public class GuiScreenRealmsProxy extends GuiScreen
         this.field_154330_a.confirmResult(p_73878_1_, p_73878_2_);
     }
 
+    /**
+     * Called when the screen is unloaded. Used to disable keyboard repeat events
+     */
     public void onGuiClosed()
     {
         this.field_154330_a.removed();

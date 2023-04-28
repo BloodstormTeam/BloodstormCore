@@ -24,6 +24,9 @@ public class GuiIngestServers extends GuiScreen
         this.field_152309_a = p_i1077_1_;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         this.field_152310_f = I18n.format("options.stream.ingest.title", new Object[0]);
@@ -38,6 +41,9 @@ public class GuiIngestServers extends GuiScreen
         this.buttonList.add(new GuiButton(2, this.width / 2 + 5, this.height - 24 - 6, 150, 20, I18n.format("options.stream.ingest.reset", new Object[0])));
     }
 
+    /**
+     * Called when the screen is unloaded. Used to disable keyboard repeat events
+     */
     public void onGuiClosed()
     {
         if (this.mc.func_152346_Z().func_152908_z())
@@ -62,6 +68,9 @@ public class GuiIngestServers extends GuiScreen
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();
@@ -86,12 +95,18 @@ public class GuiIngestServers extends GuiScreen
             return GuiIngestServers.this.mc.func_152346_Z().func_152925_v().length;
         }
 
+        /**
+         * The element in the slot that was clicked, boolean for whether it was double clicked or not
+         */
         protected void elementClicked(int p_148144_1_, boolean p_148144_2_, int p_148144_3_, int p_148144_4_)
         {
             GuiIngestServers.this.mc.gameSettings.field_152407_Q = GuiIngestServers.this.mc.func_152346_Z().func_152925_v()[p_148144_1_].serverUrl;
             GuiIngestServers.this.mc.gameSettings.saveOptions();
         }
 
+        /**
+         * Returns true if the element passed in is currently selected
+         */
         protected boolean isSelected(int p_148131_1_)
         {
             return GuiIngestServers.this.mc.func_152346_Z().func_152925_v()[p_148131_1_].serverUrl.equals(GuiIngestServers.this.mc.gameSettings.field_152407_Q);

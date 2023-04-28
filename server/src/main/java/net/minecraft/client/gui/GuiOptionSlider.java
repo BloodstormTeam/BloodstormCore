@@ -33,11 +33,18 @@ public class GuiOptionSlider extends GuiButton
         this.displayString = minecraft.gameSettings.getKeyBinding(p_i45017_4_);
     }
 
+    /**
+     * Returns 0 if the button is disabled, 1 if the mouse is NOT hovering over this button and 2 if it IS hovering over
+     * this button.
+     */
     public int getHoverState(boolean p_146114_1_)
     {
         return 0;
     }
 
+    /**
+     * Fired when the mouse button is dragged. Equivalent of MouseListener.mouseDragged(MouseEvent e).
+     */
     protected void mouseDragged(Minecraft p_146119_1_, int p_146119_2_, int p_146119_3_)
     {
         if (this.visible)
@@ -68,6 +75,10 @@ public class GuiOptionSlider extends GuiButton
         }
     }
 
+    /**
+     * Returns true if the mouse has been pressed on this control. Equivalent of MouseListener.mousePressed(MouseEvent
+     * e).
+     */
     public boolean mousePressed(Minecraft p_146116_1_, int p_146116_2_, int p_146116_3_)
     {
         if (super.mousePressed(p_146116_1_, p_146116_2_, p_146116_3_))
@@ -95,6 +106,9 @@ public class GuiOptionSlider extends GuiButton
         }
     }
 
+    /**
+     * Fired when the mouse button is released. Equivalent of MouseListener.mouseReleased(MouseEvent e).
+     */
     public void mouseReleased(int p_146118_1_, int p_146118_2_)
     {
         this.field_146135_o = false;

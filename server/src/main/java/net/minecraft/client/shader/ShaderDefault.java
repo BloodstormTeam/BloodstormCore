@@ -1,17 +1,13 @@
 package net.minecraft.client.shader;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import javax.vecmath.Matrix4f;
+import net.optifine.Matrix4f;
 
-@SideOnly(Side.CLIENT)
 public class ShaderDefault extends ShaderUniform
 {
-    private static final String __OBFID = "CL_00001039";
 
     public ShaderDefault()
     {
-        super("dummy", 4, 1, (ShaderManager)null);
+        super("dummy", 4, 1, null);
     }
 
     public void func_148090_a(float p_148090_1_) {}

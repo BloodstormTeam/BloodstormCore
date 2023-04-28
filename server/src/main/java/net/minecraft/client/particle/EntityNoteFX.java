@@ -1,20 +1,17 @@
 package net.minecraft.client.particle;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-@SideOnly(Side.CLIENT)
 public class EntityNoteFX extends EntityFX
 {
     float noteParticleScale;
     private static final String __OBFID = "CL_00000913";
 
-    public EntityNoteFX(World p_i1216_1_, double p_i1216_2_, double p_i1216_4_, double p_i1216_6_, double p_i1216_8_, double p_i1216_10_, double p_i1216_12_)
+    public EntityNoteFX(World p_i46353_1_, double p_i46353_2_, double p_i46353_4_, double p_i46353_6_, double p_i46353_8_, double p_i46353_10_, double p_i46353_12_)
     {
-        this(p_i1216_1_, p_i1216_2_, p_i1216_4_, p_i1216_6_, p_i1216_8_, p_i1216_10_, p_i1216_12_, 2.0F);
+        this(p_i46353_1_, p_i46353_2_, p_i46353_4_, p_i46353_6_, p_i46353_8_, p_i46353_10_, p_i46353_12_, 2.0F);
     }
 
     public EntityNoteFX(World p_i1217_1_, double p_i1217_2_, double p_i1217_4_, double p_i1217_6_, double p_i1217_8_, double p_i1217_10_, double p_i1217_12_, float p_i1217_14_)
@@ -37,22 +34,25 @@ public class EntityNoteFX extends EntityFX
 
     public void renderParticle(Tessellator p_70539_1_, float p_70539_2_, float p_70539_3_, float p_70539_4_, float p_70539_5_, float p_70539_6_, float p_70539_7_)
     {
-        float f6 = ((float)this.particleAge + p_70539_2_) / (float)this.particleMaxAge * 32.0F;
+        float var8 = ((float)this.particleAge + p_70539_2_) / (float)this.particleMaxAge * 32.0F;
 
-        if (f6 < 0.0F)
+        if (var8 < 0.0F)
         {
-            f6 = 0.0F;
+            var8 = 0.0F;
         }
 
-        if (f6 > 1.0F)
+        if (var8 > 1.0F)
         {
-            f6 = 1.0F;
+            var8 = 1.0F;
         }
 
-        this.particleScale = this.noteParticleScale * f6;
+        this.particleScale = this.noteParticleScale * var8;
         super.renderParticle(p_70539_1_, p_70539_2_, p_70539_3_, p_70539_4_, p_70539_5_, p_70539_6_, p_70539_7_);
     }
 
+    /**
+     * Called to update the entity's position/logic.
+     */
     public void onUpdate()
     {
         this.prevPosX = this.posX;

@@ -27,19 +27,28 @@ import org.lwjgl.opengl.GL12;
 public abstract class GuiContainer extends GuiScreen
 {
     protected static final ResourceLocation field_147001_a = new ResourceLocation("textures/gui/container/inventory.png");
+    /** The X size of the inventory window in pixels. */
     protected int xSize = 176;
+    /** The Y size of the inventory window in pixels. */
     protected int ySize = 166;
+    /** A list of the players inventory slots */
     public Container inventorySlots;
+    /** Starting X position for the Gui. Inconsistent use for Gui backgrounds. */
     protected int guiLeft;
+    /** Starting Y position for the Gui. Inconsistent use for Gui backgrounds. */
     protected int guiTop;
     private Slot theSlot;
+    /** Used when touchscreen is enabled. */
     private Slot clickedSlot;
+    /** Used when touchscreen is enabled. */
     private boolean isRightMouseClick;
+    /** Used when touchscreen is enabled */
     private ItemStack draggedStack;
     private int field_147011_y;
     private int field_147010_z;
     private Slot returningStackDestSlot;
     private long returningStackTime;
+    /** Used when touchscreen is enabled */
     private ItemStack returningStack;
     private Slot field_146985_D;
     private long field_146986_E;
@@ -62,6 +71,9 @@ public abstract class GuiContainer extends GuiScreen
         this.field_146995_H = true;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         super.initGui();
@@ -70,6 +82,9 @@ public abstract class GuiContainer extends GuiScreen
         this.guiTop = (this.height - this.ySize) / 2;
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();
@@ -190,6 +205,9 @@ public abstract class GuiContainer extends GuiScreen
         itemRender.zLevel = 0.0F;
     }
 
+    /**
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
+     */
     protected void drawGuiContainerForegroundLayer(int p_146979_1_, int p_146979_2_) {}
 
     protected abstract void drawGuiContainerBackgroundLayer(float p_146976_1_, int p_146976_2_, int p_146976_3_);
@@ -306,6 +324,9 @@ public abstract class GuiContainer extends GuiScreen
         }
     }
 
+    /**
+     * Returns the slot at the given coordinates or null if there is none.
+     */
     private Slot getSlotAtPosition(int p_146975_1_, int p_146975_2_)
     {
         for (int k = 0; k < this.inventorySlots.inventorySlots.size(); ++k)
@@ -321,6 +342,9 @@ public abstract class GuiContainer extends GuiScreen
         return null;
     }
 
+    /**
+     * Called when the mouse is clicked.
+     */
     protected void mouseClicked(int p_73864_1_, int p_73864_2_, int p_73864_3_)
     {
         super.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
@@ -420,6 +444,10 @@ public abstract class GuiContainer extends GuiScreen
         this.field_146992_L = p_73864_3_;
     }
 
+    /**
+     * Called when a mouse button is pressed and the mouse is moved around. Parameters are : mouseX, mouseY,
+     * lastButtonClicked & timeSinceMouseClick.
+     */
     protected void mouseClickMove(int p_146273_1_, int p_146273_2_, int p_146273_3_, long p_146273_4_)
     {
         Slot slot = this.getSlotAtPosition(p_146273_1_, p_146273_2_);
@@ -466,6 +494,10 @@ public abstract class GuiContainer extends GuiScreen
         }
     }
 
+    /**
+     * Called when the mouse is moved or a mouse button is released.  Signature: (mouseX, mouseY, which) which==-1 is
+     * mouseMove, which==0 or which==1 is mouseUp
+     */
     protected void mouseMovedOrUp(int p_146286_1_, int p_146286_2_, int p_146286_3_)
     {
         super.mouseMovedOrUp(p_146286_1_, p_146286_2_, p_146286_3_); //Forge, Call parent to release buttons
@@ -617,6 +649,9 @@ public abstract class GuiContainer extends GuiScreen
         this.field_147007_t = false;
     }
 
+    /**
+     * Returns if the passed mouse position is over the specified slot.
+     */
     private boolean isMouseOverSlot(Slot p_146981_1_, int p_146981_2_, int p_146981_3_)
     {
         return this.func_146978_c(p_146981_1_.xDisplayPosition, p_146981_1_.yDisplayPosition, 16, 16, p_146981_2_, p_146981_3_);
@@ -641,6 +676,9 @@ public abstract class GuiContainer extends GuiScreen
         this.mc.playerController.windowClick(this.inventorySlots.windowId, p_146984_2_, p_146984_3_, p_146984_4_, this.mc.thePlayer);
     }
 
+    /**
+     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
+     */
     protected void keyTyped(char p_73869_1_, int p_73869_2_)
     {
         if (p_73869_2_ == 1 || p_73869_2_ == this.mc.gameSettings.keyBindInventory.getKeyCode())
@@ -663,6 +701,9 @@ public abstract class GuiContainer extends GuiScreen
         }
     }
 
+    /**
+     * This function is what controls the hotbar shortcut check when you press a number key when hovering a stack.
+     */
     protected boolean checkHotbarKeys(int p_146983_1_)
     {
         if (this.mc.thePlayer.inventory.getItemStack() == null && this.theSlot != null)
@@ -680,6 +721,9 @@ public abstract class GuiContainer extends GuiScreen
         return false;
     }
 
+    /**
+     * Called when the screen is unloaded. Used to disable keyboard repeat events
+     */
     public void onGuiClosed()
     {
         if (this.mc.thePlayer != null)
@@ -688,11 +732,17 @@ public abstract class GuiContainer extends GuiScreen
         }
     }
 
+    /**
+     * Returns true if this GUI should pause the game when it is displayed in single-player
+     */
     public boolean doesGuiPauseGame()
     {
         return false;
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         super.updateScreen();

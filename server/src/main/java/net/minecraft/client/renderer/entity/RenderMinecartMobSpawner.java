@@ -1,14 +1,11 @@
 package net.minecraft.client.renderer.entity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.tileentity.TileEntityMobSpawnerRenderer;
 import net.minecraft.entity.ai.EntityMinecartMobSpawner;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.init.Blocks;
 
-@SideOnly(Side.CLIENT)
 public class RenderMinecartMobSpawner extends RenderMinecart
 {
     private static final String __OBFID = "CL_00001014";

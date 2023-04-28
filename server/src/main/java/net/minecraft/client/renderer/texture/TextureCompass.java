@@ -1,30 +1,31 @@
 package net.minecraft.client.renderer.texture;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
+import net.optifine.Config;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
+import shadersmod.client.ShadersTex;
 
-@SideOnly(Side.CLIENT)
 public class TextureCompass extends TextureAtlasSprite
 {
+    /** Current compass heading in radians */
     public double currentAngle;
-    public double angleDelta;
-    private static final String __OBFID = "CL_00001071";
 
-    public TextureCompass(String p_i1286_1_)
+    /** Speed and direction of compass rotation */
+    public double angleDelta;
+
+    public TextureCompass(String par1Str)
     {
-        super(p_i1286_1_);
+        super(par1Str);
     }
 
     public void updateAnimation()
     {
-        Minecraft minecraft = Minecraft.getMinecraft();
+        Minecraft var1 = Minecraft.getMinecraft();
 
-        if (minecraft.theWorld != null && minecraft.thePlayer != null)
+        if (var1.theWorld != null && var1.thePlayer != null)
         {
-            this.updateCompass(minecraft.theWorld, minecraft.thePlayer.posX, minecraft.thePlayer.posZ, (double)minecraft.thePlayer.rotationYaw, false, false);
+            this.updateCompass(var1.theWorld, var1.thePlayer.posX, var1.thePlayer.posZ, (double)var1.thePlayer.rotationYaw, false, false);
         }
         else
         {
@@ -32,70 +33,81 @@ public class TextureCompass extends TextureAtlasSprite
         }
     }
 
-    public void updateCompass(World p_94241_1_, double p_94241_2_, double p_94241_4_, double p_94241_6_, boolean p_94241_8_, boolean p_94241_9_)
+    /**
+     * Updates the compass based on the given x,z coords and camera direction
+     */
+    public void updateCompass(World par1World, double par2, double par4, double par6, boolean par8, boolean par9)
     {
         if (!this.framesTextureData.isEmpty())
         {
-            double d3 = 0.0D;
+            double var10 = 0.0D;
 
-            if (p_94241_1_ != null && !p_94241_8_)
+            if (par1World != null && !par8)
             {
-                ChunkCoordinates chunkcoordinates = p_94241_1_.getSpawnPoint();
-                double d4 = (double)chunkcoordinates.posX - p_94241_2_;
-                double d5 = (double)chunkcoordinates.posZ - p_94241_4_;
-                p_94241_6_ %= 360.0D;
-                d3 = -((p_94241_6_ - 90.0D) * Math.PI / 180.0D - Math.atan2(d5, d4));
+                ChunkCoordinates var18 = par1World.getSpawnPoint();
+                double var13 = (double)var18.posX - par2;
+                double var15 = (double)var18.posZ - par4;
+                par6 %= 360.0D;
+                var10 = -((par6 - 90.0D) * Math.PI / 180.0D - Math.atan2(var15, var13));
 
-                if (!p_94241_1_.provider.isSurfaceWorld())
+                if (!par1World.provider.isSurfaceWorld())
                 {
-                    d3 = Math.random() * Math.PI * 2.0D;
+                    var10 = Math.random() * Math.PI * 2.0D;
                 }
             }
 
-            if (p_94241_9_)
+            if (par9)
             {
-                this.currentAngle = d3;
+                this.currentAngle = var10;
             }
             else
             {
-                double d6;
+                double var181;
 
-                for (d6 = d3 - this.currentAngle; d6 < -Math.PI; d6 += (Math.PI * 2D))
+                for (var181 = var10 - this.currentAngle; var181 < -Math.PI; var181 += (Math.PI * 2D))
                 {
                     ;
                 }
 
-                while (d6 >= Math.PI)
+                while (var181 >= Math.PI)
                 {
-                    d6 -= (Math.PI * 2D);
+                    var181 -= (Math.PI * 2D);
                 }
 
-                if (d6 < -1.0D)
+                if (var181 < -1.0D)
                 {
-                    d6 = -1.0D;
+                    var181 = -1.0D;
                 }
 
-                if (d6 > 1.0D)
+                if (var181 > 1.0D)
                 {
-                    d6 = 1.0D;
+                    var181 = 1.0D;
                 }
 
-                this.angleDelta += d6 * 0.1D;
+                this.angleDelta += var181 * 0.1D;
                 this.angleDelta *= 0.8D;
                 this.currentAngle += this.angleDelta;
             }
 
-            int i;
+            int var182;
 
-            for (i = (int)((this.currentAngle / (Math.PI * 2D) + 1.0D) * (double)this.framesTextureData.size()) % this.framesTextureData.size(); i < 0; i = (i + this.framesTextureData.size()) % this.framesTextureData.size())
+            for (var182 = (int)((this.currentAngle / (Math.PI * 2D) + 1.0D) * (double)this.framesTextureData.size()) % this.framesTextureData.size(); var182 < 0; var182 = (var182 + this.framesTextureData.size()) % this.framesTextureData.size())
             {
                 ;
             }
 
-            if (i != this.frameCounter)
+            if (var182 != this.frameCounter)
             {
-                this.frameCounter = i;
-                TextureUtil.uploadTextureMipmap((int[][])this.framesTextureData.get(this.frameCounter), this.width, this.height, this.originX, this.originY, false, false);
+                this.frameCounter = var182;
+
+                if (Config.isShaders())
+                {
+                    ShadersTex.uploadTexSub((int[][])((int[][])this.framesTextureData.get(this.frameCounter)), this.width, this.height, this.originX, this.originY, false, false);
+                }
+                else
+                {
+                    TextureUtil.func_147955_a((int[][])((int[][])this.framesTextureData.get(this.frameCounter)), this.width, this.height, this.originX, this.originY, false, false);
+                }
             }
         }
     }

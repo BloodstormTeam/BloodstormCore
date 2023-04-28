@@ -42,13 +42,19 @@ public class GuiSelectWorld extends GuiScreen implements GuiYesNoCallback {
         this.field_146632_a = p_i1054_1_;
     }
 
-    public void initGui() {
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
+    public void initGui()
+    {
         this.field_146628_f = I18n.format("selectWorld.title", new Object[0]);
 
-        try {
+        try
+        {
             this.func_146627_h();
         }
-        catch (AnvilConverterException anvilconverterexception) {
+        catch (AnvilConverterException anvilconverterexception)
+        {
             this.mc.displayGuiScreen(new GuiErrorScreen("Unable to load worlds", anvilconverterexception.getMessage()));
             return;
         }
@@ -189,16 +195,19 @@ public class GuiSelectWorld extends GuiScreen implements GuiYesNoCallback {
                 isaveformat.flushCache();
                 isaveformat.deleteWorldDirectory(this.func_146621_a(p_73878_2_));
 
-                try {
+                try
+                {
                     this.func_146627_h();
-                }
-                catch (AnvilConverterException ignored) {}
+                } catch (AnvilConverterException ignored) {}
             }
 
             this.mc.displayGuiScreen(this);
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.field_146638_t.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
@@ -231,6 +240,9 @@ public class GuiSelectWorld extends GuiScreen implements GuiYesNoCallback {
             return GuiSelectWorld.this.field_146639_s.size();
         }
 
+        /**
+         * The element in the slot that was clicked, boolean for whether it was double clicked or not
+         */
         protected void elementClicked(int p_148144_1_, boolean p_148144_2_, int p_148144_3_, int p_148144_4_)
         {
             GuiSelectWorld.this.field_146640_r = p_148144_1_;
@@ -246,11 +258,17 @@ public class GuiSelectWorld extends GuiScreen implements GuiYesNoCallback {
             }
         }
 
+        /**
+         * Returns true if the element passed in is currently selected
+         */
         protected boolean isSelected(int p_148131_1_)
         {
             return p_148131_1_ == GuiSelectWorld.this.field_146640_r;
         }
 
+        /**
+         * Return the height of the content being scrolled
+         */
         protected int getContentHeight()
         {
             return GuiSelectWorld.this.field_146639_s.size() * 36;

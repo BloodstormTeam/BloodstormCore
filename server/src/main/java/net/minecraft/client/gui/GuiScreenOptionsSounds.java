@@ -26,6 +26,9 @@ public class GuiScreenOptionsSounds extends GuiScreen
         this.field_146506_g = p_i45025_2_;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         byte b0 = 0;
@@ -62,6 +65,9 @@ public class GuiScreenOptionsSounds extends GuiScreen
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();
@@ -93,11 +99,18 @@ public class GuiScreenOptionsSounds extends GuiScreen
             this.field_146156_o = GuiScreenOptionsSounds.this.field_146506_g.getSoundLevel(p_i45024_5_);
         }
 
+        /**
+         * Returns 0 if the button is disabled, 1 if the mouse is NOT hovering over this button and 2 if it IS hovering
+         * over this button.
+         */
         public int getHoverState(boolean p_146114_1_)
         {
             return 0;
         }
 
+        /**
+         * Fired when the mouse button is dragged. Equivalent of MouseListener.mouseDragged(MouseEvent e).
+         */
         protected void mouseDragged(Minecraft p_146119_1_, int p_146119_2_, int p_146119_3_)
         {
             if (this.visible)
@@ -127,6 +140,10 @@ public class GuiScreenOptionsSounds extends GuiScreen
             }
         }
 
+        /**
+         * Returns true if the mouse has been pressed on this control. Equivalent of
+         * MouseListener.mousePressed(MouseEvent e).
+         */
         public boolean mousePressed(Minecraft p_146116_1_, int p_146116_2_, int p_146116_3_)
         {
             if (super.mousePressed(p_146116_1_, p_146116_2_, p_146116_3_))
@@ -157,6 +174,9 @@ public class GuiScreenOptionsSounds extends GuiScreen
 
         public void func_146113_a(SoundHandler p_146113_1_) {}
 
+        /**
+         * Fired when the mouse button is released. Equivalent of MouseListener.mouseReleased(MouseEvent e).
+         */
         public void mouseReleased(int p_146118_1_, int p_146118_2_)
         {
             if (this.field_146155_p)

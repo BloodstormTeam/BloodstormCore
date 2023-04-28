@@ -23,11 +23,17 @@ public class GuiSlotRealmsProxy extends GuiSlot
         return this.field_154340_k.getItemCount();
     }
 
+    /**
+     * The element in the slot that was clicked, boolean for whether it was double clicked or not
+     */
     protected void elementClicked(int p_148144_1_, boolean p_148144_2_, int p_148144_3_, int p_148144_4_)
     {
         this.field_154340_k.selectItem(p_148144_1_, p_148144_2_, p_148144_3_, p_148144_4_);
     }
 
+    /**
+     * Returns true if the element passed in is currently selected
+     */
     protected boolean isSelected(int p_148131_1_)
     {
         return this.field_154340_k.isSelectedItem(p_148131_1_);
@@ -58,6 +64,9 @@ public class GuiSlotRealmsProxy extends GuiSlot
         return super.mouseX;
     }
 
+    /**
+     * Return the height of the content being scrolled
+     */
     protected int getContentHeight()
     {
         return this.field_154340_k.getMaxPosition();

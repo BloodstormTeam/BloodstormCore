@@ -1,5 +1,7 @@
 package net.minecraft.block;
 
+import com.bloodstorm.core.api.event.EventFactory;
+import com.bloodstorm.core.api.event.block.BlockRedstoneEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.List;
@@ -17,14 +19,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import static net.minecraftforge.common.util.ForgeDirection.*;
 // CraftBukkit start
-import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 // CraftBukkit end
 
 public abstract class BlockButton extends Block
 {
     private final boolean field_150047_a;
-    private static final String __OBFID = "CL_00000209";
 
     protected BlockButton(boolean p_i45396_1_)
     {
@@ -214,13 +214,10 @@ public abstract class BlockButton extends Block
         else
         {
             // CraftBukkit start
-            org.bukkit.block.Block block = p_149727_1_.getWorld().getBlockAt(p_149727_2_, p_149727_3_, p_149727_4_);
-            int old = (k1 != 8) ? 15 : 0;
-            int current = (k1 == 8) ? 15 : 0;
-            BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(block, old, current);
-            p_149727_1_.getServer().getPluginManager().callEvent(eventRedstone);
-
-            if ((eventRedstone.getNewCurrent() > 0) != (k1 == 8))
+            int old = 0;
+            int current = 15;
+            BlockRedstoneEvent blockRedstoneEvent = EventFactory.postRedstoneEvent(p_149727_1_, p_149727_2_, p_149727_3_, p_149727_4_, old, current);
+            if (!(blockRedstoneEvent.getNewValue() > 0))
             {
                 return true;
             }
@@ -280,11 +277,8 @@ public abstract class BlockButton extends Block
             if ((l & 8) != 0)
             {
                 // CraftBukkit start
-                org.bukkit.block.Block block = p_149674_1_.getWorld().getBlockAt(p_149674_2_, p_149674_3_, p_149674_4_);
-                BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(block, 15, 0);
-                p_149674_1_.getServer().getPluginManager().callEvent(eventRedstone);
-
-                if (eventRedstone.getNewCurrent() > 0)
+                BlockRedstoneEvent blockRedstoneEvent = EventFactory.postRedstoneEvent(p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, 15, 0);
+                if (blockRedstoneEvent.getNewValue() > 0)
                 {
                     return;
                 }

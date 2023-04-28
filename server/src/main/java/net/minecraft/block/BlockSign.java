@@ -1,5 +1,6 @@
 package net.minecraft.block;
 
+import com.bloodstorm.core.api.event.EventFactory;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Random;
@@ -13,8 +14,6 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
-import org.bukkit.event.block.BlockRedstoneEvent; // CraftBukkit
 
 public class BlockSign extends BlockContainer
 {
@@ -171,8 +170,7 @@ public class BlockSign extends BlockContainer
         {
             org.bukkit.block.Block bukkitBlock = p_149695_1_.getWorld().getBlockAt(p_149695_2_, p_149695_3_, p_149695_4_);
             int power = bukkitBlock.getBlockPower();
-            BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(bukkitBlock, power, power);
-            p_149695_1_.getServer().getPluginManager().callEvent(eventRedstone);
+            EventFactory.postRedstoneEvent(p_149695_1_, p_149695_2_, p_149695_3_, p_149695_4_, power, power);
         }
 
         // CraftBukkit end

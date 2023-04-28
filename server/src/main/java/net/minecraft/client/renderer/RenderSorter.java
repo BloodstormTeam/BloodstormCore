@@ -1,13 +1,11 @@
 package net.minecraft.client.renderer;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Comparator;
 import net.minecraft.entity.EntityLivingBase;
 
-@SideOnly(Side.CLIENT)
 public class RenderSorter implements Comparator
 {
+    /** The entity (usually the player) that the camera is inside. */
     private EntityLivingBase baseEntity;
     private static final String __OBFID = "CL_00000943";
 
@@ -28,9 +26,9 @@ public class RenderSorter implements Comparator
         }
         else
         {
-            double d0 = (double)p_compare_1_.distanceToEntitySquared(this.baseEntity);
-            double d1 = (double)p_compare_2_.distanceToEntitySquared(this.baseEntity);
-            return d0 < d1 ? 1 : (d0 > d1 ? -1 : (p_compare_1_.chunkIndex < p_compare_2_.chunkIndex ? 1 : -1));
+            double var3 = (double)p_compare_1_.distanceToEntitySquared(this.baseEntity);
+            double var5 = (double)p_compare_2_.distanceToEntitySquared(this.baseEntity);
+            return var3 < var5 ? 1 : (var3 > var5 ? -1 : (p_compare_1_.chunkIndex < p_compare_2_.chunkIndex ? 1 : -1));
         }
     }
 

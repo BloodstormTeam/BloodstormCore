@@ -1,13 +1,10 @@
 package net.minecraft.client.particle;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-@SideOnly(Side.CLIENT)
 public class EntityRainFX extends EntityFX
 {
     private static final String __OBFID = "CL_00000934";
@@ -27,6 +24,9 @@ public class EntityRainFX extends EntityFX
         this.particleMaxAge = (int)(8.0D / (Math.random() * 0.8D + 0.2D));
     }
 
+    /**
+     * Called to update the entity's position/logic.
+     */
     public void onUpdate()
     {
         this.prevPosX = this.posX;
@@ -54,13 +54,13 @@ public class EntityRainFX extends EntityFX
             this.motionZ *= 0.699999988079071D;
         }
 
-        Material material = this.worldObj.getBlock(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)).getMaterial();
+        Material var1 = this.worldObj.getBlock(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)).getMaterial();
 
-        if (material.isLiquid() || material.isSolid())
+        if (var1.isLiquid() || var1.isSolid())
         {
-            double d0 = (double)((float)(MathHelper.floor_double(this.posY) + 1) - BlockLiquid.getLiquidHeightPercent(this.worldObj.getBlockMetadata(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ))));
+            double var2 = (double)((float)(MathHelper.floor_double(this.posY) + 1) - BlockLiquid.getLiquidHeightPercent(this.worldObj.getBlockMetadata(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ))));
 
-            if (this.posY < d0)
+            if (this.posY < var2)
             {
                 this.setDead();
             }

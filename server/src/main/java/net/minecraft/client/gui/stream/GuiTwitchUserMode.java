@@ -179,6 +179,9 @@ public class GuiTwitchUserMode extends GuiScreen
         return chatcomponenttranslation;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         int i = this.width / 3;
@@ -229,6 +232,9 @@ public class GuiTwitchUserMode extends GuiScreen
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();

@@ -21,14 +21,16 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
-public class GuiScreenBook extends GuiScreen
-{
+public class GuiScreenBook extends GuiScreen {
     private static final ResourceLocation bookGuiTextures = new ResourceLocation("textures/gui/book.png");
+    /** The player editing the book */
     private final EntityPlayer editingPlayer;
     private final ItemStack bookObj;
+    /** Whether the book is signed or can still be edited */
     private final boolean bookIsUnsigned;
     private boolean field_146481_r;
     private boolean field_146480_s;
+    /** Update ticks since the gui was opened */
     private int updateCount;
     private int bookImageWidth = 192;
     private int bookImageHeight = 192;
@@ -39,6 +41,7 @@ public class GuiScreenBook extends GuiScreen
     private GuiScreenBook.NextPageButton buttonNextPage;
     private GuiScreenBook.NextPageButton buttonPreviousPage;
     private GuiButton buttonDone;
+    /** The GuiButton to sign this book. */
     private GuiButton buttonSign;
     private GuiButton buttonFinalize;
     private GuiButton buttonCancel;
@@ -75,12 +78,18 @@ public class GuiScreenBook extends GuiScreen
         }
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         super.updateScreen();
         ++this.updateCount;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         this.buttonList.clear();
@@ -105,6 +114,9 @@ public class GuiScreenBook extends GuiScreen
         this.updateButtons();
     }
 
+    /**
+     * Called when the screen is unloaded. Used to disable keyboard repeat events
+     */
     public void onGuiClosed()
     {
         Keyboard.enableRepeatEvents(false);
@@ -173,7 +185,8 @@ public class GuiScreenBook extends GuiScreen
                     this.mc.getNetHandler().addToSendQueue(new C17PacketCustomPayload(s, bytebuf));
                 }
                 catch (Exception ignored) {}
-                finally {
+                finally
+                {
                     bytebuf.release();
                 }
             }
@@ -240,6 +253,9 @@ public class GuiScreenBook extends GuiScreen
         }
     }
 
+    /**
+     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
+     */
     protected void keyTyped(char p_73869_1_, int p_73869_2_)
     {
         super.keyTyped(p_73869_1_, p_73869_2_);
@@ -257,6 +273,9 @@ public class GuiScreenBook extends GuiScreen
         }
     }
 
+    /**
+     * Processes keystrokes when editing the text of a book
+     */
     private void keyTypedInBook(char p_146463_1_, int p_146463_2_)
     {
         switch (p_146463_1_)
@@ -346,6 +365,9 @@ public class GuiScreenBook extends GuiScreen
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -430,6 +452,9 @@ public class GuiScreenBook extends GuiScreen
                 this.field_146151_o = p_i1079_4_;
             }
 
+            /**
+             * Draws this button to the screen.
+             */
             public void drawButton(Minecraft p_146112_1_, int p_146112_2_, int p_146112_3_)
             {
                 if (this.visible)

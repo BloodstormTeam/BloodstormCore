@@ -1,14 +1,11 @@
 package net.minecraft.client.shader;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import javax.vecmath.Matrix4f;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.optifine.Matrix4f;
 import org.lwjgl.BufferUtils;
 
-@SideOnly(Side.CLIENT)
 public class ShaderUniform {
     private int field_148102_b;
     private final int field_148103_c;
@@ -54,33 +51,33 @@ public class ShaderUniform {
 
     public static int func_148085_a(String p_148085_0_)
     {
-        byte b0 = -1;
+        byte var1 = -1;
 
         if (p_148085_0_.equals("int"))
         {
-            b0 = 0;
+            var1 = 0;
         }
         else if (p_148085_0_.equals("float"))
         {
-            b0 = 4;
+            var1 = 4;
         }
         else if (p_148085_0_.startsWith("matrix"))
         {
             if (p_148085_0_.endsWith("2x2"))
             {
-                b0 = 8;
+                var1 = 8;
             }
             else if (p_148085_0_.endsWith("3x3"))
             {
-                b0 = 9;
+                var1 = 9;
             }
             else if (p_148085_0_.endsWith("4x4"))
             {
-                b0 = 10;
+                var1 = 10;
             }
         }
 
-        return b0;
+        return var1;
     }
 
     public void func_148084_b(int p_148084_1_)
@@ -184,7 +181,8 @@ public class ShaderUniform {
 
     public void func_148097_a(float[] p_148097_1_)
     {
-        if (p_148097_1_.length > this.field_148103_c) {
+        if (p_148097_1_.length > this.field_148103_c)
+        {
             this.field_148098_f.position(0);
             this.field_148098_f.put(p_148097_1_);
             this.field_148098_f.position(0);
@@ -254,15 +252,19 @@ public class ShaderUniform {
             case 0:
                 OpenGlHelper.func_153181_a(this.field_148102_b, this.field_148101_e);
                 break;
+
             case 1:
                 OpenGlHelper.func_153182_b(this.field_148102_b, this.field_148101_e);
                 break;
+
             case 2:
                 OpenGlHelper.func_153192_c(this.field_148102_b, this.field_148101_e);
                 break;
+
             case 3:
                 OpenGlHelper.func_153162_d(this.field_148102_b, this.field_148101_e);
                 break;
+
             default:
                 break;
         }
@@ -275,15 +277,19 @@ public class ShaderUniform {
             case 4:
                 OpenGlHelper.func_153168_a(this.field_148102_b, this.field_148098_f);
                 break;
+
             case 5:
                 OpenGlHelper.func_153177_b(this.field_148102_b, this.field_148098_f);
                 break;
+
             case 6:
                 OpenGlHelper.func_153191_c(this.field_148102_b, this.field_148098_f);
                 break;
+
             case 7:
                 OpenGlHelper.func_153159_d(this.field_148102_b, this.field_148098_f);
                 break;
+
             default:
                 break;
         }
@@ -296,9 +302,11 @@ public class ShaderUniform {
             case 8:
                 OpenGlHelper.func_153173_a(this.field_148102_b, true, this.field_148098_f);
                 break;
+
             case 9:
                 OpenGlHelper.func_153189_b(this.field_148102_b, true, this.field_148098_f);
                 break;
+
             case 10:
                 OpenGlHelper.func_153160_c(this.field_148102_b, true, this.field_148098_f);
         }

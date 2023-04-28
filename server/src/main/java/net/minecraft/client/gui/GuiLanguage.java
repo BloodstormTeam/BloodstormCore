@@ -30,6 +30,9 @@ public class GuiLanguage extends GuiScreen
         this.field_146454_h = p_i1043_3_;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         boolean flag = false;
@@ -74,6 +77,9 @@ public class GuiLanguage extends GuiScreen
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.field_146450_f.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
@@ -107,6 +113,9 @@ public class GuiLanguage extends GuiScreen
             return this.field_148176_l.size();
         }
 
+        /**
+         * The element in the slot that was clicked, boolean for whether it was double clicked or not
+         */
         protected void elementClicked(int p_148144_1_, boolean p_148144_2_, int p_148144_3_, int p_148144_4_)
         {
             Language language = (Language)this.field_148177_m.get(this.field_148176_l.get(p_148144_1_));
@@ -120,11 +129,17 @@ public class GuiLanguage extends GuiScreen
             GuiLanguage.this.field_146451_g.saveOptions();
         }
 
+        /**
+         * Returns true if the element passed in is currently selected
+         */
         protected boolean isSelected(int p_148131_1_)
         {
             return ((String)this.field_148176_l.get(p_148131_1_)).equals(GuiLanguage.this.field_146454_h.getCurrentLanguage().getLanguageCode());
         }
 
+        /**
+         * Return the height of the content being scrolled
+         */
         protected int getContentHeight()
         {
             return this.getSize() * 18;

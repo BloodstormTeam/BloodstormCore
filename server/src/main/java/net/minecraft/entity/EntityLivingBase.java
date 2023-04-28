@@ -102,7 +102,7 @@ public abstract class EntityLivingBase extends Entity
     public EntityPlayer attackingPlayer; // CraftBukkit - protected -> public
     protected int recentlyHit;
     protected boolean dead;
-    protected int entityAge;
+    public int entityAge;
     protected float field_70768_au;
     protected float field_110154_aX;
     protected float field_70764_aw;

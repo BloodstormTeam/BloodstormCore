@@ -1,13 +1,11 @@
 package net.minecraft.client.particle;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.World;
 
-@SideOnly(Side.CLIENT)
 public class EntitySpellParticleFX extends EntityFX
 {
+    /** Base spell texture index */
     private int baseSpellTextureIndex = 128;
     private static final String __OBFID = "CL_00000926";
 
@@ -29,21 +27,24 @@ public class EntitySpellParticleFX extends EntityFX
 
     public void renderParticle(Tessellator p_70539_1_, float p_70539_2_, float p_70539_3_, float p_70539_4_, float p_70539_5_, float p_70539_6_, float p_70539_7_)
     {
-        float f6 = ((float)this.particleAge + p_70539_2_) / (float)this.particleMaxAge * 32.0F;
+        float var8 = ((float)this.particleAge + p_70539_2_) / (float)this.particleMaxAge * 32.0F;
 
-        if (f6 < 0.0F)
+        if (var8 < 0.0F)
         {
-            f6 = 0.0F;
+            var8 = 0.0F;
         }
 
-        if (f6 > 1.0F)
+        if (var8 > 1.0F)
         {
-            f6 = 1.0F;
+            var8 = 1.0F;
         }
 
         super.renderParticle(p_70539_1_, p_70539_2_, p_70539_3_, p_70539_4_, p_70539_5_, p_70539_6_, p_70539_7_);
     }
 
+    /**
+     * Called to update the entity's position/logic.
+     */
     public void onUpdate()
     {
         this.prevPosX = this.posX;
@@ -76,6 +77,9 @@ public class EntitySpellParticleFX extends EntityFX
         }
     }
 
+    /**
+     * Sets the base spell texture index
+     */
     public void setBaseSpellTextureIndex(int p_70589_1_)
     {
         this.baseSpellTextureIndex = p_70589_1_;

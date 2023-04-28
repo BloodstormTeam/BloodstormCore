@@ -46,6 +46,9 @@ public class GuiStreamUnavailable extends GuiScreen {
         this.field_152327_i = p_i1071_3_;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         if (this.field_152323_r.isEmpty())
@@ -76,8 +79,14 @@ public class GuiStreamUnavailable extends GuiScreen {
         }
     }
 
+    /**
+     * Called when the screen is unloaded. Used to disable keyboard repeat events
+     */
     public void onGuiClosed() {}
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();
@@ -129,8 +138,7 @@ public class GuiStreamUnavailable extends GuiScreen {
             Class oclass = Class.forName("java.awt.Desktop");
             Object object = oclass.getMethod("getDesktop", new Class[0]).invoke((Object)null, new Object[0]);
             oclass.getMethod("browse", new Class[] {URI.class}).invoke(object, new Object[] {new URI(p_152320_1_)});
-        }
-        catch (Throwable ignored) {}
+        } catch (Throwable ignored) {}
     }
 
     public static void func_152321_a(GuiScreen p_152321_0_)

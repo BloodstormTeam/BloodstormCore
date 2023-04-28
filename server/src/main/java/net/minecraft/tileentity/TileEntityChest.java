@@ -1,5 +1,6 @@
 package net.minecraft.tileentity;
 
+import com.bloodstorm.core.api.event.EventFactory;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Iterator;
@@ -469,7 +470,7 @@ public class TileEntityChest extends TileEntity implements IInventory
 
             if (oldPower != newPower)
             {
-                org.bukkit.craftbukkit.event.CraftEventFactory.callRedstoneChange(worldObj, this.xCoord, this.yCoord, this.zCoord, oldPower, newPower);
+                EventFactory.postRedstoneEvent(worldObj, this.xCoord, this.yCoord, this.zCoord, oldPower, newPower);
             }
         }
 
@@ -499,7 +500,7 @@ public class TileEntityChest extends TileEntity implements IInventory
 
                 if (oldPower != newPower)
                 {
-                    org.bukkit.craftbukkit.event.CraftEventFactory.callRedstoneChange(worldObj, this.xCoord, this.yCoord, this.zCoord, oldPower, newPower);
+                    EventFactory.postRedstoneEvent(worldObj, this.xCoord, this.yCoord, this.zCoord, oldPower, newPower);
                 }
             }
 

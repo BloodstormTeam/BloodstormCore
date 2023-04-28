@@ -1,19 +1,26 @@
 package net.minecraft.client.model;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.util.MathHelper;
 
-@SideOnly(Side.CLIENT)
 public class ModelBat extends ModelBase
 {
     private ModelRenderer batHead;
+
+    /** The body box of the bat model. */
     private ModelRenderer batBody;
+
+    /** The inner right wing box of the bat model. */
     private ModelRenderer batRightWing;
+
+    /** The inner left wing box of the bat model. */
     private ModelRenderer batLeftWing;
+
+    /** The outer right wing box of the bat model. */
     private ModelRenderer batOuterRightWing;
+
+    /** The outer left wing box of the bat model. */
     private ModelRenderer batOuterLeftWing;
     private static final String __OBFID = "CL_00000830";
 
@@ -23,13 +30,13 @@ public class ModelBat extends ModelBase
         this.textureHeight = 64;
         this.batHead = new ModelRenderer(this, 0, 0);
         this.batHead.addBox(-3.0F, -3.0F, -3.0F, 6, 6, 6);
-        ModelRenderer modelrenderer = new ModelRenderer(this, 24, 0);
-        modelrenderer.addBox(-4.0F, -6.0F, -2.0F, 3, 4, 1);
-        this.batHead.addChild(modelrenderer);
-        ModelRenderer modelrenderer1 = new ModelRenderer(this, 24, 0);
-        modelrenderer1.mirror = true;
-        modelrenderer1.addBox(1.0F, -6.0F, -2.0F, 3, 4, 1);
-        this.batHead.addChild(modelrenderer1);
+        ModelRenderer var1 = new ModelRenderer(this, 24, 0);
+        var1.addBox(-4.0F, -6.0F, -2.0F, 3, 4, 1);
+        this.batHead.addChild(var1);
+        ModelRenderer var2 = new ModelRenderer(this, 24, 0);
+        var2.mirror = true;
+        var2.addBox(1.0F, -6.0F, -2.0F, 3, 4, 1);
+        this.batHead.addChild(var2);
         this.batBody = new ModelRenderer(this, 0, 16);
         this.batBody.addBox(-3.0F, 4.0F, -3.0F, 6, 12, 6);
         this.batBody.setTextureOffset(0, 34).addBox(-5.0F, 16.0F, 0.0F, 10, 6, 1);
@@ -51,19 +58,26 @@ public class ModelBat extends ModelBase
         this.batLeftWing.addChild(this.batOuterLeftWing);
     }
 
+    /**
+     * not actually sure this is size, is not used as of now, but the model would be recreated if the value changed and
+     * it seems a good match for a bats size
+     */
     public int getBatSize()
     {
         return 36;
     }
 
+    /**
+     * Sets the models various rotation angles then renders the model.
+     */
     public void render(Entity p_78088_1_, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float p_78088_7_)
     {
-        EntityBat entitybat = (EntityBat)p_78088_1_;
-        float f6;
+        EntityBat var8 = (EntityBat)p_78088_1_;
+        float var9;
 
-        if (entitybat.getIsBatHanging())
+        if (var8.getIsBatHanging())
         {
-            f6 = (180F / (float)Math.PI);
+            var9 = (180F / (float)Math.PI);
             this.batHead.rotateAngleX = p_78088_6_ / (180F / (float)Math.PI);
             this.batHead.rotateAngleY = (float)Math.PI - p_78088_5_ / (180F / (float)Math.PI);
             this.batHead.rotateAngleZ = (float)Math.PI;
@@ -80,7 +94,7 @@ public class ModelBat extends ModelBase
         }
         else
         {
-            f6 = (180F / (float)Math.PI);
+            var9 = (180F / (float)Math.PI);
             this.batHead.rotateAngleX = p_78088_6_ / (180F / (float)Math.PI);
             this.batHead.rotateAngleY = p_78088_5_ / (180F / (float)Math.PI);
             this.batHead.rotateAngleZ = 0.0F;

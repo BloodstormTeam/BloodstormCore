@@ -20,7 +20,7 @@ import org.apache.commons.io.IOUtils;
 
 @SideOnly(Side.CLIENT)
 public abstract class AbstractResourcePack implements IResourcePack {
-    protected final File resourcePackFile;
+    public final File resourcePackFile;
     private static final String __OBFID = "CL_00001072";
 
     public AbstractResourcePack(File p_i1287_1_)

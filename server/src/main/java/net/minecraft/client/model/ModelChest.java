@@ -1,13 +1,14 @@
 package net.minecraft.client.model;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
-@SideOnly(Side.CLIENT)
 public class ModelChest extends ModelBase
 {
+    /** The chest lid in the chest's model. */
     public ModelRenderer chestLid = (new ModelRenderer(this, 0, 0)).setTextureSize(64, 64);
+
+    /** The model of the bottom of the chest. */
     public ModelRenderer chestBelow;
+
+    /** The chest's knob in the chest model. */
     public ModelRenderer chestKnob;
     private static final String __OBFID = "CL_00000834";
 
@@ -29,6 +30,9 @@ public class ModelChest extends ModelBase
         this.chestBelow.rotationPointZ = 1.0F;
     }
 
+    /**
+     * This method renders out all parts of the chest model.
+     */
     public void renderAll()
     {
         this.chestKnob.rotateAngleX = this.chestLid.rotateAngleX;

@@ -1,12 +1,9 @@
 package net.minecraft.client.particle;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 
-@SideOnly(Side.CLIENT)
 public class EntityFireworkSparkFX extends EntityFX
 {
     private int baseTextureIndex = 160;
@@ -19,13 +16,13 @@ public class EntityFireworkSparkFX extends EntityFX
     private boolean hasFadeColour;
     private static final String __OBFID = "CL_00000905";
 
-    public EntityFireworkSparkFX(World p_i1207_1_, double p_i1207_2_, double p_i1207_4_, double p_i1207_6_, double p_i1207_8_, double p_i1207_10_, double p_i1207_12_, EffectRenderer p_i1207_14_)
+    public EntityFireworkSparkFX(World p_i46356_1_, double p_i46356_2_, double p_i46356_4_, double p_i46356_6_, double p_i46356_8_, double p_i46356_10_, double p_i46356_12_, EffectRenderer p_i46356_14_)
     {
-        super(p_i1207_1_, p_i1207_2_, p_i1207_4_, p_i1207_6_);
-        this.motionX = p_i1207_8_;
-        this.motionY = p_i1207_10_;
-        this.motionZ = p_i1207_12_;
-        this.field_92047_az = p_i1207_14_;
+        super(p_i46356_1_, p_i46356_2_, p_i46356_4_, p_i46356_6_);
+        this.motionX = p_i46356_8_;
+        this.motionY = p_i46356_10_;
+        this.motionZ = p_i46356_12_;
+        this.field_92047_az = p_i46356_14_;
         this.particleScale *= 0.75F;
         this.particleMaxAge = 48 + this.rand.nextInt(12);
         this.noClip = false;
@@ -43,11 +40,11 @@ public class EntityFireworkSparkFX extends EntityFX
 
     public void setColour(int p_92044_1_)
     {
-        float f = (float)((p_92044_1_ & 16711680) >> 16) / 255.0F;
-        float f1 = (float)((p_92044_1_ & 65280) >> 8) / 255.0F;
-        float f2 = (float)((p_92044_1_ & 255) >> 0) / 255.0F;
-        float f3 = 1.0F;
-        this.setRBGColorF(f * f3, f1 * f3, f2 * f3);
+        float var2 = (float)((p_92044_1_ & 16711680) >> 16) / 255.0F;
+        float var3 = (float)((p_92044_1_ & 65280) >> 8) / 255.0F;
+        float var4 = (float)((p_92044_1_ & 255) >> 0) / 255.0F;
+        float var5 = 1.0F;
+        this.setRBGColorF(var2 * var5, var3 * var5, var4 * var5);
     }
 
     public void setFadeColour(int p_92046_1_)
@@ -58,11 +55,17 @@ public class EntityFireworkSparkFX extends EntityFX
         this.hasFadeColour = true;
     }
 
+    /**
+     * returns the bounding box for this entity
+     */
     public AxisAlignedBB getBoundingBox()
     {
         return null;
     }
 
+    /**
+     * Returns true if this entity should push and be pushed by other entities when colliding.
+     */
     public boolean canBePushed()
     {
         return false;
@@ -76,6 +79,9 @@ public class EntityFireworkSparkFX extends EntityFX
         }
     }
 
+    /**
+     * Called to update the entity's position/logic.
+     */
     public void onUpdate()
     {
         this.prevPosX = this.posX;
@@ -114,20 +120,20 @@ public class EntityFireworkSparkFX extends EntityFX
 
         if (this.field_92054_ax && this.particleAge < this.particleMaxAge / 2 && (this.particleAge + this.particleMaxAge) % 2 == 0)
         {
-            EntityFireworkSparkFX entityfireworksparkfx = new EntityFireworkSparkFX(this.worldObj, this.posX, this.posY, this.posZ, 0.0D, 0.0D, 0.0D, this.field_92047_az);
-            entityfireworksparkfx.setRBGColorF(this.particleRed, this.particleGreen, this.particleBlue);
-            entityfireworksparkfx.particleAge = entityfireworksparkfx.particleMaxAge / 2;
+            EntityFireworkSparkFX var1 = new EntityFireworkSparkFX(this.worldObj, this.posX, this.posY, this.posZ, 0.0D, 0.0D, 0.0D, this.field_92047_az);
+            var1.setRBGColorF(this.particleRed, this.particleGreen, this.particleBlue);
+            var1.particleAge = var1.particleMaxAge / 2;
 
             if (this.hasFadeColour)
             {
-                entityfireworksparkfx.hasFadeColour = true;
-                entityfireworksparkfx.fadeColourRed = this.fadeColourRed;
-                entityfireworksparkfx.fadeColourGreen = this.fadeColourGreen;
-                entityfireworksparkfx.fadeColourBlue = this.fadeColourBlue;
+                var1.hasFadeColour = true;
+                var1.fadeColourRed = this.fadeColourRed;
+                var1.fadeColourGreen = this.fadeColourGreen;
+                var1.fadeColourBlue = this.fadeColourBlue;
             }
 
-            entityfireworksparkfx.field_92048_ay = this.field_92048_ay;
-            this.field_92047_az.addEffect(entityfireworksparkfx);
+            var1.field_92048_ay = this.field_92048_ay;
+            this.field_92047_az.addEffect(var1);
         }
     }
 
@@ -136,6 +142,9 @@ public class EntityFireworkSparkFX extends EntityFX
         return 15728880;
     }
 
+    /**
+     * Gets how bright this entity is.
+     */
     public float getBrightness(float p_70013_1_)
     {
         return 1.0F;

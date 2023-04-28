@@ -1,14 +1,12 @@
 package net.minecraft.client.particle;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 
-@SideOnly(Side.CLIENT)
 public class EntityCrit2FX extends EntityFX
 {
+    /** Entity that had been hit and done the Critical hit on. */
     private Entity theEntity;
     private int currentLife;
     private int maximumLife;
@@ -31,20 +29,23 @@ public class EntityCrit2FX extends EntityFX
 
     public void renderParticle(Tessellator p_70539_1_, float p_70539_2_, float p_70539_3_, float p_70539_4_, float p_70539_5_, float p_70539_6_, float p_70539_7_) {}
 
+    /**
+     * Called to update the entity's position/logic.
+     */
     public void onUpdate()
     {
-        for (int i = 0; i < 16; ++i)
+        for (int var1 = 0; var1 < 16; ++var1)
         {
-            double d0 = (double)(this.rand.nextFloat() * 2.0F - 1.0F);
-            double d1 = (double)(this.rand.nextFloat() * 2.0F - 1.0F);
-            double d2 = (double)(this.rand.nextFloat() * 2.0F - 1.0F);
+            double var2 = (double)(this.rand.nextFloat() * 2.0F - 1.0F);
+            double var4 = (double)(this.rand.nextFloat() * 2.0F - 1.0F);
+            double var6 = (double)(this.rand.nextFloat() * 2.0F - 1.0F);
 
-            if (d0 * d0 + d1 * d1 + d2 * d2 <= 1.0D)
+            if (var2 * var2 + var4 * var4 + var6 * var6 <= 1.0D)
             {
-                double d3 = this.theEntity.posX + d0 * (double)this.theEntity.width / 4.0D;
-                double d4 = this.theEntity.boundingBox.minY + (double)(this.theEntity.height / 2.0F) + d1 * (double)this.theEntity.height / 4.0D;
-                double d5 = this.theEntity.posZ + d2 * (double)this.theEntity.width / 4.0D;
-                this.worldObj.spawnParticle(this.particleName, d3, d4, d5, d0, d1 + 0.2D, d2);
+                double var8 = this.theEntity.posX + var2 * (double)this.theEntity.width / 4.0D;
+                double var10 = this.theEntity.boundingBox.minY + (double)(this.theEntity.height / 2.0F) + var4 * (double)this.theEntity.height / 4.0D;
+                double var12 = this.theEntity.posZ + var6 * (double)this.theEntity.width / 4.0D;
+                this.worldObj.spawnParticle(this.particleName, var8, var10, var12, var2, var4 + 0.2D, var6);
             }
         }
 

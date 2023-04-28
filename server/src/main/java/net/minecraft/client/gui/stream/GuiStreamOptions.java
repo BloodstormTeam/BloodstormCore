@@ -29,6 +29,9 @@ public class GuiStreamOptions extends GuiScreen
         this.field_152318_h = p_i1073_2_;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         int i = 0;
@@ -131,6 +134,9 @@ public class GuiStreamOptions extends GuiScreen
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();

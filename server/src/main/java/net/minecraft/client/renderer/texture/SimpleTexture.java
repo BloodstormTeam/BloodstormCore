@@ -1,7 +1,5 @@
 package net.minecraft.client.renderer.texture;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,53 +7,60 @@ import javax.imageio.ImageIO;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.data.TextureMetadataSection;
+import net.optifine.Config;
 import net.minecraft.util.ResourceLocation;
+import shadersmod.client.ShadersTex;
 
-@SideOnly(Side.CLIENT)
 public class SimpleTexture extends AbstractTexture {
     protected final ResourceLocation textureLocation;
-    private static final String __OBFID = "CL_00001052";
 
-    public SimpleTexture(ResourceLocation p_i1275_1_)
+    public SimpleTexture(ResourceLocation par1ResourceLocation)
     {
-        this.textureLocation = p_i1275_1_;
+        this.textureLocation = par1ResourceLocation;
     }
 
-    public void loadTexture(IResourceManager p_110551_1_) throws IOException
+    public void loadTexture(IResourceManager par1ResourceManager) throws IOException
     {
-        this.deleteGlTexture();
-        InputStream inputstream = null;
+        this.func_147631_c();
+        InputStream var2 = null;
 
         try
         {
-            IResource iresource = p_110551_1_.getResource(this.textureLocation);
-            inputstream = iresource.getInputStream();
-            BufferedImage bufferedimage = ImageIO.read(inputstream);
-            boolean flag = false;
-            boolean flag1 = false;
+            IResource var3 = par1ResourceManager.getResource(this.textureLocation);
+            var2 = var3.getInputStream();
+            BufferedImage var4 = ImageIO.read(var2);
+            boolean var5 = false;
+            boolean var6 = false;
 
-            if (iresource.hasMetadata())
+            if (var3.hasMetadata())
             {
                 try
                 {
-                    TextureMetadataSection texturemetadatasection = (TextureMetadataSection)iresource.getMetadata("texture");
+                    TextureMetadataSection var11 = (TextureMetadataSection)var3.getMetadata("texture");
 
-                    if (texturemetadatasection != null)
+                    if (var11 != null)
                     {
-                        flag = texturemetadatasection.getTextureBlur();
-                        flag1 = texturemetadatasection.getTextureClamp();
+                        var5 = var11.getTextureBlur();
+                        var6 = var11.getTextureClamp();
                     }
                 }
                 catch (RuntimeException ignored) {}
             }
 
-            TextureUtil.uploadTextureImageAllocate(this.getGlTextureId(), bufferedimage, flag, flag1);
+            if (Config.isShaders())
+            {
+                ShadersTex.loadSimpleTexture(this.getGlTextureId(), var4, var5, var6, par1ResourceManager, this.textureLocation, this.getMultiTexID());
+            }
+            else
+            {
+                TextureUtil.uploadTextureImageAllocate(this.getGlTextureId(), var4, var5, var6);
+            }
         }
         finally
         {
-            if (inputstream != null)
+            if (var2 != null)
             {
-                inputstream.close();
+                var2.close();
             }
         }
     }

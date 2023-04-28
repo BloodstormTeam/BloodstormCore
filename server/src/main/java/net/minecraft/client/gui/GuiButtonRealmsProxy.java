@@ -53,6 +53,10 @@ public class GuiButtonRealmsProxy extends GuiButton
         return super.yPosition;
     }
 
+    /**
+     * Returns true if the mouse has been pressed on this control. Equivalent of MouseListener.mousePressed(MouseEvent
+     * e).
+     */
     public boolean mousePressed(Minecraft p_146116_1_, int p_146116_2_, int p_146116_3_)
     {
         if (super.mousePressed(p_146116_1_, p_146116_2_, p_146116_3_))
@@ -63,11 +67,17 @@ public class GuiButtonRealmsProxy extends GuiButton
         return super.mousePressed(p_146116_1_, p_146116_2_, p_146116_3_);
     }
 
+    /**
+     * Fired when the mouse button is released. Equivalent of MouseListener.mouseReleased(MouseEvent e).
+     */
     public void mouseReleased(int p_146118_1_, int p_146118_2_)
     {
         this.field_154318_o.released(p_146118_1_, p_146118_2_);
     }
 
+    /**
+     * Fired when the mouse button is dragged. Equivalent of MouseListener.mouseDragged(MouseEvent e).
+     */
     public void mouseDragged(Minecraft p_146119_1_, int p_146119_2_, int p_146119_3_)
     {
         this.field_154318_o.renderBg(p_146119_2_, p_146119_3_);
@@ -78,6 +88,10 @@ public class GuiButtonRealmsProxy extends GuiButton
         return this.field_154318_o;
     }
 
+    /**
+     * Returns 0 if the button is disabled, 1 if the mouse is NOT hovering over this button and 2 if it IS hovering over
+     * this button.
+     */
     public int getHoverState(boolean p_146114_1_)
     {
         return this.field_154318_o.getYImage(p_146114_1_);

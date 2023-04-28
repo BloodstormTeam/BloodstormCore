@@ -1,5 +1,6 @@
 package net.minecraft.client.main;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.HashMultimap;
 import com.google.gson.Gson;
 import cpw.mods.fml.relauncher.Side;
@@ -16,6 +17,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import io.netty.util.internal.ThreadLocalRandom;
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.NonOptionArgumentSpec;
 import joptsimple.OptionParser;
@@ -62,6 +65,14 @@ public class Main
 
     public static void main(String[] p_main_0_)
     {
+        String paths = System.getProperty("java.library.path");
+        String nativesDir = "natives/";
+        if (Strings.isNullOrEmpty(paths))
+            paths = nativesDir;
+        else
+            paths += File.pathSeparator + nativesDir;
+        System.setProperty("java.library.path", paths);
+        System.setProperty("org.lwjgl.librarypath", new File(".", "natives").getAbsolutePath());
         System.setProperty("java.net.preferIPv4Stack", "true");
         OptionParser optionparser = new OptionParser();
         optionparser.allowsUnrecognizedOptions();
@@ -78,11 +89,11 @@ public class Main
         ArgumentAcceptingOptionSpec argumentacceptingoptionspec8 = optionparser.accepts("proxyPass").withRequiredArg();
         ArgumentAcceptingOptionSpec argumentacceptingoptionspec9 = optionparser.accepts("username").withRequiredArg().defaultsTo("Player" + Minecraft.getSystemTime() % 1000L, new String[0]);
         ArgumentAcceptingOptionSpec argumentacceptingoptionspec10 = optionparser.accepts("uuid").withRequiredArg();
-        ArgumentAcceptingOptionSpec argumentacceptingoptionspec11 = optionparser.accepts("accessToken").withRequiredArg().required();
+        ArgumentAcceptingOptionSpec argumentacceptingoptionspec11 = optionparser.accepts("accessToken").withRequiredArg();
         ArgumentAcceptingOptionSpec argumentacceptingoptionspec12 = optionparser.accepts("version").withRequiredArg().required();
         ArgumentAcceptingOptionSpec argumentacceptingoptionspec13 = optionparser.accepts("width").withRequiredArg().ofType(Integer.class).defaultsTo(Integer.valueOf(854), new Integer[0]);
         ArgumentAcceptingOptionSpec argumentacceptingoptionspec14 = optionparser.accepts("height").withRequiredArg().ofType(Integer.class).defaultsTo(Integer.valueOf(480), new Integer[0]);
-        ArgumentAcceptingOptionSpec argumentacceptingoptionspec15 = optionparser.accepts("userProperties").withRequiredArg().required();
+        ArgumentAcceptingOptionSpec argumentacceptingoptionspec15 = optionparser.accepts("userProperties").withRequiredArg();
         ArgumentAcceptingOptionSpec argumentacceptingoptionspec16 = optionparser.accepts("assetIndex").withRequiredArg();
         ArgumentAcceptingOptionSpec argumentacceptingoptionspec17 = optionparser.accepts("userType").withRequiredArg().defaultsTo("legacy", new String[0]);
         NonOptionArgumentSpec nonoptionargumentspec = optionparser.nonOptions();
@@ -124,14 +135,6 @@ public class Main
         boolean flag1 = optionset.has("demo");
         String s3 = (String)optionset.valueOf(argumentacceptingoptionspec12);
         HashMultimap hashmultimap = HashMultimap.create();
-        Iterator iterator = ((Map)(new Gson()).fromJson((String)optionset.valueOf(argumentacceptingoptionspec15), field_152370_a)).entrySet().iterator();
-
-        while (iterator.hasNext())
-        {
-            Entry entry = (Entry)iterator.next();
-            hashmultimap.putAll(entry.getKey(), (Iterable)entry.getValue());
-        }
-
         File file2 = (File)optionset.valueOf(argumentacceptingoptionspec2);
         File file3 = optionset.has(argumentacceptingoptionspec3) ? (File)optionset.valueOf(argumentacceptingoptionspec3) : new File(file2, "assets/");
         File file1 = optionset.has(argumentacceptingoptionspec4) ? (File)optionset.valueOf(argumentacceptingoptionspec4) : new File(file2, "resourcepacks/");

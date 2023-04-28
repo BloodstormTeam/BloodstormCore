@@ -1,5 +1,7 @@
 package net.minecraft.block;
 
+import com.bloodstorm.core.api.event.EventFactory;
+import com.bloodstorm.core.api.event.block.BlockRedstoneEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.ArrayList;
@@ -14,8 +16,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
-import org.bukkit.event.block.BlockRedstoneEvent; // CraftBukkit
 
 
 public class BlockRedstoneTorch extends BlockTorch
@@ -135,10 +135,8 @@ public class BlockRedstoneTorch extends BlockTorch
         }
 
         // CraftBukkit start
-        org.bukkit.plugin.PluginManager manager = p_149674_1_.getServer().getPluginManager();
-        org.bukkit.block.Block block = p_149674_1_.getWorld().getBlockAt(p_149674_2_, p_149674_3_, p_149674_4_);
         int oldCurrent = this.field_150113_a ? 15 : 0;
-        BlockRedstoneEvent event = new BlockRedstoneEvent(block, oldCurrent, oldCurrent);
+        BlockRedstoneEvent blockRedstoneEvent;
         // CraftBukkit end
 
         if (this.field_150113_a)
@@ -148,10 +146,8 @@ public class BlockRedstoneTorch extends BlockTorch
                 // CraftBukkit start
                 if (oldCurrent != 0)
                 {
-                    event.setNewCurrent(0);
-                    manager.callEvent(event);
-
-                    if (event.getNewCurrent() != 0)
+                    blockRedstoneEvent = EventFactory.postRedstoneEvent(p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, oldCurrent, 0);
+                    if (blockRedstoneEvent.getNewValue() != 0)
                     {
                         return;
                     }
@@ -162,7 +158,7 @@ public class BlockRedstoneTorch extends BlockTorch
 
                 if (this.func_150111_a(p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, true))
                 {
-                    p_149674_1_.playSoundEffect((double)((float)p_149674_2_ + 0.5F), (double)((float)p_149674_3_ + 0.5F), (double)((float)p_149674_4_ + 0.5F), "random.fizz", 0.5F, 2.6F + (p_149674_1_.rand.nextFloat() - p_149674_1_.rand.nextFloat()) * 0.8F);
+                    p_149674_1_.playSoundEffect((float)p_149674_2_ + 0.5F, (float)p_149674_3_ + 0.5F, (float)p_149674_4_ + 0.5F, "random.fizz", 0.5F, 2.6F + (p_149674_1_.rand.nextFloat() - p_149674_1_.rand.nextFloat()) * 0.8F);
 
                     for (int l = 0; l < 5; ++l)
                     {
@@ -179,10 +175,8 @@ public class BlockRedstoneTorch extends BlockTorch
             // CraftBukkit start
             if (oldCurrent != 15)
             {
-                event.setNewCurrent(15);
-                manager.callEvent(event);
-
-                if (event.getNewCurrent() != 15)
+                blockRedstoneEvent = EventFactory.postRedstoneEvent(p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, oldCurrent, 15);
+                if (blockRedstoneEvent.getNewValue() != 15)
                 {
                     return;
                 }

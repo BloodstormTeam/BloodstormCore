@@ -1,7 +1,5 @@
 package net.minecraft.client.renderer.entity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Random;
 import net.minecraft.client.model.ModelDragon;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -12,19 +10,21 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.boss.EntityDragon;
+import net.optifine.Config;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
+import shadersmod.client.Shaders;
 
-@SideOnly(Side.CLIENT)
 public class RenderDragon extends RenderLiving
 {
     private static final ResourceLocation enderDragonExplodingTextures = new ResourceLocation("textures/entity/enderdragon/dragon_exploding.png");
     private static final ResourceLocation enderDragonCrystalBeamTextures = new ResourceLocation("textures/entity/endercrystal/endercrystal_beam.png");
     private static final ResourceLocation enderDragonEyesTextures = new ResourceLocation("textures/entity/enderdragon/dragon_eyes.png");
     private static final ResourceLocation enderDragonTextures = new ResourceLocation("textures/entity/enderdragon/dragon.png");
+
+    /** An instance of the dragon model in RenderDragon */
     protected ModelDragon modelDragon;
-    private static final String __OBFID = "CL_00000988";
 
     public RenderDragon()
     {
@@ -33,100 +33,109 @@ public class RenderDragon extends RenderLiving
         this.setRenderPassModel(this.mainModel);
     }
 
-    protected void rotateCorpse(EntityDragon p_77043_1_, float p_77043_2_, float p_77043_3_, float p_77043_4_)
+    protected void rotateCorpse(EntityDragon par1EntityLivingBase, float par2, float par3, float par4)
     {
-        float f3 = (float)p_77043_1_.getMovementOffsets(7, p_77043_4_)[0];
-        float f4 = (float)(p_77043_1_.getMovementOffsets(5, p_77043_4_)[1] - p_77043_1_.getMovementOffsets(10, p_77043_4_)[1]);
-        GL11.glRotatef(-f3, 0.0F, 1.0F, 0.0F);
-        GL11.glRotatef(f4 * 10.0F, 1.0F, 0.0F, 0.0F);
+        float var5 = (float)par1EntityLivingBase.getMovementOffsets(7, par4)[0];
+        float var6 = (float)(par1EntityLivingBase.getMovementOffsets(5, par4)[1] - par1EntityLivingBase.getMovementOffsets(10, par4)[1]);
+        GL11.glRotatef(-var5, 0.0F, 1.0F, 0.0F);
+        GL11.glRotatef(var6 * 10.0F, 1.0F, 0.0F, 0.0F);
         GL11.glTranslatef(0.0F, 0.0F, 1.0F);
 
-        if (p_77043_1_.deathTime > 0)
+        if (par1EntityLivingBase.deathTime > 0)
         {
-            float f5 = ((float)p_77043_1_.deathTime + p_77043_4_ - 1.0F) / 20.0F * 1.6F;
-            f5 = MathHelper.sqrt_float(f5);
+            float var7 = ((float)par1EntityLivingBase.deathTime + par4 - 1.0F) / 20.0F * 1.6F;
+            var7 = MathHelper.sqrt_float(var7);
 
-            if (f5 > 1.0F)
+            if (var7 > 1.0F)
             {
-                f5 = 1.0F;
+                var7 = 1.0F;
             }
 
-            GL11.glRotatef(f5 * this.getDeathMaxRotation(p_77043_1_), 0.0F, 0.0F, 1.0F);
+            GL11.glRotatef(var7 * this.getDeathMaxRotation(par1EntityLivingBase), 0.0F, 0.0F, 1.0F);
         }
     }
 
-    protected void renderModel(EntityDragon p_77036_1_, float p_77036_2_, float p_77036_3_, float p_77036_4_, float p_77036_5_, float p_77036_6_, float p_77036_7_)
+    /**
+     * Renders the model in RenderLiving
+     */
+    protected void renderModel(EntityDragon par1EntityLivingBase, float par2, float par3, float par4, float par5, float par6, float par7)
     {
-        if (p_77036_1_.deathTicks > 0)
+        if (par1EntityLivingBase.deathTicks > 0)
         {
-            float f6 = (float)p_77036_1_.deathTicks / 200.0F;
+            float var8 = (float)par1EntityLivingBase.deathTicks / 200.0F;
             GL11.glDepthFunc(GL11.GL_LEQUAL);
             GL11.glEnable(GL11.GL_ALPHA_TEST);
-            GL11.glAlphaFunc(GL11.GL_GREATER, f6);
+            GL11.glAlphaFunc(GL11.GL_GREATER, var8);
             this.bindTexture(enderDragonExplodingTextures);
-            this.mainModel.render(p_77036_1_, p_77036_2_, p_77036_3_, p_77036_4_, p_77036_5_, p_77036_6_, p_77036_7_);
+            this.mainModel.render(par1EntityLivingBase, par2, par3, par4, par5, par6, par7);
             GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
             GL11.glDepthFunc(GL11.GL_EQUAL);
         }
 
-        this.bindEntityTexture(p_77036_1_);
-        this.mainModel.render(p_77036_1_, p_77036_2_, p_77036_3_, p_77036_4_, p_77036_5_, p_77036_6_, p_77036_7_);
+        this.bindEntityTexture(par1EntityLivingBase);
+        this.mainModel.render(par1EntityLivingBase, par2, par3, par4, par5, par6, par7);
 
-        if (p_77036_1_.hurtTime > 0)
+        if (par1EntityLivingBase.hurtTime > 0)
         {
             GL11.glDepthFunc(GL11.GL_EQUAL);
             GL11.glDisable(GL11.GL_TEXTURE_2D);
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             GL11.glColor4f(1.0F, 0.0F, 0.0F, 0.5F);
-            this.mainModel.render(p_77036_1_, p_77036_2_, p_77036_3_, p_77036_4_, p_77036_5_, p_77036_6_, p_77036_7_);
+            this.mainModel.render(par1EntityLivingBase, par2, par3, par4, par5, par6, par7);
             GL11.glEnable(GL11.GL_TEXTURE_2D);
             GL11.glDisable(GL11.GL_BLEND);
             GL11.glDepthFunc(GL11.GL_LEQUAL);
         }
     }
 
-    public void doRender(EntityDragon p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
+    public void doRender(EntityDragon par1Entity, double par2, double par4, double par6, float par8, float par9)
     {
-        BossStatus.setBossStatus(p_76986_1_, false);
-        super.doRender((EntityLiving)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+        BossStatus.setBossStatus(par1Entity, false);
+        super.doRender((EntityLiving)par1Entity, par2, par4, par6, par8, par9);
 
-        if (p_76986_1_.healingEnderCrystal != null)
+        if (par1Entity.healingEnderCrystal != null)
         {
-            float f2 = (float)p_76986_1_.healingEnderCrystal.innerRotation + p_76986_9_;
-            float f3 = MathHelper.sin(f2 * 0.2F) / 2.0F + 0.5F;
-            f3 = (f3 * f3 + f3) * 0.2F;
-            float f4 = (float)(p_76986_1_.healingEnderCrystal.posX - p_76986_1_.posX - (p_76986_1_.prevPosX - p_76986_1_.posX) * (double)(1.0F - p_76986_9_));
-            float f5 = (float)((double)f3 + p_76986_1_.healingEnderCrystal.posY - 1.0D - p_76986_1_.posY - (p_76986_1_.prevPosY - p_76986_1_.posY) * (double)(1.0F - p_76986_9_));
-            float f6 = (float)(p_76986_1_.healingEnderCrystal.posZ - p_76986_1_.posZ - (p_76986_1_.prevPosZ - p_76986_1_.posZ) * (double)(1.0F - p_76986_9_));
-            float f7 = MathHelper.sqrt_float(f4 * f4 + f6 * f6);
-            float f8 = MathHelper.sqrt_float(f4 * f4 + f5 * f5 + f6 * f6);
+            float var10 = (float)par1Entity.healingEnderCrystal.innerRotation + par9;
+            float var11 = MathHelper.sin(var10 * 0.2F) / 2.0F + 0.5F;
+            var11 = (var11 * var11 + var11) * 0.2F;
+            float var12 = (float)(par1Entity.healingEnderCrystal.posX - par1Entity.posX - (par1Entity.prevPosX - par1Entity.posX) * (double)(1.0F - par9));
+            float var13 = (float)((double)var11 + par1Entity.healingEnderCrystal.posY - 1.0D - par1Entity.posY - (par1Entity.prevPosY - par1Entity.posY) * (double)(1.0F - par9));
+            float var14 = (float)(par1Entity.healingEnderCrystal.posZ - par1Entity.posZ - (par1Entity.prevPosZ - par1Entity.posZ) * (double)(1.0F - par9));
+            float var15 = MathHelper.sqrt_float(var12 * var12 + var14 * var14);
+            float var16 = MathHelper.sqrt_float(var12 * var12 + var13 * var13 + var14 * var14);
             GL11.glPushMatrix();
-            GL11.glTranslatef((float)p_76986_2_, (float)p_76986_4_ + 2.0F, (float)p_76986_6_);
-            GL11.glRotatef((float)(-Math.atan2((double)f6, (double)f4)) * 180.0F / (float)Math.PI - 90.0F, 0.0F, 1.0F, 0.0F);
-            GL11.glRotatef((float)(-Math.atan2((double)f7, (double)f5)) * 180.0F / (float)Math.PI - 90.0F, 1.0F, 0.0F, 0.0F);
-            Tessellator tessellator = Tessellator.instance;
+            GL11.glTranslatef((float)par2, (float)par4 + 2.0F, (float)par6);
+            GL11.glRotatef((float)(-Math.atan2((double)var14, (double)var12)) * 180.0F / (float)Math.PI - 90.0F, 0.0F, 1.0F, 0.0F);
+            GL11.glRotatef((float)(-Math.atan2((double)var15, (double)var13)) * 180.0F / (float)Math.PI - 90.0F, 1.0F, 0.0F, 0.0F);
+            Tessellator var17 = Tessellator.instance;
             RenderHelper.disableStandardItemLighting();
             GL11.glDisable(GL11.GL_CULL_FACE);
             this.bindTexture(enderDragonCrystalBeamTextures);
             GL11.glShadeModel(GL11.GL_SMOOTH);
-            float f9 = 0.0F - ((float)p_76986_1_.ticksExisted + p_76986_9_) * 0.01F;
-            float f10 = MathHelper.sqrt_float(f4 * f4 + f5 * f5 + f6 * f6) / 32.0F - ((float)p_76986_1_.ticksExisted + p_76986_9_) * 0.01F;
-            tessellator.startDrawing(5);
-            byte b0 = 8;
+            float var18 = 0.0F - ((float)par1Entity.ticksExisted + par9) * 0.01F;
+            float var19 = MathHelper.sqrt_float(var12 * var12 + var13 * var13 + var14 * var14) / 32.0F - ((float)par1Entity.ticksExisted + par9) * 0.01F;
+            var17.startDrawing(5);
+            byte var20 = 8;
 
-            for (int i = 0; i <= b0; ++i)
+            for (int var21 = 0; var21 <= var20; ++var21)
             {
-                float f11 = MathHelper.sin((float)(i % b0) * (float)Math.PI * 2.0F / (float)b0) * 0.75F;
-                float f12 = MathHelper.cos((float)(i % b0) * (float)Math.PI * 2.0F / (float)b0) * 0.75F;
-                float f13 = (float)(i % b0) * 1.0F / (float)b0;
-                tessellator.setColorOpaque_I(0);
-                tessellator.addVertexWithUV((double)(f11 * 0.2F), (double)(f12 * 0.2F), 0.0D, (double)f13, (double)f10);
-                tessellator.setColorOpaque_I(16777215);
-                tessellator.addVertexWithUV((double)f11, (double)f12, (double)f8, (double)f13, (double)f9);
+                float var22 = MathHelper.sin((float)(var21 % var20) * (float)Math.PI * 2.0F / (float)var20) * 0.75F;
+                float var23 = MathHelper.cos((float)(var21 % var20) * (float)Math.PI * 2.0F / (float)var20) * 0.75F;
+                float var24 = (float)(var21 % var20) * 1.0F / (float)var20;
+                var17.setColorOpaque_I(0);
+                var17.addVertexWithUV((double)(var22 * 0.2F), (double)(var23 * 0.2F), 0.0D, (double)var24, (double)var19);
+                var17.setColorOpaque_I(16777215);
+                var17.addVertexWithUV((double)var22, (double)var23, (double)var16, (double)var24, (double)var18);
             }
 
-            tessellator.draw();
+            var17.draw();
             GL11.glEnable(GL11.GL_CULL_FACE);
             GL11.glShadeModel(GL11.GL_FLAT);
             RenderHelper.enableStandardItemLighting();
@@ -134,28 +143,31 @@ public class RenderDragon extends RenderLiving
         }
     }
 
-    protected ResourceLocation getEntityTexture(EntityDragon p_110775_1_)
+    /**
+     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
+     */
+    protected ResourceLocation getEntityTexture(EntityDragon par1Entity)
     {
         return enderDragonTextures;
     }
 
-    protected void renderEquippedItems(EntityDragon p_77029_1_, float p_77029_2_)
+    protected void renderEquippedItems(EntityDragon par1EntityLivingBase, float par2)
     {
-        super.renderEquippedItems(p_77029_1_, p_77029_2_);
-        Tessellator tessellator = Tessellator.instance;
+        super.renderEquippedItems(par1EntityLivingBase, par2);
+        Tessellator var3 = Tessellator.instance;
 
-        if (p_77029_1_.deathTicks > 0)
+        if (par1EntityLivingBase.deathTicks > 0)
         {
             RenderHelper.disableStandardItemLighting();
-            float f1 = ((float)p_77029_1_.deathTicks + p_77029_2_) / 200.0F;
-            float f2 = 0.0F;
+            float var4 = ((float)par1EntityLivingBase.deathTicks + par2) / 200.0F;
+            float var5 = 0.0F;
 
-            if (f1 > 0.8F)
+            if (var4 > 0.8F)
             {
-                f2 = (f1 - 0.8F) / 0.2F;
+                var5 = (var4 - 0.8F) / 0.2F;
             }
 
-            Random random = new Random(432L);
+            Random var6 = new Random(432L);
             GL11.glDisable(GL11.GL_TEXTURE_2D);
             GL11.glShadeModel(GL11.GL_SMOOTH);
             GL11.glEnable(GL11.GL_BLEND);
@@ -166,25 +178,25 @@ public class RenderDragon extends RenderLiving
             GL11.glPushMatrix();
             GL11.glTranslatef(0.0F, -1.0F, -2.0F);
 
-            for (int i = 0; (float)i < (f1 + f1 * f1) / 2.0F * 60.0F; ++i)
+            for (int var7 = 0; (float)var7 < (var4 + var4 * var4) / 2.0F * 60.0F; ++var7)
             {
-                GL11.glRotatef(random.nextFloat() * 360.0F, 1.0F, 0.0F, 0.0F);
-                GL11.glRotatef(random.nextFloat() * 360.0F, 0.0F, 1.0F, 0.0F);
-                GL11.glRotatef(random.nextFloat() * 360.0F, 0.0F, 0.0F, 1.0F);
-                GL11.glRotatef(random.nextFloat() * 360.0F, 1.0F, 0.0F, 0.0F);
-                GL11.glRotatef(random.nextFloat() * 360.0F, 0.0F, 1.0F, 0.0F);
-                GL11.glRotatef(random.nextFloat() * 360.0F + f1 * 90.0F, 0.0F, 0.0F, 1.0F);
-                tessellator.startDrawing(6);
-                float f3 = random.nextFloat() * 20.0F + 5.0F + f2 * 10.0F;
-                float f4 = random.nextFloat() * 2.0F + 1.0F + f2 * 2.0F;
-                tessellator.setColorRGBA_I(16777215, (int)(255.0F * (1.0F - f2)));
-                tessellator.addVertex(0.0D, 0.0D, 0.0D);
-                tessellator.setColorRGBA_I(16711935, 0);
-                tessellator.addVertex(-0.866D * (double)f4, (double)f3, (double)(-0.5F * f4));
-                tessellator.addVertex(0.866D * (double)f4, (double)f3, (double)(-0.5F * f4));
-                tessellator.addVertex(0.0D, (double)f3, (double)(1.0F * f4));
-                tessellator.addVertex(-0.866D * (double)f4, (double)f3, (double)(-0.5F * f4));
-                tessellator.draw();
+                GL11.glRotatef(var6.nextFloat() * 360.0F, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(var6.nextFloat() * 360.0F, 0.0F, 1.0F, 0.0F);
+                GL11.glRotatef(var6.nextFloat() * 360.0F, 0.0F, 0.0F, 1.0F);
+                GL11.glRotatef(var6.nextFloat() * 360.0F, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(var6.nextFloat() * 360.0F, 0.0F, 1.0F, 0.0F);
+                GL11.glRotatef(var6.nextFloat() * 360.0F + var4 * 90.0F, 0.0F, 0.0F, 1.0F);
+                var3.startDrawing(6);
+                float var8 = var6.nextFloat() * 20.0F + 5.0F + var5 * 10.0F;
+                float var9 = var6.nextFloat() * 2.0F + 1.0F + var5 * 2.0F;
+                var3.setColorRGBA_I(16777215, (int)(255.0F * (1.0F - var5)));
+                var3.addVertex(0.0D, 0.0D, 0.0D);
+                var3.setColorRGBA_I(16711935, 0);
+                var3.addVertex(-0.866D * (double)var9, (double)var8, (double)(-0.5F * var9));
+                var3.addVertex(0.866D * (double)var9, (double)var8, (double)(-0.5F * var9));
+                var3.addVertex(0.0D, (double)var8, (double)(1.0F * var9));
+                var3.addVertex(-0.866D * (double)var9, (double)var8, (double)(-0.5F * var9));
+                var3.draw();
             }
 
             GL11.glPopMatrix();
@@ -199,14 +211,17 @@ public class RenderDragon extends RenderLiving
         }
     }
 
-    protected int shouldRenderPass(EntityDragon p_77032_1_, int p_77032_2_, float p_77032_3_)
+    /**
+     * Queries whether should render the specified pass or not.
+     */
+    protected int shouldRenderPass(EntityDragon par1EntityLivingBase, int par2, float par3)
     {
-        if (p_77032_2_ == 1)
+        if (par2 == 1)
         {
             GL11.glDepthFunc(GL11.GL_LEQUAL);
         }
 
-        if (p_77032_2_ != 0)
+        if (par2 != 0)
         {
             return -1;
         }
@@ -218,53 +233,86 @@ public class RenderDragon extends RenderLiving
             GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
             GL11.glDisable(GL11.GL_LIGHTING);
             GL11.glDepthFunc(GL11.GL_EQUAL);
-            char c0 = 61680;
-            int j = c0 % 65536;
-            int k = c0 / 65536;
-            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j / 1.0F, (float)k / 1.0F);
+            char var4 = 61680;
+            int var5 = var4 % 65536;
+            int var6 = var4 / 65536;
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)var5 / 1.0F, (float)var6 / 1.0F);
             GL11.glEnable(GL11.GL_LIGHTING);
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+
+            if (Config.isShaders())
+            {
+                Shaders.beginSpiderEyes();
+            }
+
             return 1;
         }
     }
 
-    public void doRender(EntityLiving p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
+    public void doRender(EntityLiving par1Entity, double par2, double par4, double par6, float par8, float par9)
     {
-        this.doRender((EntityDragon)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+        this.doRender((EntityDragon)par1Entity, par2, par4, par6, par8, par9);
     }
 
-    protected int shouldRenderPass(EntityLivingBase p_77032_1_, int p_77032_2_, float p_77032_3_)
+    /**
+     * Queries whether should render the specified pass or not.
+     */
+    protected int shouldRenderPass(EntityLivingBase par1EntityLivingBase, int par2, float par3)
     {
-        return this.shouldRenderPass((EntityDragon)p_77032_1_, p_77032_2_, p_77032_3_);
+        return this.shouldRenderPass((EntityDragon)par1EntityLivingBase, par2, par3);
     }
 
-    protected void renderEquippedItems(EntityLivingBase p_77029_1_, float p_77029_2_)
+    protected void renderEquippedItems(EntityLivingBase par1EntityLivingBase, float par2)
     {
-        this.renderEquippedItems((EntityDragon)p_77029_1_, p_77029_2_);
+        this.renderEquippedItems((EntityDragon)par1EntityLivingBase, par2);
     }
 
-    protected void rotateCorpse(EntityLivingBase p_77043_1_, float p_77043_2_, float p_77043_3_, float p_77043_4_)
+    protected void rotateCorpse(EntityLivingBase par1EntityLivingBase, float par2, float par3, float par4)
     {
-        this.rotateCorpse((EntityDragon)p_77043_1_, p_77043_2_, p_77043_3_, p_77043_4_);
+        this.rotateCorpse((EntityDragon)par1EntityLivingBase, par2, par3, par4);
     }
 
-    protected void renderModel(EntityLivingBase p_77036_1_, float p_77036_2_, float p_77036_3_, float p_77036_4_, float p_77036_5_, float p_77036_6_, float p_77036_7_)
+    /**
+     * Renders the model in RenderLiving
+     */
+    protected void renderModel(EntityLivingBase par1EntityLivingBase, float par2, float par3, float par4, float par5, float par6, float par7)
     {
-        this.renderModel((EntityDragon)p_77036_1_, p_77036_2_, p_77036_3_, p_77036_4_, p_77036_5_, p_77036_6_, p_77036_7_);
+        this.renderModel((EntityDragon)par1EntityLivingBase, par2, par3, par4, par5, par6, par7);
     }
 
-    public void doRender(EntityLivingBase p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
+    public void doRender(EntityLivingBase par1Entity, double par2, double par4, double par6, float par8, float par9)
     {
-        this.doRender((EntityDragon)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+        this.doRender((EntityDragon)par1Entity, par2, par4, par6, par8, par9);
     }
 
-    protected ResourceLocation getEntityTexture(Entity p_110775_1_)
+    /**
+     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
+     */
+    protected ResourceLocation getEntityTexture(Entity par1Entity)
     {
-        return this.getEntityTexture((EntityDragon)p_110775_1_);
+        return this.getEntityTexture((EntityDragon)par1Entity);
     }
 
-    public void doRender(Entity p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
+    public void doRender(Entity par1Entity, double par2, double par4, double par6, float par8, float par9)
     {
-        this.doRender((EntityDragon)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+        this.doRender((EntityDragon)par1Entity, par2, par4, par6, par8, par9);
     }
 }

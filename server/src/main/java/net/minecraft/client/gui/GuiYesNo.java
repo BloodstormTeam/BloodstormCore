@@ -8,10 +8,13 @@ import net.minecraft.client.resources.I18n;
 @SideOnly(Side.CLIENT)
 public class GuiYesNo extends GuiScreen
 {
+    /** A reference to the screen object that created this. Used for navigating between screens. */
     protected GuiYesNoCallback parentScreen;
     protected String field_146351_f;
     private String field_146354_r;
+    /** The text shown for the first button in GuiYesNo */
     protected String confirmButtonText;
+    /** The text shown for the second button in GuiYesNo */
     protected String cancelButtonText;
     protected int field_146357_i;
     private int field_146353_s;
@@ -37,6 +40,9 @@ public class GuiYesNo extends GuiScreen
         this.field_146357_i = p_i1083_6_;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         this.buttonList.add(new GuiOptionButton(0, this.width / 2 - 155, this.height / 6 + 96, this.confirmButtonText));
@@ -48,6 +54,9 @@ public class GuiYesNo extends GuiScreen
         this.parentScreen.confirmClicked(p_146284_1_.id == 0, this.field_146357_i);
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();
@@ -67,6 +76,9 @@ public class GuiYesNo extends GuiScreen
         }
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         super.updateScreen();

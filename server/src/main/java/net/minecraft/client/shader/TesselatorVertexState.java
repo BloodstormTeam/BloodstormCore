@@ -1,9 +1,5 @@
 package net.minecraft.client.shader;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
-@SideOnly(Side.CLIENT)
 public class TesselatorVertexState
 {
     private int[] rawBuffer;
@@ -13,7 +9,6 @@ public class TesselatorVertexState
     private boolean hasBrightness;
     private boolean hasNormals;
     private boolean hasColor;
-    private static final String __OBFID = "CL_00000961";
 
     public TesselatorVertexState(int[] p_i45079_1_, int p_i45079_2_, int p_i45079_3_, boolean p_i45079_4_, boolean p_i45079_5_, boolean p_i45079_6_, boolean p_i45079_7_)
     {
@@ -59,5 +54,26 @@ public class TesselatorVertexState
     public boolean getHasColor()
     {
         return this.hasColor;
+    }
+
+    public void addTessellatorVertexState(TesselatorVertexState tsv)
+    {
+        if (tsv != null)
+        {
+            if (tsv.hasBrightness == this.hasBrightness && tsv.hasColor == this.hasColor && tsv.hasNormals == this.hasNormals && tsv.hasTexture == this.hasTexture)
+            {
+                int newRawBufferIndex = this.rawBufferIndex + tsv.rawBufferIndex;
+                int[] newRawBuffer = new int[newRawBufferIndex];
+                System.arraycopy(this.rawBuffer, 0, newRawBuffer, 0, this.rawBufferIndex);
+                System.arraycopy(tsv.rawBuffer, 0, newRawBuffer, this.rawBufferIndex, tsv.rawBufferIndex);
+                this.rawBuffer = newRawBuffer;
+                this.rawBufferIndex = newRawBufferIndex;
+                this.vertexCount += tsv.vertexCount;
+            }
+            else
+            {
+                throw new IllegalArgumentException("Incompatible vertex states");
+            }
+        }
     }
 }

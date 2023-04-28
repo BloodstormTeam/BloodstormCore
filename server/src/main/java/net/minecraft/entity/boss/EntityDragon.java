@@ -776,7 +776,7 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
         BlockEndPortal.field_149948_a = false;
     }
 
-    protected void despawnEntity() {}
+    public void despawnEntity() {}
 
     public Entity[] getParts()
     {

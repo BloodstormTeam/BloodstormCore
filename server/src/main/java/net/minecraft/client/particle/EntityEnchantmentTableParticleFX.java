@@ -1,10 +1,7 @@
 package net.minecraft.client.particle;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.world.World;
 
-@SideOnly(Side.CLIENT)
 public class EntityEnchantmentTableParticleFX extends EntityFX
 {
     private float field_70565_a;
@@ -22,9 +19,9 @@ public class EntityEnchantmentTableParticleFX extends EntityFX
         this.field_70568_aq = this.posX = p_i1204_2_;
         this.field_70567_ar = this.posY = p_i1204_4_;
         this.field_70566_as = this.posZ = p_i1204_6_;
-        float f = this.rand.nextFloat() * 0.6F + 0.4F;
+        float var14 = this.rand.nextFloat() * 0.6F + 0.4F;
         this.field_70565_a = this.particleScale = this.rand.nextFloat() * 0.5F + 0.2F;
-        this.particleRed = this.particleGreen = this.particleBlue = 1.0F * f;
+        this.particleRed = this.particleGreen = this.particleBlue = 1.0F * var14;
         this.particleGreen *= 0.9F;
         this.particleRed *= 0.9F;
         this.particleMaxAge = (int)(Math.random() * 10.0D) + 30;
@@ -34,44 +31,50 @@ public class EntityEnchantmentTableParticleFX extends EntityFX
 
     public int getBrightnessForRender(float p_70070_1_)
     {
-        int i = super.getBrightnessForRender(p_70070_1_);
-        float f1 = (float)this.particleAge / (float)this.particleMaxAge;
-        f1 *= f1;
-        f1 *= f1;
-        int j = i & 255;
-        int k = i >> 16 & 255;
-        k += (int)(f1 * 15.0F * 16.0F);
+        int var2 = super.getBrightnessForRender(p_70070_1_);
+        float var3 = (float)this.particleAge / (float)this.particleMaxAge;
+        var3 *= var3;
+        var3 *= var3;
+        int var4 = var2 & 255;
+        int var5 = var2 >> 16 & 255;
+        var5 += (int)(var3 * 15.0F * 16.0F);
 
-        if (k > 240)
+        if (var5 > 240)
         {
-            k = 240;
+            var5 = 240;
         }
 
-        return j | k << 16;
+        return var4 | var5 << 16;
     }
 
+    /**
+     * Gets how bright this entity is.
+     */
     public float getBrightness(float p_70013_1_)
     {
-        float f1 = super.getBrightness(p_70013_1_);
-        float f2 = (float)this.particleAge / (float)this.particleMaxAge;
-        f2 *= f2;
-        f2 *= f2;
-        return f1 * (1.0F - f2) + f2;
+        float var2 = super.getBrightness(p_70013_1_);
+        float var3 = (float)this.particleAge / (float)this.particleMaxAge;
+        var3 *= var3;
+        var3 *= var3;
+        return var2 * (1.0F - var3) + var3;
     }
 
+    /**
+     * Called to update the entity's position/logic.
+     */
     public void onUpdate()
     {
         this.prevPosX = this.posX;
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
-        float f = (float)this.particleAge / (float)this.particleMaxAge;
-        f = 1.0F - f;
-        float f1 = 1.0F - f;
-        f1 *= f1;
-        f1 *= f1;
-        this.posX = this.field_70568_aq + this.motionX * (double)f;
-        this.posY = this.field_70567_ar + this.motionY * (double)f - (double)(f1 * 1.2F);
-        this.posZ = this.field_70566_as + this.motionZ * (double)f;
+        float var1 = (float)this.particleAge / (float)this.particleMaxAge;
+        var1 = 1.0F - var1;
+        float var2 = 1.0F - var1;
+        var2 *= var2;
+        var2 *= var2;
+        this.posX = this.field_70568_aq + this.motionX * (double)var1;
+        this.posY = this.field_70567_ar + this.motionY * (double)var1 - (double)(var2 * 1.2F);
+        this.posZ = this.field_70566_as + this.motionZ * (double)var1;
 
         if (this.particleAge++ >= this.particleMaxAge)
         {

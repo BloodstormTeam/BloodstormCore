@@ -13,6 +13,9 @@ public class GuiScreenDemo extends GuiScreen {
     private static final ResourceLocation field_146348_f = new ResourceLocation("textures/gui/demo_background.png");
     private static final String __OBFID = "CL_00000691";
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         this.buttonList.clear();
@@ -33,21 +36,26 @@ public class GuiScreenDemo extends GuiScreen {
                     Class oclass = Class.forName("java.awt.Desktop");
                     Object object = oclass.getMethod("getDesktop", new Class[0]).invoke((Object)null, new Object[0]);
                     oclass.getMethod("browse", new Class[] {URI.class}).invoke(object, new Object[] {new URI("http://www.minecraft.net/store?source=demo")});
-                }
-                catch (Throwable ignored) {}
+                } catch (Throwable ignored) {}
 
                 break;
             case 2:
-                this.mc.displayGuiScreen(null);
+                this.mc.displayGuiScreen((GuiScreen)null);
                 this.mc.setIngameFocus();
         }
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         super.updateScreen();
     }
 
+    /**
+     * Draws either a gradient over the background screen (when it exists) or a flat gradient over background.png
+     */
     public void drawDefaultBackground()
     {
         super.drawDefaultBackground();
@@ -58,6 +66,9 @@ public class GuiScreenDemo extends GuiScreen {
         this.drawTexturedModalRect(i, j, 0, 0, 248, 166);
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();

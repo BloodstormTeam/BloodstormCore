@@ -60,6 +60,9 @@ public class GuiKeyBindingList extends GuiListExtended
         return this.field_148190_m.length;
     }
 
+    /**
+     * Gets the IGuiListEntry object for the given index
+     */
     public GuiListExtended.IGuiListEntry getListEntry(int p_148180_1_)
     {
         return this.field_148190_m[p_148180_1_];
@@ -70,6 +73,9 @@ public class GuiKeyBindingList extends GuiListExtended
         return super.getScrollBarX() + 15;
     }
 
+    /**
+     * Gets the width of the list
+     */
     public int getListWidth()
     {
         return super.getListWidth() + 32;
@@ -93,11 +99,17 @@ public class GuiKeyBindingList extends GuiListExtended
             GuiKeyBindingList.this.mc.fontRenderer.drawString(this.field_148285_b, GuiKeyBindingList.this.mc.currentScreen.width / 2 - this.field_148286_c / 2, p_148279_3_ + p_148279_5_ - GuiKeyBindingList.this.mc.fontRenderer.FONT_HEIGHT - 1, 16777215);
         }
 
+        /**
+         * Returns true if the mouse has been pressed on this control.
+         */
         public boolean mousePressed(int p_148278_1_, int p_148278_2_, int p_148278_3_, int p_148278_4_, int p_148278_5_, int p_148278_6_)
         {
             return false;
         }
 
+        /**
+         * Fired when the mouse button is released. Arguments: index, x, y, mouseEvent, relativeX, relativeY
+         */
         public void mouseReleased(int p_148277_1_, int p_148277_2_, int p_148277_3_, int p_148277_4_, int p_148277_5_, int p_148277_6_) {}
     }
 
@@ -160,6 +172,9 @@ public class GuiKeyBindingList extends GuiListExtended
             this.btnChangeKeyBinding.drawButton(GuiKeyBindingList.this.mc, p_148279_7_, p_148279_8_);
         }
 
+        /**
+         * Returns true if the mouse has been pressed on this control.
+         */
         public boolean mousePressed(int p_148278_1_, int p_148278_2_, int p_148278_3_, int p_148278_4_, int p_148278_5_, int p_148278_6_)
         {
             if (this.btnChangeKeyBinding.mousePressed(GuiKeyBindingList.this.mc, p_148278_2_, p_148278_3_))
@@ -179,6 +194,9 @@ public class GuiKeyBindingList extends GuiListExtended
             }
         }
 
+        /**
+         * Fired when the mouse button is released. Arguments: index, x, y, mouseEvent, relativeX, relativeY
+         */
         public void mouseReleased(int p_148277_1_, int p_148277_2_, int p_148277_3_, int p_148277_4_, int p_148277_5_, int p_148277_6_)
         {
             this.btnChangeKeyBinding.mouseReleased(p_148277_2_, p_148277_3_);

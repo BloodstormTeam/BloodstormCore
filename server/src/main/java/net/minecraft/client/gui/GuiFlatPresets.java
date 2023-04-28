@@ -41,6 +41,9 @@ public class GuiFlatPresets extends GuiScreen
         this.field_146432_g = p_i1049_1_;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         this.buttonList.clear();
@@ -57,17 +60,26 @@ public class GuiFlatPresets extends GuiScreen
         this.func_146426_g();
     }
 
+    /**
+     * Called when the screen is unloaded. Used to disable keyboard repeat events
+     */
     public void onGuiClosed()
     {
         Keyboard.enableRepeatEvents(false);
     }
 
+    /**
+     * Called when the mouse is clicked.
+     */
     protected void mouseClicked(int p_73864_1_, int p_73864_2_, int p_73864_3_)
     {
         this.field_146433_u.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
         super.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
     }
 
+    /**
+     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
+     */
     protected void keyTyped(char p_73869_1_, int p_73869_2_)
     {
         if (!this.field_146433_u.textboxKeyTyped(p_73869_1_, p_73869_2_))
@@ -89,6 +101,9 @@ public class GuiFlatPresets extends GuiScreen
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();
@@ -100,6 +115,9 @@ public class GuiFlatPresets extends GuiScreen
         super.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         this.field_146433_u.updateCursorCounter();
@@ -224,6 +242,9 @@ public class GuiFlatPresets extends GuiScreen
             return GuiFlatPresets.field_146431_f.size();
         }
 
+        /**
+         * The element in the slot that was clicked, boolean for whether it was double clicked or not
+         */
         protected void elementClicked(int p_148144_1_, boolean p_148144_2_, int p_148144_3_, int p_148144_4_)
         {
             this.field_148175_k = p_148144_1_;
@@ -231,6 +252,9 @@ public class GuiFlatPresets extends GuiScreen
             GuiFlatPresets.this.field_146433_u.setText(((GuiFlatPresets.LayerItem)GuiFlatPresets.field_146431_f.get(GuiFlatPresets.this.field_146435_s.field_148175_k)).field_148233_c);
         }
 
+        /**
+         * Returns true if the element passed in is currently selected
+         */
         protected boolean isSelected(int p_148131_1_)
         {
             return p_148131_1_ == this.field_148175_k;

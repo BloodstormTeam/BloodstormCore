@@ -36,6 +36,8 @@ import net.minecraft.world.storage.SaveHandlerMP;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
+import net.optifine.Config;
+import net.optifine.DynamicLights;
 
 @SideOnly(Side.CLIENT)
 public class WorldClient extends World
@@ -47,7 +49,7 @@ public class WorldClient extends World
     private Set entitySpawnQueue = new HashSet();
     private final Minecraft mc = Minecraft.getMinecraft();
     private final Set previousActiveChunkSet = new HashSet();
-    private static final String __OBFID = "CL_00000882";
+    public boolean renderItemInFirstPerson = false;
 
     public WorldClient(NetHandlerPlayClient p_i45063_1_, WorldSettings p_i45063_2_, int p_i45063_3_, EnumDifficulty p_i45063_4_, Profiler p_i45063_5_)
     {
@@ -55,8 +57,8 @@ public class WorldClient extends World
         this.sendQueue = p_i45063_1_;
         this.difficultySetting = p_i45063_4_;
         this.mapStorage = p_i45063_1_.mapStorageOrigin;
-        this.isRemote = true;
         this.finishSetup();
+        this.isRemote = false;
         this.setSpawnLocation(8, 64, 8);
         MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(this));
     }
@@ -267,12 +269,6 @@ public class WorldClient extends World
 
     protected void updateWeather()
     {
-        super.updateWeather();
-    }
-
-    @Override
-    public void updateWeatherBody()
-    {
         if (!this.provider.hasNoSky)
         {
             ;
@@ -445,5 +441,28 @@ public class WorldClient extends World
         }
 
         super.setWorldTime(p_72877_1_);
+    }
+
+    /**
+     * Any Light rendered on a 1.8 Block goes through here
+     */
+    public int getLightBrightnessForSkyBlocks(int x, int y, int z, int lightValue)
+    {
+        int combinedLight = super.getLightBrightnessForSkyBlocks(x, y, z, lightValue);
+
+        if (Config.isDynamicLights())
+        {
+            if (this.renderItemInFirstPerson)
+            {
+                combinedLight = DynamicLights.getCombinedLight(this.mc.renderViewEntity, combinedLight);
+            }
+
+            if (!this.getBlock(x, y, z).isOpaqueCube())
+            {
+                combinedLight = DynamicLights.getCombinedLight(x, y, z, combinedLight);
+            }
+        }
+
+        return combinedLight;
     }
 }

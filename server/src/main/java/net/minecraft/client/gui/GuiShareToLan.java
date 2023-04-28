@@ -23,6 +23,9 @@ public class GuiShareToLan extends GuiScreen
         this.field_146598_a = p_i1055_1_;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         this.buttonList.clear();
@@ -95,6 +98,9 @@ public class GuiShareToLan extends GuiScreen
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();

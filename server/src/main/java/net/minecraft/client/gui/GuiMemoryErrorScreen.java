@@ -9,6 +9,9 @@ public class GuiMemoryErrorScreen extends GuiScreen
 {
     private static final String __OBFID = "CL_00000702";
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         this.buttonList.clear();
@@ -28,8 +31,14 @@ public class GuiMemoryErrorScreen extends GuiScreen
         }
     }
 
+    /**
+     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
+     */
     protected void keyTyped(char p_73869_1_, int p_73869_2_) {}
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();

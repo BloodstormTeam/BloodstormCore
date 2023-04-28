@@ -18,9 +18,13 @@ import org.lwjgl.opengl.GL11;
 @SideOnly(Side.CLIENT)
 public class GuiEditSign extends GuiScreen
 {
+    /** Reference to the sign object. */
     private TileEntitySign tileSign;
+    /** Counts the number of screen updates. */
     private int updateCounter;
+    /** The index of the line that is being edited. */
     private int editLine;
+    /** "Done" button for the GUI. */
     private GuiButton doneBtn;
     private static final String __OBFID = "CL_00000764";
 
@@ -29,6 +33,9 @@ public class GuiEditSign extends GuiScreen
         this.tileSign = p_i1097_1_;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         this.buttonList.clear();
@@ -37,6 +44,9 @@ public class GuiEditSign extends GuiScreen
         this.tileSign.setEditable(false);
     }
 
+    /**
+     * Called when the screen is unloaded. Used to disable keyboard repeat events
+     */
     public void onGuiClosed()
     {
         Keyboard.enableRepeatEvents(false);
@@ -50,6 +60,9 @@ public class GuiEditSign extends GuiScreen
         this.tileSign.setEditable(true);
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         ++this.updateCounter;
@@ -67,6 +80,9 @@ public class GuiEditSign extends GuiScreen
         }
     }
 
+    /**
+     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
+     */
     protected void keyTyped(char p_73869_1_, int p_73869_2_)
     {
         if (p_73869_2_ == 200)
@@ -95,6 +111,9 @@ public class GuiEditSign extends GuiScreen
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();

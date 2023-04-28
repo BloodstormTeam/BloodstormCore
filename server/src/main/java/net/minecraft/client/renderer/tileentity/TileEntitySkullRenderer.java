@@ -3,8 +3,6 @@ package net.minecraft.client.renderer.tileentity;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -16,7 +14,6 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-@SideOnly(Side.CLIENT)
 public class TileEntitySkullRenderer extends TileEntitySpecialRenderer
 {
     private static final ResourceLocation field_147537_c = new ResourceLocation("textures/entity/skeleton/skeleton.png");
@@ -41,7 +38,7 @@ public class TileEntitySkullRenderer extends TileEntitySpecialRenderer
 
     public void func_152674_a(float p_152674_1_, float p_152674_2_, float p_152674_3_, int p_152674_4_, float p_152674_5_, int p_152674_6_, GameProfile p_152674_7_)
     {
-        ModelSkeletonHead modelskeletonhead = this.field_147533_g;
+        ModelSkeletonHead var8 = this.field_147533_g;
 
         switch (p_152674_6_)
         {
@@ -49,29 +46,33 @@ public class TileEntitySkullRenderer extends TileEntitySpecialRenderer
             default:
                 this.bindTexture(field_147537_c);
                 break;
+
             case 1:
                 this.bindTexture(field_147534_d);
                 break;
+
             case 2:
                 this.bindTexture(field_147535_e);
-                modelskeletonhead = this.field_147538_h;
+                var8 = this.field_147538_h;
                 break;
+
             case 3:
-                ResourceLocation resourcelocation = AbstractClientPlayer.locationStevePng;
+                ResourceLocation var9 = AbstractClientPlayer.locationStevePng;
 
                 if (p_152674_7_ != null)
                 {
-                    Minecraft minecraft = Minecraft.getMinecraft();
-                    Map map = minecraft.func_152342_ad().func_152788_a(p_152674_7_);
+                    Minecraft var10 = Minecraft.getMinecraft();
+                    Map var11 = var10.func_152342_ad().func_152788_a(p_152674_7_);
 
-                    if (map.containsKey(Type.SKIN))
+                    if (var11.containsKey(Type.SKIN))
                     {
-                        resourcelocation = minecraft.func_152342_ad().func_152792_a((MinecraftProfileTexture)map.get(Type.SKIN), Type.SKIN);
+                        var9 = var10.func_152342_ad().func_152792_a((MinecraftProfileTexture)var11.get(Type.SKIN), Type.SKIN);
                     }
                 }
 
-                this.bindTexture(resourcelocation);
+                this.bindTexture(var9);
                 break;
+
             case 4:
                 this.bindTexture(field_147532_f);
         }
@@ -86,14 +87,17 @@ public class TileEntitySkullRenderer extends TileEntitySpecialRenderer
                 case 2:
                     GL11.glTranslatef(p_152674_1_ + 0.5F, p_152674_2_ + 0.25F, p_152674_3_ + 0.74F);
                     break;
+
                 case 3:
                     GL11.glTranslatef(p_152674_1_ + 0.5F, p_152674_2_ + 0.25F, p_152674_3_ + 0.26F);
                     p_152674_5_ = 180.0F;
                     break;
+
                 case 4:
                     GL11.glTranslatef(p_152674_1_ + 0.74F, p_152674_2_ + 0.25F, p_152674_3_ + 0.5F);
                     p_152674_5_ = 270.0F;
                     break;
+
                 case 5:
                 default:
                     GL11.glTranslatef(p_152674_1_ + 0.26F, p_152674_2_ + 0.25F, p_152674_3_ + 0.5F);
@@ -105,11 +109,11 @@ public class TileEntitySkullRenderer extends TileEntitySpecialRenderer
             GL11.glTranslatef(p_152674_1_ + 0.5F, p_152674_2_, p_152674_3_ + 0.5F);
         }
 
-        float f4 = 0.0625F;
+        float var12 = 0.0625F;
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         GL11.glScalef(-1.0F, -1.0F, 1.0F);
         GL11.glEnable(GL11.GL_ALPHA_TEST);
-        modelskeletonhead.render((Entity)null, 0.0F, 0.0F, 0.0F, p_152674_5_, 0.0F, f4);
+        var8.render((Entity)null, 0.0F, 0.0F, 0.0F, p_152674_5_, 0.0F, var12);
         GL11.glPopMatrix();
     }
 

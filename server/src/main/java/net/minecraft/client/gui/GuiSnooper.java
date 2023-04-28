@@ -29,6 +29,9 @@ public class GuiSnooper extends GuiScreen
         this.field_146603_f = p_i1061_2_;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         this.field_146610_i = I18n.format("options.snooper.title", new Object[0]);
@@ -92,6 +95,9 @@ public class GuiSnooper extends GuiScreen
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();
@@ -126,8 +132,14 @@ public class GuiSnooper extends GuiScreen
             return GuiSnooper.this.field_146604_g.size();
         }
 
+        /**
+         * The element in the slot that was clicked, boolean for whether it was double clicked or not
+         */
         protected void elementClicked(int p_148144_1_, boolean p_148144_2_, int p_148144_3_, int p_148144_4_) {}
 
+        /**
+         * Returns true if the element passed in is currently selected
+         */
         protected boolean isSelected(int p_148131_1_)
         {
             return false;

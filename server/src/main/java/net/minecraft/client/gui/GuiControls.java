@@ -11,9 +11,12 @@ import net.minecraft.client.settings.KeyBinding;
 public class GuiControls extends GuiScreen
 {
     private static final GameSettings.Options[] field_146492_g = new GameSettings.Options[] {GameSettings.Options.INVERT_MOUSE, GameSettings.Options.SENSITIVITY, GameSettings.Options.TOUCHSCREEN};
+    /** A reference to the screen object that created this. Used for navigating between screens. */
     private GuiScreen parentScreen;
     protected String field_146495_a = "Controls";
+    /** Reference to the GameSettings object. */
     private GameSettings options;
+    /** The ID of the button that has been pressed. */
     public KeyBinding buttonId = null;
     public long field_152177_g;
     private GuiKeyBindingList keyBindingList;
@@ -26,6 +29,9 @@ public class GuiControls extends GuiScreen
         this.options = p_i1027_2_;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         this.keyBindingList = new GuiKeyBindingList(this, this.mc);
@@ -79,6 +85,9 @@ public class GuiControls extends GuiScreen
         }
     }
 
+    /**
+     * Called when the mouse is clicked.
+     */
     protected void mouseClicked(int p_73864_1_, int p_73864_2_, int p_73864_3_)
     {
         if (this.buttonId != null)
@@ -93,6 +102,10 @@ public class GuiControls extends GuiScreen
         }
     }
 
+    /**
+     * Called when the mouse is moved or a mouse button is released.  Signature: (mouseX, mouseY, which) which==-1 is
+     * mouseMove, which==0 or which==1 is mouseUp
+     */
     protected void mouseMovedOrUp(int p_146286_1_, int p_146286_2_, int p_146286_3_)
     {
         if (p_146286_3_ != 0 || !this.keyBindingList.func_148181_b(p_146286_1_, p_146286_2_, p_146286_3_))
@@ -101,6 +114,9 @@ public class GuiControls extends GuiScreen
         }
     }
 
+    /**
+     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
+     */
     protected void keyTyped(char p_73869_1_, int p_73869_2_)
     {
         if (this.buttonId != null)
@@ -124,6 +140,9 @@ public class GuiControls extends GuiScreen
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();

@@ -18,7 +18,9 @@ import org.lwjgl.opengl.GL12;
 @SideOnly(Side.CLIENT)
 public class GuiInventory extends InventoryEffectRenderer
 {
+    /** x size of the inventory window in pixels. Defined as  float, passed as int */
     private float xSizeFloat;
+    /** y size of the inventory window in pixels. Defined as  float, passed as int. */
     private float ySizeFloat;
     private static final String __OBFID = "CL_00000761";
 
@@ -28,6 +30,9 @@ public class GuiInventory extends InventoryEffectRenderer
         this.allowUserInput = true;
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         if (this.mc.playerController.isInCreativeMode())
@@ -36,6 +41,9 @@ public class GuiInventory extends InventoryEffectRenderer
         }
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         this.buttonList.clear();
@@ -50,11 +58,17 @@ public class GuiInventory extends InventoryEffectRenderer
         }
     }
 
+    /**
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
+     */
     protected void drawGuiContainerForegroundLayer(int p_146979_1_, int p_146979_2_)
     {
         this.fontRendererObj.drawString(I18n.format("container.crafting", new Object[0]), 86, 16, 4210752);
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         super.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);

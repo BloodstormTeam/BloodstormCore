@@ -29,6 +29,9 @@ public class GuiScreenHorseInventory extends GuiContainer
         this.allowUserInput = false;
     }
 
+    /**
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
+     */
     protected void drawGuiContainerForegroundLayer(int p_146979_1_, int p_146979_2_)
     {
         this.fontRendererObj.drawString(this.field_147029_w.hasCustomInventoryName() ? this.field_147029_w.getInventoryName() : I18n.format(this.field_147029_w.getInventoryName(), new Object[0]), 8, 6, 4210752);
@@ -56,6 +59,9 @@ public class GuiScreenHorseInventory extends GuiContainer
         GuiInventory.func_147046_a(k + 51, l + 60, 17, (float)(k + 51) - this.field_147033_y, (float)(l + 75 - 50) - this.field_147032_z, this.field_147034_x);
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.field_147033_y = (float)p_73863_1_;

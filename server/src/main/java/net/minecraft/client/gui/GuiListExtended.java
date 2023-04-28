@@ -15,8 +15,14 @@ public abstract class GuiListExtended extends GuiSlot
         super(p_i45010_1_, p_i45010_2_, p_i45010_3_, p_i45010_4_, p_i45010_5_, p_i45010_6_);
     }
 
+    /**
+     * The element in the slot that was clicked, boolean for whether it was double clicked or not
+     */
     protected void elementClicked(int p_148144_1_, boolean p_148144_2_, int p_148144_3_, int p_148144_4_) {}
 
+    /**
+     * Returns true if the element passed in is currently selected
+     */
     protected boolean isSelected(int p_148131_1_)
     {
         return false;
@@ -68,6 +74,9 @@ public abstract class GuiListExtended extends GuiSlot
         return false;
     }
 
+    /**
+     * Gets the IGuiListEntry object for the given index
+     */
     public abstract GuiListExtended.IGuiListEntry getListEntry(int p_148180_1_);
 
     @SideOnly(Side.CLIENT)
@@ -75,8 +84,14 @@ public abstract class GuiListExtended extends GuiSlot
     {
         void drawEntry(int p_148279_1_, int p_148279_2_, int p_148279_3_, int p_148279_4_, int p_148279_5_, Tessellator p_148279_6_, int p_148279_7_, int p_148279_8_, boolean p_148279_9_);
 
+        /**
+         * Returns true if the mouse has been pressed on this control.
+         */
         boolean mousePressed(int p_148278_1_, int p_148278_2_, int p_148278_3_, int p_148278_4_, int p_148278_5_, int p_148278_6_);
 
+        /**
+         * Fired when the mouse button is released. Arguments: index, x, y, mouseEvent, relativeX, relativeY
+         */
         void mouseReleased(int p_148277_1_, int p_148277_2_, int p_148277_3_, int p_148277_4_, int p_148277_5_, int p_148277_6_);
     }
 }

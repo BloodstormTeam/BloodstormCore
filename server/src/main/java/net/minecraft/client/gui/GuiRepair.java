@@ -35,6 +35,9 @@ public class GuiRepair extends GuiContainer implements ICrafting
         this.field_147092_v = (ContainerRepair)this.inventorySlots;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         super.initGui();
@@ -50,6 +53,9 @@ public class GuiRepair extends GuiContainer implements ICrafting
         this.inventorySlots.addCraftingToCrafters(this);
     }
 
+    /**
+     * Called when the screen is unloaded. Used to disable keyboard repeat events
+     */
     public void onGuiClosed()
     {
         super.onGuiClosed();
@@ -57,6 +63,9 @@ public class GuiRepair extends GuiContainer implements ICrafting
         this.inventorySlots.removeCraftingFromCrafters(this);
     }
 
+    /**
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
+     */
     protected void drawGuiContainerForegroundLayer(int p_146979_1_, int p_146979_2_)
     {
         GL11.glDisable(GL11.GL_LIGHTING);
@@ -108,6 +117,9 @@ public class GuiRepair extends GuiContainer implements ICrafting
         GL11.glEnable(GL11.GL_LIGHTING);
     }
 
+    /**
+     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
+     */
     protected void keyTyped(char p_73869_1_, int p_73869_2_)
     {
         if (this.field_147091_w.textboxKeyTyped(p_73869_1_, p_73869_2_))
@@ -134,12 +146,18 @@ public class GuiRepair extends GuiContainer implements ICrafting
         this.mc.thePlayer.sendQueue.addToSendQueue(new C17PacketCustomPayload("MC|ItemName", s.getBytes(Charsets.UTF_8)));
     }
 
+    /**
+     * Called when the mouse is clicked.
+     */
     protected void mouseClicked(int p_73864_1_, int p_73864_2_, int p_73864_3_)
     {
         super.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
         this.field_147091_w.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         super.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
@@ -168,6 +186,10 @@ public class GuiRepair extends GuiContainer implements ICrafting
         this.sendSlotContents(p_71110_1_, 0, p_71110_1_.getSlot(0).getStack());
     }
 
+    /**
+     * Sends the contents of an inventory slot to the client-side Container. This doesn't have to match the actual
+     * contents of that slot. Args: Container, slot number, slot contents
+     */
     public void sendSlotContents(Container p_71111_1_, int p_71111_2_, ItemStack p_71111_3_)
     {
         if (p_71111_2_ == 0)
@@ -182,5 +204,10 @@ public class GuiRepair extends GuiContainer implements ICrafting
         }
     }
 
+    /**
+     * Sends two ints to the client-side Container. Used for furnace burning time, smelting progress, brewing progress,
+     * and enchanting level. Normally the first int identifies which variable to update, and the second contains the new
+     * value. Both are truncated to shorts in non-local SMP.
+     */
     public void sendProgressBarUpdate(Container p_71112_1_, int p_71112_2_, int p_71112_3_) {}
 }

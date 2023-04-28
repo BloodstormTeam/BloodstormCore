@@ -13,13 +13,20 @@ import org.lwjgl.opengl.GL11;
 public class GuiButton extends Gui
 {
     protected static final ResourceLocation buttonTextures = new ResourceLocation("textures/gui/widgets.png");
+    /** Button width in pixels */
     public int width;
+    /** Button height in pixels */
     public int height;
+    /** The x position of this control. */
     public int xPosition;
+    /** The y position of this control. */
     public int yPosition;
+    /** The string displayed on this control. */
     public String displayString;
     public int id;
+    /** True if this control is enabled, false to disable. */
     public boolean enabled;
+    /** Hides the button completely if false. */
     public boolean visible;
     protected boolean field_146123_n;
     private static final String __OBFID = "CL_00000668";
@@ -44,6 +51,10 @@ public class GuiButton extends Gui
         this.displayString = p_i1021_6_;
     }
 
+    /**
+     * Returns 0 if the button is disabled, 1 if the mouse is NOT hovering over this button and 2 if it IS hovering over
+     * this button.
+     */
     public int getHoverState(boolean p_146114_1_)
     {
         byte b0 = 1;
@@ -60,6 +71,9 @@ public class GuiButton extends Gui
         return b0;
     }
 
+    /**
+     * Draws this button to the screen.
+     */
     public void drawButton(Minecraft p_146112_1_, int p_146112_2_, int p_146112_3_)
     {
         if (this.visible)
@@ -94,10 +108,20 @@ public class GuiButton extends Gui
         }
     }
 
+    /**
+     * Fired when the mouse button is dragged. Equivalent of MouseListener.mouseDragged(MouseEvent e).
+     */
     protected void mouseDragged(Minecraft p_146119_1_, int p_146119_2_, int p_146119_3_) {}
 
+    /**
+     * Fired when the mouse button is released. Equivalent of MouseListener.mouseReleased(MouseEvent e).
+     */
     public void mouseReleased(int p_146118_1_, int p_146118_2_) {}
 
+    /**
+     * Returns true if the mouse has been pressed on this control. Equivalent of MouseListener.mousePressed(MouseEvent
+     * e).
+     */
     public boolean mousePressed(Minecraft p_146116_1_, int p_146116_2_, int p_146116_3_)
     {
         return this.enabled && this.visible && p_146116_2_ >= this.xPosition && p_146116_3_ >= this.yPosition && p_146116_2_ < this.xPosition + this.width && p_146116_3_ < this.yPosition + this.height;

@@ -14,6 +14,7 @@ public class GuiChest extends GuiContainer
     private static final ResourceLocation field_147017_u = new ResourceLocation("textures/gui/container/generic_54.png");
     private IInventory upperChestInventory;
     private IInventory lowerChestInventory;
+    /** window height is calculated with these values; the more rows, the heigher */
     private int inventoryRows;
     private static final String __OBFID = "CL_00000749";
 
@@ -29,6 +30,9 @@ public class GuiChest extends GuiContainer
         this.ySize = i + this.inventoryRows * 18;
     }
 
+    /**
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
+     */
     protected void drawGuiContainerForegroundLayer(int p_146979_1_, int p_146979_2_)
     {
         this.fontRendererObj.drawString(this.lowerChestInventory.hasCustomInventoryName() ? this.lowerChestInventory.getInventoryName() : I18n.format(this.lowerChestInventory.getInventoryName(), new Object[0]), 8, 6, 4210752);

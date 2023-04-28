@@ -1,5 +1,6 @@
 package net.minecraft.block;
 
+import com.bloodstorm.core.api.event.EventFactory;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Random;
@@ -37,13 +38,11 @@ public class BlockRedstoneLight extends Block
             }
             else if (!this.field_150171_a && p_149726_1_.isBlockIndirectlyGettingPowered(p_149726_2_, p_149726_3_, p_149726_4_))
             {
-                // CraftBukkit start
-                if (CraftEventFactory.callRedstoneChange(p_149726_1_, p_149726_2_, p_149726_3_, p_149726_4_, 0, 15).getNewCurrent() != 15)
+                if (EventFactory.postRedstoneEvent(p_149726_1_, p_149726_2_, p_149726_3_, p_149726_4_, 0, 15).getNewValue() != 15)
                 {
                     return;
                 }
 
-                // CraftBukkit end
                 p_149726_1_.setBlock(p_149726_2_, p_149726_3_, p_149726_4_, Blocks.lit_redstone_lamp, 0, 2);
             }
         }
@@ -59,13 +58,11 @@ public class BlockRedstoneLight extends Block
             }
             else if (!this.field_150171_a && p_149695_1_.isBlockIndirectlyGettingPowered(p_149695_2_, p_149695_3_, p_149695_4_))
             {
-                // CraftBukkit start
-                if (CraftEventFactory.callRedstoneChange(p_149695_1_, p_149695_2_, p_149695_3_, p_149695_4_, 0, 15).getNewCurrent() != 15)
+                if (EventFactory.postRedstoneEvent(p_149695_1_, p_149695_2_, p_149695_3_, p_149695_4_, 0, 15).getNewValue() != 15)
                 {
                     return;
                 }
 
-                // CraftBukkit end
                 p_149695_1_.setBlock(p_149695_2_, p_149695_3_, p_149695_4_, Blocks.lit_redstone_lamp, 0, 2);
             }
         }
@@ -75,13 +72,11 @@ public class BlockRedstoneLight extends Block
     {
         if (!p_149674_1_.isRemote && this.field_150171_a && !p_149674_1_.isBlockIndirectlyGettingPowered(p_149674_2_, p_149674_3_, p_149674_4_))
         {
-            // CraftBukkit start
-            if (CraftEventFactory.callRedstoneChange(p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, 15, 0).getNewCurrent() != 0)
+            if (EventFactory.postRedstoneEvent(p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, 15, 0).getNewValue() != 0)
             {
                 return;
             }
 
-            // CraftBukkit end
             p_149674_1_.setBlock(p_149674_2_, p_149674_3_, p_149674_4_, Blocks.redstone_lamp, 0, 2);
         }
     }

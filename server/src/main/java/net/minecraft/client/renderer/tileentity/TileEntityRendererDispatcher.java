@@ -1,7 +1,5 @@
 package net.minecraft.client.renderer.tileentity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -26,7 +24,6 @@ import net.minecraft.util.ReportedException;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
 
-@SideOnly(Side.CLIENT)
 public class TileEntityRendererDispatcher
 {
     public Map mapSpecialRenderers = new HashMap();
@@ -56,26 +53,26 @@ public class TileEntityRendererDispatcher
         this.mapSpecialRenderers.put(TileEntityEndPortal.class, new RenderEndPortal());
         this.mapSpecialRenderers.put(TileEntityBeacon.class, new TileEntityBeaconRenderer());
         this.mapSpecialRenderers.put(TileEntitySkull.class, new TileEntitySkullRenderer());
-        Iterator iterator = this.mapSpecialRenderers.values().iterator();
+        Iterator var1 = this.mapSpecialRenderers.values().iterator();
 
-        while (iterator.hasNext())
+        while (var1.hasNext())
         {
-            TileEntitySpecialRenderer tileentityspecialrenderer = (TileEntitySpecialRenderer)iterator.next();
-            tileentityspecialrenderer.func_147497_a(this);
+            TileEntitySpecialRenderer var2 = (TileEntitySpecialRenderer)var1.next();
+            var2.func_147497_a(this);
         }
     }
 
     public TileEntitySpecialRenderer getSpecialRendererByClass(Class p_147546_1_)
     {
-        TileEntitySpecialRenderer tileentityspecialrenderer = (TileEntitySpecialRenderer)this.mapSpecialRenderers.get(p_147546_1_);
+        TileEntitySpecialRenderer var2 = (TileEntitySpecialRenderer)this.mapSpecialRenderers.get(p_147546_1_);
 
-        if (tileentityspecialrenderer == null && p_147546_1_ != TileEntity.class)
+        if (var2 == null && p_147546_1_ != TileEntity.class)
         {
-            tileentityspecialrenderer = this.getSpecialRendererByClass(p_147546_1_.getSuperclass());
-            this.mapSpecialRenderers.put(p_147546_1_, tileentityspecialrenderer);
+            var2 = this.getSpecialRendererByClass(p_147546_1_.getSuperclass());
+            this.mapSpecialRenderers.put(p_147546_1_, var2);
         }
 
-        return tileentityspecialrenderer;
+        return var2;
     }
 
     public boolean hasSpecialRenderer(TileEntity p_147545_1_)
@@ -88,7 +85,7 @@ public class TileEntityRendererDispatcher
         return p_147547_1_ == null ? null : this.getSpecialRendererByClass(p_147547_1_.getClass());
     }
 
-    public void cacheActiveRenderInfo(World p_147542_1_, TextureManager p_147542_2_, FontRenderer p_147542_3_, EntityLivingBase p_147542_4_, float p_147542_5_)
+    public void func_147542_a(World p_147542_1_, TextureManager p_147542_2_, FontRenderer p_147542_3_, EntityLivingBase p_147542_4_, float p_147542_5_)
     {
         if (this.field_147550_f != p_147542_1_)
         {
@@ -105,14 +102,14 @@ public class TileEntityRendererDispatcher
         this.field_147558_l = p_147542_4_.lastTickPosZ + (p_147542_4_.posZ - p_147542_4_.lastTickPosZ) * (double)p_147542_5_;
     }
 
-    public void renderTileEntity(TileEntity p_147544_1_, float p_147544_2_)
+    public void func_147544_a(TileEntity p_147544_1_, float p_147544_2_)
     {
         if (p_147544_1_.getDistanceFrom(this.field_147560_j, this.field_147561_k, this.field_147558_l) < p_147544_1_.getMaxRenderDistanceSquared())
         {
-            int i = this.field_147550_f.getLightBrightnessForSkyBlocks(p_147544_1_.xCoord, p_147544_1_.yCoord, p_147544_1_.zCoord, 0);
-            int j = i % 65536;
-            int k = i / 65536;
-            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j / 1.0F, (float)k / 1.0F);
+            int var3 = this.field_147550_f.getLightBrightnessForSkyBlocks(p_147544_1_.xCoord, p_147544_1_.yCoord, p_147544_1_.zCoord, 0);
+            int var4 = var3 % 65536;
+            int var5 = var3 / 65536;
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)var4 / 1.0F, (float)var5 / 1.0F);
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             this.renderTileEntityAt(p_147544_1_, (double)p_147544_1_.xCoord - staticPlayerX, (double)p_147544_1_.yCoord - staticPlayerY, (double)p_147544_1_.zCoord - staticPlayerZ, p_147544_2_);
         }
@@ -120,20 +117,20 @@ public class TileEntityRendererDispatcher
 
     public void renderTileEntityAt(TileEntity p_147549_1_, double p_147549_2_, double p_147549_4_, double p_147549_6_, float p_147549_8_)
     {
-        TileEntitySpecialRenderer tileentityspecialrenderer = this.getSpecialRenderer(p_147549_1_);
+        TileEntitySpecialRenderer var9 = this.getSpecialRenderer(p_147549_1_);
 
-        if (tileentityspecialrenderer != null)
+        if (var9 != null)
         {
             try
             {
-                tileentityspecialrenderer.renderTileEntityAt(p_147549_1_, p_147549_2_, p_147549_4_, p_147549_6_, p_147549_8_);
+                var9.renderTileEntityAt(p_147549_1_, p_147549_2_, p_147549_4_, p_147549_6_, p_147549_8_);
             }
-            catch (Throwable throwable)
+            catch (Throwable var13)
             {
-                CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering Block Entity");
-                CrashReportCategory crashreportcategory = crashreport.makeCategory("Block Entity Details");
-                p_147549_1_.func_145828_a(crashreportcategory);
-                throw new ReportedException(crashreport);
+                CrashReport var11 = CrashReport.makeCrashReport(var13, "Rendering Block Entity");
+                CrashReportCategory var12 = var11.makeCategory("Block Entity Details");
+                p_147549_1_.func_145828_a(var12);
+                throw new ReportedException(var11);
             }
         }
     }
@@ -141,20 +138,20 @@ public class TileEntityRendererDispatcher
     public void func_147543_a(World p_147543_1_)
     {
         this.field_147550_f = p_147543_1_;
-        Iterator iterator = this.mapSpecialRenderers.values().iterator();
+        Iterator var2 = this.mapSpecialRenderers.values().iterator();
 
-        while (iterator.hasNext())
+        while (var2.hasNext())
         {
-            TileEntitySpecialRenderer tileentityspecialrenderer = (TileEntitySpecialRenderer)iterator.next();
+            TileEntitySpecialRenderer var3 = (TileEntitySpecialRenderer)var2.next();
 
-            if (tileentityspecialrenderer != null)
+            if (var3 != null)
             {
-                tileentityspecialrenderer.func_147496_a(p_147543_1_);
+                var3.func_147496_a(p_147543_1_);
             }
         }
     }
 
-    public FontRenderer getFontRenderer()
+    public FontRenderer func_147548_a()
     {
         return this.field_147557_n;
     }

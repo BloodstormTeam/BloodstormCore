@@ -10,6 +10,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Supplier;
 
 import io.github.crucible.CrucibleConfigs;
 
@@ -40,6 +41,9 @@ import net.minecraftforge.common.util.EnumHelper;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldCreator;
 import org.bukkit.generator.ChunkGenerator;
+
+import static com.bloodstorm.core.ExtensionsKt.executeOnServerSide;
+import static com.bloodstorm.core.ExtensionsKt.isServerSide;
 // Cauldron end
 
 public class DimensionManager
@@ -78,7 +82,11 @@ public class DimensionManager
         {
             worldType = Environment.getEnvironment(id).name().toLowerCase();
         }
-        keepLoaded = MinecraftServer.getServer().cauldronConfig.getBoolean("world-environment-settings." + worldType + ".keep-world-loaded", keepLoaded);
+
+        if (isServerSide()) {
+            keepLoaded = MinecraftServer.getServer().cauldronConfig.getBoolean("world-environment-settings." + worldType + ".keep-world-loaded", keepLoaded);
+        }
+
         // Cauldron end
         providers.put(id, provider);
         classToProviders.put(provider, id);

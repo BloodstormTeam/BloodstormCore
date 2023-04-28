@@ -1,10 +1,7 @@
 package net.minecraft.client.particle;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.world.World;
 
-@SideOnly(Side.CLIENT)
 public class EntityFishWakeFX extends EntityFX
 {
     private static final String __OBFID = "CL_00000933";
@@ -27,6 +24,9 @@ public class EntityFishWakeFX extends EntityFX
         this.motionZ = p_i45073_12_;
     }
 
+    /**
+     * Called to update the entity's position/logic.
+     */
     public void onUpdate()
     {
         this.prevPosX = this.posX;
@@ -37,10 +37,10 @@ public class EntityFishWakeFX extends EntityFX
         this.motionX *= 0.9800000190734863D;
         this.motionY *= 0.9800000190734863D;
         this.motionZ *= 0.9800000190734863D;
-        int i = 60 - this.particleMaxAge;
-        float f = (float)i * 0.001F;
-        this.setSize(f, f);
-        this.setParticleTextureIndex(19 + i % 4);
+        int var1 = 60 - this.particleMaxAge;
+        float var2 = (float)var1 * 0.001F;
+        this.setSize(var2, var2);
+        this.setParticleTextureIndex(19 + var1 % 4);
 
         if (this.particleMaxAge-- <= 0)
         {

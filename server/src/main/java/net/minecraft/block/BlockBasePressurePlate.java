@@ -1,5 +1,7 @@
 package net.minecraft.block;
 
+import com.bloodstorm.core.api.event.EventFactory;
+import com.bloodstorm.core.api.event.block.BlockRedstoneEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Random;
@@ -10,8 +12,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
-import org.bukkit.event.block.BlockRedstoneEvent; // CraftBukkit
 
 public abstract class BlockBasePressurePlate extends Block
 {
@@ -124,19 +124,13 @@ public abstract class BlockBasePressurePlate extends Block
         int i1 = this.func_150065_e(p_150062_1_, p_150062_2_, p_150062_3_, p_150062_4_);
         boolean flag = p_150062_5_ > 0;
         boolean flag1 = i1 > 0;
-        // CraftBukkit start - Interact Pressure Plate
-        org.bukkit.World bworld = p_150062_1_.getWorld();
-        org.bukkit.plugin.PluginManager manager = p_150062_1_.getServer().getPluginManager();
 
         if (flag != flag1)
         {
-            BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(bworld.getBlockAt(p_150062_2_, p_150062_3_, p_150062_4_), p_150062_5_, i1);
-            manager.callEvent(eventRedstone);
-            flag1 = eventRedstone.getNewCurrent() > 0;
-            i1 = eventRedstone.getNewCurrent();
+            BlockRedstoneEvent blockRedstoneEvent = EventFactory.postRedstoneEvent(p_150062_1_, p_150062_2_, p_150062_3_, p_150062_4_, p_150062_5_, i1);
+            flag1 = blockRedstoneEvent.getNewValue() > 0;
+            i1 = blockRedstoneEvent.getNewValue();
         }
-
-        // CraftBukkit end
 
         if (p_150062_5_ != i1)
         {

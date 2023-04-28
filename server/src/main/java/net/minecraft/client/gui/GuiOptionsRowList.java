@@ -42,6 +42,9 @@ public class GuiOptionsRowList extends GuiListExtended
         }
     }
 
+    /**
+     * Gets the IGuiListEntry object for the given index
+     */
     public GuiOptionsRowList.Row getListEntry(int p_148180_1_)
     {
         return (GuiOptionsRowList.Row)this.field_148184_k.get(p_148180_1_);
@@ -52,6 +55,9 @@ public class GuiOptionsRowList extends GuiListExtended
         return this.field_148184_k.size();
     }
 
+    /**
+     * Gets the width of the list
+     */
     public int getListWidth()
     {
         return 400;
@@ -91,6 +97,9 @@ public class GuiOptionsRowList extends GuiListExtended
                 }
             }
 
+            /**
+             * Returns true if the mouse has been pressed on this control.
+             */
             public boolean mousePressed(int p_148278_1_, int p_148278_2_, int p_148278_3_, int p_148278_4_, int p_148278_5_, int p_148278_6_)
             {
                 if (this.field_148323_b.mousePressed(this.field_148325_a, p_148278_2_, p_148278_3_))
@@ -119,6 +128,9 @@ public class GuiOptionsRowList extends GuiListExtended
                 }
             }
 
+            /**
+             * Fired when the mouse button is released. Arguments: index, x, y, mouseEvent, relativeX, relativeY
+             */
             public void mouseReleased(int p_148277_1_, int p_148277_2_, int p_148277_3_, int p_148277_4_, int p_148277_5_, int p_148277_6_)
             {
                 if (this.field_148323_b != null)

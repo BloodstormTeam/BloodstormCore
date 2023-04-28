@@ -1,5 +1,8 @@
 package net.minecraft.entity.monster;
 
+import com.bloodstorm.core.api.event.EventFactory;
+import com.bloodstorm.core.api.event.block.EntityBlockFormEvent;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -20,14 +23,14 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
 // CraftBukkit start
+import net.optifine.BlockPos;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
-import org.bukkit.event.block.EntityBlockFormEvent;
 // CraftBukkit end
 
-public class EntitySnowman extends EntityGolem implements IRangedAttackMob
-{
-    private static final String __OBFID = "CL_00001650";
+public class EntitySnowman extends EntityGolem implements IRangedAttackMob {
+    private int tickCount = 0;
+    private int tickCountMax = 20;
 
     public EntitySnowman(World p_i1692_1_)
     {
@@ -70,26 +73,20 @@ public class EntitySnowman extends EntityGolem implements IRangedAttackMob
             this.attackEntityFrom(CraftEventFactory.MELTING, 1.0F); // CraftBukkit - DamageSource.BURN -> CraftEventFactory.MELTING
         }
 
-        for (int l = 0; l < 4; ++l)
-        {
-            i = MathHelper.floor_double(this.posX + (double)((float)(l % 2 * 2 - 1) * 0.25F));
-            j = MathHelper.floor_double(this.posY);
-            k = MathHelper.floor_double(this.posZ + (double)((float)(l / 2 % 2 * 2 - 1) * 0.25F));
-
-            if (this.worldObj.getBlock(i, j, k).getMaterial() == Material.air && this.worldObj.getBiomeGenForCoords(i, k).getFloatTemperature(i, j, k) < 0.8F && Blocks.snow_layer.canPlaceBlockAt(this.worldObj, i, j, k))
-            {
-                // CraftBukkit start
-                org.bukkit.block.BlockState blockState = this.worldObj.getWorld().getBlockAt(i, j, k).getState();
-                blockState.setType(CraftMagicNumbers.getMaterial(Blocks.snow_layer));
-                EntityBlockFormEvent event = new EntityBlockFormEvent(this.getBukkitEntity(), blockState.getBlock(), blockState);
-                this.worldObj.getServer().getPluginManager().callEvent(event);
-
-                if (!event.isCancelled())
-                {
-                    blockState.update(true);
+        if (tickCount++ >= tickCountMax) {
+            tickCount = 0;
+            for (int l = 0; l < 4; ++l) {
+                i = MathHelper.floor_double(this.posX + (double) ((float) (l % 2 * 2 - 1) * 0.25F));
+                j = MathHelper.floor_double(this.posY);
+                k = MathHelper.floor_double(this.posZ + (double) ((float) (l / 2 % 2 * 2 - 1) * 0.25F));
+                Block block = this.worldObj.getBlock(i, j, k);
+                if (block.getMaterial() == Material.air && this.worldObj.getBiomeGenForCoords(i, k).getFloatTemperature(i, j, k) < 0.8F && Blocks.snow_layer.canPlaceBlockAt(this.worldObj, i, j, k)) {
+                    EntityBlockFormEvent entityBlockFormEvent = EventFactory.postEntityBlockFormEvent(i, k, k, Blocks.snow_layer, this);
+                    if (!entityBlockFormEvent.getCancelled()) {
+                        this.worldObj.setBlock(i, j, k, entityBlockFormEvent.getBlock());
+                        this.worldObj.markBlockForUpdate(i, j, k);
+                    }
                 }
-
-                // CraftBukkit end
             }
         }
     }

@@ -32,6 +32,9 @@ public class GuiScreenResourcePacks extends GuiScreen {
         this.field_146965_f = p_i45050_1_;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         this.buttonList.add(new GuiOptionButton(2, this.width / 2 - 154, this.height - 48, I18n.format("resourcePack.openFolder", new Object[0])));
@@ -97,25 +100,19 @@ public class GuiScreenResourcePacks extends GuiScreen {
                 File file1 = this.mc.getResourcePackRepository().getDirResourcepacks();
                 String s = file1.getAbsolutePath();
 
-                if (Util.getOSType() == Util.EnumOS.OSX)
-                {
-                    try
-                    {
+                if (Util.getOSType() == Util.EnumOS.OSX) {
+                    try {
                         Runtime.getRuntime().exec(new String[] {"/usr/bin/open", s});
                         return;
-                    }
-                    catch (IOException ignored) {}
+                    } catch (IOException ignored) {}
                 }
-                else if (Util.getOSType() == Util.EnumOS.WINDOWS)
-                {
+                else if (Util.getOSType() == Util.EnumOS.WINDOWS) {
                     String s1 = String.format("cmd.exe /C start \"Open file\" \"%s\"", s);
 
-                    try
-                    {
+                    try {
                         Runtime.getRuntime().exec(s1);
                         return;
-                    }
-                    catch (IOException ignored) {}
+                    } catch (IOException ignored) {}
                 }
 
                 boolean flag = false;
@@ -135,18 +132,14 @@ public class GuiScreenResourcePacks extends GuiScreen {
                 {
                     Sys.openURL("file://" + s);
                 }
-            }
-            else if (p_146284_1_.id == 1)
-            {
+            } else if (p_146284_1_.id == 1) {
                 ArrayList arraylist = Lists.newArrayList();
                 Iterator iterator = this.field_146969_h.iterator();
 
-                while (iterator.hasNext())
-                {
+                while (iterator.hasNext()) {
                     ResourcePackListEntry resourcepacklistentry = (ResourcePackListEntry)iterator.next();
 
-                    if (resourcepacklistentry instanceof ResourcePackListEntryFound)
-                    {
+                    if (resourcepacklistentry instanceof ResourcePackListEntryFound) {
                         arraylist.add(((ResourcePackListEntryFound)resourcepacklistentry).func_148318_i());
                     }
                 }
@@ -169,6 +162,9 @@ public class GuiScreenResourcePacks extends GuiScreen {
         }
     }
 
+    /**
+     * Called when the mouse is clicked.
+     */
     protected void mouseClicked(int p_73864_1_, int p_73864_2_, int p_73864_3_)
     {
         super.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
@@ -176,11 +172,18 @@ public class GuiScreenResourcePacks extends GuiScreen {
         this.field_146967_r.func_148179_a(p_73864_1_, p_73864_2_, p_73864_3_);
     }
 
+    /**
+     * Called when the mouse is moved or a mouse button is released.  Signature: (mouseX, mouseY, which) which==-1 is
+     * mouseMove, which==0 or which==1 is mouseUp
+     */
     protected void mouseMovedOrUp(int p_146286_1_, int p_146286_2_, int p_146286_3_)
     {
         super.mouseMovedOrUp(p_146286_1_, p_146286_2_, p_146286_3_);
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawBackground(0);

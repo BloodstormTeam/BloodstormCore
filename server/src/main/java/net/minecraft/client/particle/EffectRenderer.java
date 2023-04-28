@@ -1,7 +1,5 @@
 package net.minecraft.client.particle;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -20,16 +18,18 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-
 import org.lwjgl.opengl.GL11;
 
-@SideOnly(Side.CLIENT)
 public class EffectRenderer
 {
     private static final ResourceLocation particleTextures = new ResourceLocation("textures/particle/particles.png");
+
+    /** Reference to the World object. */
     protected World worldObj;
     private List[] fxLayers = new List[4];
     private TextureManager renderer;
+
+    /** RNG. */
     private Random rand = new Random();
     private static final String __OBFID = "CL_00000915";
 
@@ -42,98 +42,100 @@ public class EffectRenderer
 
         this.renderer = p_i1220_2_;
 
-        for (int i = 0; i < 4; ++i)
+        for (int var3 = 0; var3 < 4; ++var3)
         {
-            this.fxLayers[i] = new ArrayList();
+            this.fxLayers[var3] = new ArrayList();
         }
     }
 
     public void addEffect(EntityFX p_78873_1_)
     {
-        int i = p_78873_1_.getFXLayer();
+        int var2 = p_78873_1_.getFXLayer();
 
-        if (this.fxLayers[i].size() >= 4000)
+        if (this.fxLayers[var2].size() >= 4000)
         {
-            this.fxLayers[i].remove(0);
+            this.fxLayers[var2].remove(0);
         }
 
-        this.fxLayers[i].add(p_78873_1_);
+        this.fxLayers[var2].add(p_78873_1_);
     }
 
     public void updateEffects()
     {
-        for (int k = 0; k < 4; ++k)
+        for (int var11 = 0; var11 < 4; ++var11)
         {
-            final int i = k;
+            final int var1 = var11;
 
-            for (int j = 0; j < this.fxLayers[i].size(); ++j)
+            for (int var2 = 0; var2 < this.fxLayers[var1].size(); ++var2)
             {
-                final EntityFX entityfx = (EntityFX)this.fxLayers[i].get(j);
+                final EntityFX var3 = (EntityFX)this.fxLayers[var1].get(var2);
 
                 try
                 {
-                    if (entityfx != null)
-                    {
-                        entityfx.onUpdate();
-                    }
+                    var3.onUpdate();
                 }
-                catch (Throwable throwable)
+                catch (Throwable var8)
                 {
-                    CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Ticking Particle");
-                    CrashReportCategory crashreportcategory = crashreport.makeCategory("Particle being ticked");
-                    crashreportcategory.addCrashSectionCallable("Particle", new Callable()
+                    CrashReport var5 = CrashReport.makeCrashReport(var8, "Ticking Particle");
+                    CrashReportCategory var6 = var5.makeCategory("Particle being ticked");
+                    var6.addCrashSectionCallable("Particle", new Callable()
                     {
                         private static final String __OBFID = "CL_00000916";
                         public String call()
                         {
-                            return entityfx.toString();
+                            return var3.toString();
                         }
                     });
-                    crashreportcategory.addCrashSectionCallable("Particle Type", new Callable()
+                    var6.addCrashSectionCallable("Particle Type", new Callable()
                     {
                         private static final String __OBFID = "CL_00000917";
                         public String call()
                         {
-                            return i == 0 ? "MISC_TEXTURE" : (i == 1 ? "TERRAIN_TEXTURE" : (i == 2 ? "ITEM_TEXTURE" : (i == 3 ? "ENTITY_PARTICLE_TEXTURE" : "Unknown - " + i)));
+                            return var1 == 0 ? "MISC_TEXTURE" : (var1 == 1 ? "TERRAIN_TEXTURE" : (var1 == 2 ? "ITEM_TEXTURE" : (var1 == 3 ? "ENTITY_PARTICLE_TEXTURE" : "Unknown - " + var1)));
                         }
                     });
-                    throw new ReportedException(crashreport);
+                    throw new ReportedException(var5);
                 }
 
-                if (entityfx == null || entityfx.isDead)
+                if (var3.isDead)
                 {
-                    this.fxLayers[i].remove(j--);
+                    this.fxLayers[var1].remove(var2--);
                 }
             }
         }
     }
 
+    /**
+     * Renders all current particles. Args player, partialTickTime
+     */
     public void renderParticles(Entity p_78874_1_, float p_78874_2_)
     {
-        float f1 = ActiveRenderInfo.rotationX;
-        float f2 = ActiveRenderInfo.rotationZ;
-        float f3 = ActiveRenderInfo.rotationYZ;
-        float f4 = ActiveRenderInfo.rotationXY;
-        float f5 = ActiveRenderInfo.rotationXZ;
+        float var3 = ActiveRenderInfo.rotationX;
+        float var4 = ActiveRenderInfo.rotationZ;
+        float var5 = ActiveRenderInfo.rotationYZ;
+        float var6 = ActiveRenderInfo.rotationXY;
+        float var7 = ActiveRenderInfo.rotationXZ;
         EntityFX.interpPosX = p_78874_1_.lastTickPosX + (p_78874_1_.posX - p_78874_1_.lastTickPosX) * (double)p_78874_2_;
         EntityFX.interpPosY = p_78874_1_.lastTickPosY + (p_78874_1_.posY - p_78874_1_.lastTickPosY) * (double)p_78874_2_;
         EntityFX.interpPosZ = p_78874_1_.lastTickPosZ + (p_78874_1_.posZ - p_78874_1_.lastTickPosZ) * (double)p_78874_2_;
 
-        for (int k = 0; k < 3; ++k)
+        for (int var88 = 0; var88 < 3; ++var88)
         {
-            final int i = k;
+            final int var8 = var88;
 
-            if (!this.fxLayers[i].isEmpty())
+            if (!this.fxLayers[var8].isEmpty())
             {
-                switch (i)
+                switch (var8)
                 {
                     case 0:
                     default:
                         this.renderer.bindTexture(particleTextures);
                         break;
+
                     case 1:
                         this.renderer.bindTexture(TextureMap.locationBlocksTexture);
                         break;
+
                     case 2:
                         this.renderer.bindTexture(TextureMap.locationItemsTexture);
                 }
@@ -143,44 +145,43 @@ public class EffectRenderer
                 GL11.glEnable(GL11.GL_BLEND);
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 GL11.glAlphaFunc(GL11.GL_GREATER, 0.003921569F);
-                Tessellator tessellator = Tessellator.instance;
-                tessellator.startDrawingQuads();
+                Tessellator var9 = Tessellator.instance;
+                var9.startDrawingQuads();
 
-                for (int j = 0; j < this.fxLayers[i].size(); ++j)
+                for (int var10 = 0; var10 < this.fxLayers[var8].size(); ++var10)
                 {
-                    final EntityFX entityfx = (EntityFX)this.fxLayers[i].get(j);
-                    if (entityfx == null) continue;
-                    tessellator.setBrightness(entityfx.getBrightnessForRender(p_78874_2_));
+                    final EntityFX var11 = (EntityFX)this.fxLayers[var8].get(var10);
+                    var9.setBrightness(var11.getBrightnessForRender(p_78874_2_));
 
                     try
                     {
-                        entityfx.renderParticle(tessellator, p_78874_2_, f1, f5, f2, f3, f4);
+                        var11.renderParticle(var9, p_78874_2_, var3, var7, var4, var5, var6);
                     }
-                    catch (Throwable throwable)
+                    catch (Throwable var16)
                     {
-                        CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering Particle");
-                        CrashReportCategory crashreportcategory = crashreport.makeCategory("Particle being rendered");
-                        crashreportcategory.addCrashSectionCallable("Particle", new Callable()
+                        CrashReport var13 = CrashReport.makeCrashReport(var16, "Rendering Particle");
+                        CrashReportCategory var14 = var13.makeCategory("Particle being rendered");
+                        var14.addCrashSectionCallable("Particle", new Callable()
                         {
                             private static final String __OBFID = "CL_00000918";
                             public String call()
                             {
-                                return entityfx.toString();
+                                return var11.toString();
                             }
                         });
-                        crashreportcategory.addCrashSectionCallable("Particle Type", new Callable()
+                        var14.addCrashSectionCallable("Particle Type", new Callable()
                         {
                             private static final String __OBFID = "CL_00000919";
                             public String call()
                             {
-                                return i == 0 ? "MISC_TEXTURE" : (i == 1 ? "TERRAIN_TEXTURE" : (i == 2 ? "ITEM_TEXTURE" : (i == 3 ? "ENTITY_PARTICLE_TEXTURE" : "Unknown - " + i)));
+                                return var8 == 0 ? "MISC_TEXTURE" : (var8 == 1 ? "TERRAIN_TEXTURE" : (var8 == 2 ? "ITEM_TEXTURE" : (var8 == 3 ? "ENTITY_PARTICLE_TEXTURE" : "Unknown - " + var8)));
                             }
                         });
-                        throw new ReportedException(crashreport);
+                        throw new ReportedException(var13);
                     }
                 }
 
-                tessellator.draw();
+                var9.draw();
                 GL11.glDisable(GL11.GL_BLEND);
                 GL11.glDepthMask(true);
                 GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
@@ -190,25 +191,24 @@ public class EffectRenderer
 
     public void renderLitParticles(Entity p_78872_1_, float p_78872_2_)
     {
-        float f1 = 0.017453292F;
-        float f2 = MathHelper.cos(p_78872_1_.rotationYaw * 0.017453292F);
-        float f3 = MathHelper.sin(p_78872_1_.rotationYaw * 0.017453292F);
-        float f4 = -f3 * MathHelper.sin(p_78872_1_.rotationPitch * 0.017453292F);
-        float f5 = f2 * MathHelper.sin(p_78872_1_.rotationPitch * 0.017453292F);
-        float f6 = MathHelper.cos(p_78872_1_.rotationPitch * 0.017453292F);
-        byte b0 = 3;
-        List list = this.fxLayers[b0];
+        float var3 = 0.017453292F;
+        float var4 = MathHelper.cos(p_78872_1_.rotationYaw * 0.017453292F);
+        float var5 = MathHelper.sin(p_78872_1_.rotationYaw * 0.017453292F);
+        float var6 = -var5 * MathHelper.sin(p_78872_1_.rotationPitch * 0.017453292F);
+        float var7 = var4 * MathHelper.sin(p_78872_1_.rotationPitch * 0.017453292F);
+        float var8 = MathHelper.cos(p_78872_1_.rotationPitch * 0.017453292F);
+        byte var9 = 3;
+        List var10 = this.fxLayers[var9];
 
-        if (!list.isEmpty())
+        if (!var10.isEmpty())
         {
-            Tessellator tessellator = Tessellator.instance;
+            Tessellator var11 = Tessellator.instance;
 
-            for (int i = 0; i < list.size(); ++i)
+            for (int var12 = 0; var12 < var10.size(); ++var12)
             {
-                EntityFX entityfx = (EntityFX)list.get(i);
-                if (entityfx == null) continue;
-                tessellator.setBrightness(entityfx.getBrightnessForRender(p_78872_2_));
-                entityfx.renderParticle(tessellator, p_78872_2_, f2, f6, f3, f4, f5);
+                EntityFX var13 = (EntityFX)var10.get(var12);
+                var11.setBrightness(var13.getBrightnessForRender(p_78872_2_));
+                var13.renderParticle(var11, p_78872_2_, var4, var8, var5, var6, var7);
             }
         }
     }
@@ -217,76 +217,79 @@ public class EffectRenderer
     {
         this.worldObj = p_78870_1_;
 
-        for (int i = 0; i < 4; ++i)
+        for (int var2 = 0; var2 < 4; ++var2)
         {
-            this.fxLayers[i].clear();
+            this.fxLayers[var2].clear();
         }
     }
 
-    public void addBlockDestroyEffects(int p_147215_1_, int p_147215_2_, int p_147215_3_, Block p_147215_4_, int p_147215_5_)
+    public void func_147215_a(int p_147215_1_, int p_147215_2_, int p_147215_3_, Block p_147215_4_, int p_147215_5_)
     {
-        if (!p_147215_4_.isAir(worldObj, p_147215_1_, p_147215_2_, p_147215_3_) && !p_147215_4_.addDestroyEffects(worldObj, p_147215_1_, p_147215_2_, p_147215_3_, p_147215_5_, this))
+        if (p_147215_4_.getMaterial() != Material.air)
         {
-            byte b0 = 4;
+            byte var6 = 4;
 
-            for (int i1 = 0; i1 < b0; ++i1)
+            for (int var7 = 0; var7 < var6; ++var7)
             {
-                for (int j1 = 0; j1 < b0; ++j1)
+                for (int var8 = 0; var8 < var6; ++var8)
                 {
-                    for (int k1 = 0; k1 < b0; ++k1)
+                    for (int var9 = 0; var9 < var6; ++var9)
                     {
-                        double d0 = (double)p_147215_1_ + ((double)i1 + 0.5D) / (double)b0;
-                        double d1 = (double)p_147215_2_ + ((double)j1 + 0.5D) / (double)b0;
-                        double d2 = (double)p_147215_3_ + ((double)k1 + 0.5D) / (double)b0;
-                        this.addEffect((new EntityDiggingFX(this.worldObj, d0, d1, d2, d0 - (double)p_147215_1_ - 0.5D, d1 - (double)p_147215_2_ - 0.5D, d2 - (double)p_147215_3_ - 0.5D, p_147215_4_, p_147215_5_)).applyColourMultiplier(p_147215_1_, p_147215_2_, p_147215_3_));
+                        double var10 = (double)p_147215_1_ + ((double)var7 + 0.5D) / (double)var6;
+                        double var12 = (double)p_147215_2_ + ((double)var8 + 0.5D) / (double)var6;
+                        double var14 = (double)p_147215_3_ + ((double)var9 + 0.5D) / (double)var6;
+                        this.addEffect((new EntityDiggingFX(this.worldObj, var10, var12, var14, var10 - (double)p_147215_1_ - 0.5D, var12 - (double)p_147215_2_ - 0.5D, var14 - (double)p_147215_3_ - 0.5D, p_147215_4_, p_147215_5_)).applyColourMultiplier(p_147215_1_, p_147215_2_, p_147215_3_));
                     }
                 }
             }
         }
     }
 
+    /**
+     * Adds block hit particles for the specified block. Args: x, y, z, sideHit
+     */
     public void addBlockHitEffects(int p_78867_1_, int p_78867_2_, int p_78867_3_, int p_78867_4_)
     {
-        Block block = this.worldObj.getBlock(p_78867_1_, p_78867_2_, p_78867_3_);
+        Block var5 = this.worldObj.getBlock(p_78867_1_, p_78867_2_, p_78867_3_);
 
-        if (block.getMaterial() != Material.air)
+        if (var5.getMaterial() != Material.air)
         {
-            float f = 0.1F;
-            double d0 = (double)p_78867_1_ + this.rand.nextDouble() * (block.getBlockBoundsMaxX() - block.getBlockBoundsMinX() - (double)(f * 2.0F)) + (double)f + block.getBlockBoundsMinX();
-            double d1 = (double)p_78867_2_ + this.rand.nextDouble() * (block.getBlockBoundsMaxY() - block.getBlockBoundsMinY() - (double)(f * 2.0F)) + (double)f + block.getBlockBoundsMinY();
-            double d2 = (double)p_78867_3_ + this.rand.nextDouble() * (block.getBlockBoundsMaxZ() - block.getBlockBoundsMinZ() - (double)(f * 2.0F)) + (double)f + block.getBlockBoundsMinZ();
+            float var6 = 0.1F;
+            double var7 = (double)p_78867_1_ + this.rand.nextDouble() * (var5.getBlockBoundsMaxX() - var5.getBlockBoundsMinX() - (double)(var6 * 2.0F)) + (double)var6 + var5.getBlockBoundsMinX();
+            double var9 = (double)p_78867_2_ + this.rand.nextDouble() * (var5.getBlockBoundsMaxY() - var5.getBlockBoundsMinY() - (double)(var6 * 2.0F)) + (double)var6 + var5.getBlockBoundsMinY();
+            double var11 = (double)p_78867_3_ + this.rand.nextDouble() * (var5.getBlockBoundsMaxZ() - var5.getBlockBoundsMinZ() - (double)(var6 * 2.0F)) + (double)var6 + var5.getBlockBoundsMinZ();
 
             if (p_78867_4_ == 0)
             {
-                d1 = (double)p_78867_2_ + block.getBlockBoundsMinY() - (double)f;
+                var9 = (double)p_78867_2_ + var5.getBlockBoundsMinY() - (double)var6;
             }
 
             if (p_78867_4_ == 1)
             {
-                d1 = (double)p_78867_2_ + block.getBlockBoundsMaxY() + (double)f;
+                var9 = (double)p_78867_2_ + var5.getBlockBoundsMaxY() + (double)var6;
             }
 
             if (p_78867_4_ == 2)
             {
-                d2 = (double)p_78867_3_ + block.getBlockBoundsMinZ() - (double)f;
+                var11 = (double)p_78867_3_ + var5.getBlockBoundsMinZ() - (double)var6;
             }
 
             if (p_78867_4_ == 3)
             {
-                d2 = (double)p_78867_3_ + block.getBlockBoundsMaxZ() + (double)f;
+                var11 = (double)p_78867_3_ + var5.getBlockBoundsMaxZ() + (double)var6;
             }
 
             if (p_78867_4_ == 4)
             {
-                d0 = (double)p_78867_1_ + block.getBlockBoundsMinX() - (double)f;
+                var7 = (double)p_78867_1_ + var5.getBlockBoundsMinX() - (double)var6;
             }
 
             if (p_78867_4_ == 5)
             {
-                d0 = (double)p_78867_1_ + block.getBlockBoundsMaxX() + (double)f;
+                var7 = (double)p_78867_1_ + var5.getBlockBoundsMaxX() + (double)var6;
             }
 
-            this.addEffect((new EntityDiggingFX(this.worldObj, d0, d1, d2, 0.0D, 0.0D, 0.0D, block, this.worldObj.getBlockMetadata(p_78867_1_, p_78867_2_, p_78867_3_))).applyColourMultiplier(p_78867_1_, p_78867_2_, p_78867_3_).multiplyVelocity(0.2F).multipleParticleScaleBy(0.6F));
+            this.addEffect((new EntityDiggingFX(this.worldObj, var7, var9, var11, 0.0D, 0.0D, 0.0D, var5, this.worldObj.getBlockMetadata(p_78867_1_, p_78867_2_, p_78867_3_))).applyColourMultiplier(p_78867_1_, p_78867_2_, p_78867_3_).multiplyVelocity(0.2F).multipleParticleScaleBy(0.6F));
         }
     }
 
@@ -302,5 +305,5 @@ public class EffectRenderer
         {
             addBlockHitEffects(x, y, z, target.sideHit);
         }
-     }
+    }
 }

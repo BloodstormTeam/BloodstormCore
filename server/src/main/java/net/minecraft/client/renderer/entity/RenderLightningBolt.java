@@ -1,7 +1,5 @@
 package net.minecraft.client.renderer.entity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Random;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
@@ -9,120 +7,125 @@ import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
-@SideOnly(Side.CLIENT)
 public class RenderLightningBolt extends Render
 {
     private static final String __OBFID = "CL_00001011";
 
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
     public void doRender(EntityLightningBolt p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
     {
-        Tessellator tessellator = Tessellator.instance;
+        Tessellator var10 = Tessellator.instance;
         GL11.glDisable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-        double[] adouble = new double[8];
-        double[] adouble1 = new double[8];
-        double d3 = 0.0D;
-        double d4 = 0.0D;
-        Random random = new Random(p_76986_1_.boltVertex);
+        double[] var11 = new double[8];
+        double[] var12 = new double[8];
+        double var13 = 0.0D;
+        double var15 = 0.0D;
+        Random var17 = new Random(p_76986_1_.boltVertex);
 
-        for (int i = 7; i >= 0; --i)
+        for (int var18 = 7; var18 >= 0; --var18)
         {
-            adouble[i] = d3;
-            adouble1[i] = d4;
-            d3 += (double)(random.nextInt(11) - 5);
-            d4 += (double)(random.nextInt(11) - 5);
+            var11[var18] = var13;
+            var12[var18] = var15;
+            var13 += (double)(var17.nextInt(11) - 5);
+            var15 += (double)(var17.nextInt(11) - 5);
         }
 
-        for (int k1 = 0; k1 < 4; ++k1)
+        for (int var45 = 0; var45 < 4; ++var45)
         {
-            Random random1 = new Random(p_76986_1_.boltVertex);
+            Random var46 = new Random(p_76986_1_.boltVertex);
 
-            for (int j = 0; j < 3; ++j)
+            for (int var19 = 0; var19 < 3; ++var19)
             {
-                int k = 7;
-                int l = 0;
+                int var20 = 7;
+                int var21 = 0;
 
-                if (j > 0)
+                if (var19 > 0)
                 {
-                    k = 7 - j;
+                    var20 = 7 - var19;
                 }
 
-                if (j > 0)
+                if (var19 > 0)
                 {
-                    l = k - 2;
+                    var21 = var20 - 2;
                 }
 
-                double d5 = adouble[k] - d3;
-                double d6 = adouble1[k] - d4;
+                double var22 = var11[var20] - var13;
+                double var24 = var12[var20] - var15;
 
-                for (int i1 = k; i1 >= l; --i1)
+                for (int var26 = var20; var26 >= var21; --var26)
                 {
-                    double d7 = d5;
-                    double d8 = d6;
+                    double var27 = var22;
+                    double var29 = var24;
 
-                    if (j == 0)
+                    if (var19 == 0)
                     {
-                        d5 += (double)(random1.nextInt(11) - 5);
-                        d6 += (double)(random1.nextInt(11) - 5);
+                        var22 += (double)(var46.nextInt(11) - 5);
+                        var24 += (double)(var46.nextInt(11) - 5);
                     }
                     else
                     {
-                        d5 += (double)(random1.nextInt(31) - 15);
-                        d6 += (double)(random1.nextInt(31) - 15);
+                        var22 += (double)(var46.nextInt(31) - 15);
+                        var24 += (double)(var46.nextInt(31) - 15);
                     }
 
-                    tessellator.startDrawing(5);
-                    float f2 = 0.5F;
-                    tessellator.setColorRGBA_F(0.9F * f2, 0.9F * f2, 1.0F * f2, 0.3F);
-                    double d9 = 0.1D + (double)k1 * 0.2D;
+                    var10.startDrawing(5);
+                    float var31 = 0.5F;
+                    var10.setColorRGBA_F(0.9F * var31, 0.9F * var31, 1.0F * var31, 0.3F);
+                    double var32 = 0.1D + (double)var45 * 0.2D;
 
-                    if (j == 0)
+                    if (var19 == 0)
                     {
-                        d9 *= (double)i1 * 0.1D + 1.0D;
+                        var32 *= (double)var26 * 0.1D + 1.0D;
                     }
 
-                    double d10 = 0.1D + (double)k1 * 0.2D;
+                    double var34 = 0.1D + (double)var45 * 0.2D;
 
-                    if (j == 0)
+                    if (var19 == 0)
                     {
-                        d10 *= (double)(i1 - 1) * 0.1D + 1.0D;
+                        var34 *= (double)(var26 - 1) * 0.1D + 1.0D;
                     }
 
-                    for (int j1 = 0; j1 < 5; ++j1)
+                    for (int var36 = 0; var36 < 5; ++var36)
                     {
-                        double d11 = p_76986_2_ + 0.5D - d9;
-                        double d12 = p_76986_6_ + 0.5D - d9;
+                        double var37 = p_76986_2_ + 0.5D - var32;
+                        double var39 = p_76986_6_ + 0.5D - var32;
 
-                        if (j1 == 1 || j1 == 2)
+                        if (var36 == 1 || var36 == 2)
                         {
-                            d11 += d9 * 2.0D;
+                            var37 += var32 * 2.0D;
                         }
 
-                        if (j1 == 2 || j1 == 3)
+                        if (var36 == 2 || var36 == 3)
                         {
-                            d12 += d9 * 2.0D;
+                            var39 += var32 * 2.0D;
                         }
 
-                        double d13 = p_76986_2_ + 0.5D - d10;
-                        double d14 = p_76986_6_ + 0.5D - d10;
+                        double var41 = p_76986_2_ + 0.5D - var34;
+                        double var43 = p_76986_6_ + 0.5D - var34;
 
-                        if (j1 == 1 || j1 == 2)
+                        if (var36 == 1 || var36 == 2)
                         {
-                            d13 += d10 * 2.0D;
+                            var41 += var34 * 2.0D;
                         }
 
-                        if (j1 == 2 || j1 == 3)
+                        if (var36 == 2 || var36 == 3)
                         {
-                            d14 += d10 * 2.0D;
+                            var43 += var34 * 2.0D;
                         }
 
-                        tessellator.addVertex(d13 + d5, p_76986_4_ + (double)(i1 * 16), d14 + d6);
-                        tessellator.addVertex(d11 + d7, p_76986_4_ + (double)((i1 + 1) * 16), d12 + d8);
+                        var10.addVertex(var41 + var22, p_76986_4_ + (double)(var26 * 16), var43 + var24);
+                        var10.addVertex(var37 + var27, p_76986_4_ + (double)((var26 + 1) * 16), var39 + var29);
                     }
 
-                    tessellator.draw();
+                    var10.draw();
                 }
             }
         }
@@ -132,16 +135,28 @@ public class RenderLightningBolt extends Render
         GL11.glEnable(GL11.GL_TEXTURE_2D);
     }
 
+    /**
+     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
+     */
     protected ResourceLocation getEntityTexture(EntityLightningBolt p_110775_1_)
     {
         return null;
     }
 
+    /**
+     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
+     */
     protected ResourceLocation getEntityTexture(Entity p_110775_1_)
     {
         return this.getEntityTexture((EntityLightningBolt)p_110775_1_);
     }
 
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
     public void doRender(Entity p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
     {
         this.doRender((EntityLightningBolt)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);

@@ -2,7 +2,18 @@ package net.minecraft.client.gui;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import java.awt.Toolkit;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumChatFormatting;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
+import java.awt.*;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -11,20 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
-import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
-import net.minecraftforge.common.MinecraftForge;
-
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 @SideOnly(Side.CLIENT)
 public class GuiScreen extends Gui
@@ -115,8 +112,7 @@ public class GuiScreen extends Gui
             }
         }
 
-        FontRenderer font = p_146285_1_.getItem().getFontRenderer(p_146285_1_);
-        drawHoveringText(list, p_146285_2_, p_146285_3_, (font == null ? fontRendererObj : font));
+        this.func_146283_a(list, p_146285_2_, p_146285_3_);
     }
 
     protected void drawCreativeTabHoveringText(String p_146279_1_, int p_146279_2_, int p_146279_3_)
@@ -125,11 +121,6 @@ public class GuiScreen extends Gui
     }
 
     protected void func_146283_a(List p_146283_1_, int p_146283_2_, int p_146283_3_)
-    {
-        drawHoveringText(p_146283_1_, p_146283_2_, p_146283_3_, fontRendererObj);   
-    }
-
-    protected void drawHoveringText(List p_146283_1_, int p_146283_2_, int p_146283_3_, FontRenderer font)
     {
         if (!p_146283_1_.isEmpty())
         {
@@ -143,7 +134,7 @@ public class GuiScreen extends Gui
             while (iterator.hasNext())
             {
                 String s = (String)iterator.next();
-                int l = font.getStringWidth(s);
+                int l = this.fontRendererObj.getStringWidth(s);
 
                 if (l > k)
                 {
@@ -188,7 +179,7 @@ public class GuiScreen extends Gui
             for (int i2 = 0; i2 < p_146283_1_.size(); ++i2)
             {
                 String s1 = (String)p_146283_1_.get(i2);
-                font.drawStringWithShadow(s1, j2, k2, -1);
+                this.fontRendererObj.drawStringWithShadow(s1, j2, k2, -1);
 
                 if (i2 == 0)
                 {
@@ -217,14 +208,9 @@ public class GuiScreen extends Gui
 
                 if (guibutton.mousePressed(this.mc, p_73864_1_, p_73864_2_))
                 {
-                    ActionPerformedEvent.Pre event = new ActionPerformedEvent.Pre(this, guibutton, this.buttonList);
-                    if (MinecraftForge.EVENT_BUS.post(event))
-                        break;
-                    this.selectedButton = event.button;
-                    event.button.func_146113_a(this.mc.getSoundHandler());
-                    this.actionPerformed(event.button);
-                    if (this.equals(this.mc.currentScreen))
-                        MinecraftForge.EVENT_BUS.post(new ActionPerformedEvent.Post(this, event.button, this.buttonList));
+                    this.selectedButton = guibutton;
+                    guibutton.func_146113_a(this.mc.getSoundHandler());
+                    this.actionPerformed(guibutton);
                 }
             }
         }
@@ -249,12 +235,8 @@ public class GuiScreen extends Gui
         this.fontRendererObj = p_146280_1_.fontRenderer;
         this.width = p_146280_2_;
         this.height = p_146280_3_;
-        if (!MinecraftForge.EVENT_BUS.post(new InitGuiEvent.Pre(this, this.buttonList)))
-        {
-            this.buttonList.clear();
-            this.initGui();
-        }
-        MinecraftForge.EVENT_BUS.post(new InitGuiEvent.Post(this, this.buttonList));
+        this.buttonList.clear();
+        this.initGui();
     }
 
     public void initGui() {}

@@ -1,32 +1,51 @@
 package net.minecraft.client.renderer.culling;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.util.AxisAlignedBB;
 
-@SideOnly(Side.CLIENT)
 public class Frustrum implements ICamera
 {
     private ClippingHelper clippingHelper = ClippingHelperImpl.getInstance();
     private double xPosition;
     private double yPosition;
     private double zPosition;
-    private static final String __OBFID = "CL_00000976";
 
-    public void setPosition(double p_78547_1_, double p_78547_3_, double p_78547_5_)
+    public Frustrum(ClippingHelper clippingHelper)
     {
-        this.xPosition = p_78547_1_;
-        this.yPosition = p_78547_3_;
-        this.zPosition = p_78547_5_;
+        this.clippingHelper = clippingHelper;
     }
 
-    public boolean isBoxInFrustum(double p_78548_1_, double p_78548_3_, double p_78548_5_, double p_78548_7_, double p_78548_9_, double p_78548_11_)
+    public Frustrum() {}
+
+    public void setPosition(double par1, double par3, double par5)
     {
-        return this.clippingHelper.isBoxInFrustum(p_78548_1_ - this.xPosition, p_78548_3_ - this.yPosition, p_78548_5_ - this.zPosition, p_78548_7_ - this.xPosition, p_78548_9_ - this.yPosition, p_78548_11_ - this.zPosition);
+        this.xPosition = par1;
+        this.yPosition = par3;
+        this.zPosition = par5;
     }
 
-    public boolean isBoundingBoxInFrustum(AxisAlignedBB p_78546_1_)
+    /**
+     * Calls the clipping helper. Returns true if the box is inside all 6 clipping planes, otherwise returns false.
+     */
+    public boolean isBoxInFrustum(double par1, double par3, double par5, double par7, double par9, double par11)
     {
-        return this.isBoxInFrustum(p_78546_1_.minX, p_78546_1_.minY, p_78546_1_.minZ, p_78546_1_.maxX, p_78546_1_.maxY, p_78546_1_.maxZ);
+        return this.clippingHelper.isBoxInFrustum(par1 - this.xPosition, par3 - this.yPosition, par5 - this.zPosition, par7 - this.xPosition, par9 - this.yPosition, par11 - this.zPosition);
+    }
+
+    /**
+     * Returns true if the bounding box is inside all 6 clipping planes, otherwise returns false.
+     */
+    public boolean isBoundingBoxInFrustum(AxisAlignedBB par1AxisAlignedBB)
+    {
+        return this.isBoxInFrustum(par1AxisAlignedBB.minX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ, par1AxisAlignedBB.maxX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.maxZ);
+    }
+
+    public boolean isBoxInFrustumFully(double minX, double minY, double minZ, double maxX, double maxY, double maxZ)
+    {
+        return this.clippingHelper.isBoxInFrustumFully(minX - this.xPosition, minY - this.yPosition, minZ - this.zPosition, maxX - this.xPosition, maxY - this.yPosition, maxZ - this.zPosition);
+    }
+
+    public boolean isBoundingBoxInFrustumFully(AxisAlignedBB aab)
+    {
+        return this.isBoxInFrustumFully(aab.minX, aab.minY, aab.minZ, aab.maxX, aab.maxY, aab.maxZ);
     }
 }

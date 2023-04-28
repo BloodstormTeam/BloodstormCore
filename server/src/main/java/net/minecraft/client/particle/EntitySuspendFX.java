@@ -1,12 +1,9 @@
 package net.minecraft.client.particle;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-@SideOnly(Side.CLIENT)
 public class EntitySuspendFX extends EntityFX
 {
     private static final String __OBFID = "CL_00000928";
@@ -26,6 +23,9 @@ public class EntitySuspendFX extends EntityFX
         this.particleMaxAge = (int)(16.0D / (Math.random() * 0.8D + 0.2D));
     }
 
+    /**
+     * Called to update the entity's position/logic.
+     */
     public void onUpdate()
     {
         this.prevPosX = this.posX;

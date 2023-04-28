@@ -1,21 +1,33 @@
 package net.minecraft.client.renderer;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import java.nio.IntBuffer;
 import org.lwjgl.opengl.GL11;
 
-@SideOnly(Side.CLIENT)
 public class RenderList
 {
+    /**
+     * The location of the 16x16x16 render chunk rendered by this RenderList.
+     */
     public int renderChunkX;
     public int renderChunkY;
     public int renderChunkZ;
+
+    /**
+     * The in-world location of the camera, used to translate the world into the proper position for rendering.
+     */
     private double cameraX;
     private double cameraY;
     private double cameraZ;
+
+    /** A list of OpenGL render list IDs rendered by this RenderList. */
     private IntBuffer glLists = GLAllocation.createDirectIntBuffer(65536);
+
+    /**
+     * Does this RenderList contain properly-initialized and current data for rendering?
+     */
     private boolean valid;
+
+    /** Has glLists been flipped to make it ready for reading yet? */
     private boolean bufferFlipped;
     private static final String __OBFID = "CL_00000957";
 
@@ -66,6 +78,9 @@ public class RenderList
         }
     }
 
+    /**
+     * Resets this RenderList to an uninitialized state.
+     */
     public void resetList()
     {
         this.valid = false;

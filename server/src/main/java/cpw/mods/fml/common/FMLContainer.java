@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.bloodstorm.core.api.event.EventBusDefinite;
+import com.bloodstorm.core.api.event.Listener;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -80,6 +82,7 @@ public class FMLContainer extends DummyModContainer implements WorldAccessContai
     {
         NetworkRegistry.INSTANCE.register(this, this.getClass(), null, evt.getASMHarvestedData());
         FMLNetworkHandler.registerChannel(this, evt.getSide());
+        Listener.INSTANCE.register();
     }
 
     @NetworkCheckHandler

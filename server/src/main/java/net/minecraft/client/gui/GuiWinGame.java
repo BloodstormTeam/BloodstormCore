@@ -2,11 +2,6 @@ package net.minecraft.client.gui;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.network.play.client.C16PacketClientStatus;
 import net.minecraft.util.EnumChatFormatting;
@@ -14,9 +9,14 @@ import net.minecraft.util.ResourceLocation;
 import org.apache.commons.io.Charsets;
 import org.lwjgl.opengl.GL11;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 @SideOnly(Side.CLIENT)
-public class GuiWinGame extends GuiScreen
-{
+public class GuiWinGame extends GuiScreen {
     private static final ResourceLocation field_146576_f = new ResourceLocation("textures/gui/title/minecraft.png");
     private static final ResourceLocation field_146577_g = new ResourceLocation("textures/misc/vignette.png");
     private int field_146581_h;

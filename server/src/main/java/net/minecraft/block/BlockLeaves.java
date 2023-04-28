@@ -1,5 +1,6 @@
 package net.minecraft.block;
 
+import com.bloodstorm.core.api.event.block.LeavesDecayEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.ArrayList;
@@ -8,17 +9,14 @@ import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.stats.StatList;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IShearable;
-
-import org.bukkit.event.block.LeavesDecayEvent; // CraftBukkit
+import net.optifine.BlockPos;
 
 public abstract class BlockLeaves extends BlockLeavesBase implements IShearable
 {
@@ -211,31 +209,26 @@ public abstract class BlockLeaves extends BlockLeavesBase implements IShearable
     }
 
     @SideOnly(Side.CLIENT)
-    public void randomDisplayTick(World p_149734_1_, int p_149734_2_, int p_149734_3_, int p_149734_4_, Random p_149734_5_)
+    public void randomDisplayTick(World world, int p_149734_2_, int p_149734_3_, int p_149734_4_, Random p_149734_5_)
     {
-        if (p_149734_1_.canLightningStrikeAt(p_149734_2_, p_149734_3_ + 1, p_149734_4_) && !World.doesBlockHaveSolidTopSurface(p_149734_1_, p_149734_2_, p_149734_3_ - 1, p_149734_4_) && p_149734_5_.nextInt(15) == 1)
+        if (world.canLightningStrikeAt(p_149734_2_, p_149734_3_ + 1, p_149734_4_) && !World.doesBlockHaveSolidTopSurface(world, p_149734_2_, p_149734_3_ - 1, p_149734_4_) && p_149734_5_.nextInt(15) == 1)
         {
-            double d0 = (double)((float)p_149734_2_ + p_149734_5_.nextFloat());
+            double d0 = (float)p_149734_2_ + p_149734_5_.nextFloat();
             double d1 = (double)p_149734_3_ - 0.05D;
-            double d2 = (double)((float)p_149734_4_ + p_149734_5_.nextFloat());
-            p_149734_1_.spawnParticle("dripWater", d0, d1, d2, 0.0D, 0.0D, 0.0D);
+            double d2 = (float)p_149734_4_ + p_149734_5_.nextFloat();
+            world.spawnParticle("dripWater", d0, d1, d2, 0.0D, 0.0D, 0.0D);
         }
     }
 
-    private void removeLeaves(World p_150126_1_, int p_150126_2_, int p_150126_3_, int p_150126_4_)
-    {
-        // CraftBukkit start
-        LeavesDecayEvent event = new LeavesDecayEvent(p_150126_1_.getWorld().getBlockAt(p_150126_2_, p_150126_3_, p_150126_4_));
-        p_150126_1_.getServer().getPluginManager().callEvent(event);
+    private void removeLeaves(World world, int x, int y, int z) {
+        LeavesDecayEvent leavesDecayEvent = new LeavesDecayEvent(world.getBlock(x, y, z), new BlockPos(x, y, z));
 
-        if (event.isCancelled())
-        {
+        if (!leavesDecayEvent.post()) {
             return;
         }
 
-        // CraftBukkit end
-        this.dropBlockAsItem(p_150126_1_, p_150126_2_, p_150126_3_, p_150126_4_, p_150126_1_.getBlockMetadata(p_150126_2_, p_150126_3_, p_150126_4_), 0);
-        p_150126_1_.setBlockToAir(p_150126_2_, p_150126_3_, p_150126_4_);
+        this.dropBlockAsItem(world, x, y, z, world.getBlockMetadata(x, y, z), 0);
+        world.setBlockToAir(x, y, z);
     }
 
     public int quantityDropped(Random p_149745_1_)

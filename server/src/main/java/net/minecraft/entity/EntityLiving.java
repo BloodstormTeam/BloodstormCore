@@ -34,12 +34,14 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.ForgeHooks;
 import cpw.mods.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.event.ForgeEventFactory;
 
 // CraftBukkit start
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.optifine.BlockPos;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.event.entity.EntityUnleashEvent;
 import org.bukkit.event.entity.EntityUnleashEvent.UnleashReason;
@@ -68,7 +70,9 @@ public abstract class EntityLiving extends EntityLivingBase
     private boolean isLeashed;
     private Entity leashedToEntity;
     private NBTTagCompound field_110170_bx;
-    private static final String __OBFID = "CL_00001550";
+    public int randomMobsId = 0;
+    public BiomeGenBase spawnBiome = null;
+    public BlockPos spawnPosition = null;
 
     public EntityLiving(World p_i1595_1_)
     {
@@ -499,7 +503,7 @@ public abstract class EntityLiving extends EntityLivingBase
         return true;
     }
 
-    protected void despawnEntity()
+    public void despawnEntity()
     {
         Result result = null;
         if (this.persistenceRequired)

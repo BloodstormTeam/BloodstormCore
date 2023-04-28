@@ -1,9 +1,5 @@
 package net.minecraft.client.model;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
-@SideOnly(Side.CLIENT)
 public class ModelLargeChest extends ModelChest
 {
     private static final String __OBFID = "CL_00000841";

@@ -1,7 +1,5 @@
 package net.minecraft.client.particle;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
@@ -9,7 +7,6 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-@SideOnly(Side.CLIENT)
 public class EntityFX extends Entity
 {
     protected int particleTextureIndexX;
@@ -20,26 +17,40 @@ public class EntityFX extends Entity
     protected int particleMaxAge;
     protected float particleScale;
     protected float particleGravity;
+
+    /** The red amount of color. Used as a percentage, 1.0 = 255 and 0.0 = 0. */
     protected float particleRed;
+
+    /**
+     * The green amount of color. Used as a percentage, 1.0 = 255 and 0.0 = 0.
+     */
     protected float particleGreen;
+
+    /**
+     * The blue amount of color. Used as a percentage, 1.0 = 255 and 0.0 = 0.
+     */
     protected float particleBlue;
+
+    /** Particle alpha */
     protected float particleAlpha;
+
+    /** The icon field from which the given particle pulls its texture. */
     protected IIcon particleIcon;
     public static double interpPosX;
     public static double interpPosY;
     public static double interpPosZ;
     private static final String __OBFID = "CL_00000914";
 
-    protected EntityFX(World p_i1218_1_, double p_i1218_2_, double p_i1218_4_, double p_i1218_6_)
+    protected EntityFX(World p_i46352_1_, double p_i46352_2_, double p_i46352_4_, double p_i46352_6_)
     {
-        super(p_i1218_1_);
+        super(p_i46352_1_);
         this.particleAlpha = 1.0F;
         this.setSize(0.2F, 0.2F);
         this.yOffset = this.height / 2.0F;
-        this.setPosition(p_i1218_2_, p_i1218_4_, p_i1218_6_);
-        this.lastTickPosX = p_i1218_2_;
-        this.lastTickPosY = p_i1218_4_;
-        this.lastTickPosZ = p_i1218_6_;
+        this.setPosition(p_i46352_2_, p_i46352_4_, p_i46352_6_);
+        this.lastTickPosX = p_i46352_2_;
+        this.lastTickPosY = p_i46352_4_;
+        this.lastTickPosZ = p_i46352_6_;
         this.particleRed = this.particleGreen = this.particleBlue = 1.0F;
         this.particleTextureJitterX = this.rand.nextFloat() * 3.0F;
         this.particleTextureJitterY = this.rand.nextFloat() * 3.0F;
@@ -54,11 +65,11 @@ public class EntityFX extends Entity
         this.motionX = p_i1219_8_ + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.4F);
         this.motionY = p_i1219_10_ + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.4F);
         this.motionZ = p_i1219_12_ + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.4F);
-        float f = (float)(Math.random() + Math.random() + 1.0D) * 0.15F;
-        float f1 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
-        this.motionX = this.motionX / (double)f1 * (double)f * 0.4000000059604645D;
-        this.motionY = this.motionY / (double)f1 * (double)f * 0.4000000059604645D + 0.10000000149011612D;
-        this.motionZ = this.motionZ / (double)f1 * (double)f * 0.4000000059604645D;
+        float var14 = (float)(Math.random() + Math.random() + 1.0D) * 0.15F;
+        float var15 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
+        this.motionX = this.motionX / (double)var15 * (double)var14 * 0.4000000059604645D;
+        this.motionY = this.motionY / (double)var15 * (double)var14 * 0.4000000059604645D + 0.10000000149011612D;
+        this.motionZ = this.motionZ / (double)var15 * (double)var14 * 0.4000000059604645D;
     }
 
     public EntityFX multiplyVelocity(float p_70543_1_)
@@ -83,6 +94,9 @@ public class EntityFX extends Entity
         this.particleBlue = p_70538_3_;
     }
 
+    /**
+     * Sets the particle alpha (float)
+     */
     public void setAlphaF(float p_82338_1_)
     {
         this.particleAlpha = p_82338_1_;
@@ -103,6 +117,10 @@ public class EntityFX extends Entity
         return this.particleBlue;
     }
 
+    /**
+     * returns if this entity triggers Block.onEntityWalking on the blocks they walk on. used for spiders and wolves to
+     * prevent them from trampling crops
+     */
     protected boolean canTriggerWalking()
     {
         return false;
@@ -110,6 +128,9 @@ public class EntityFX extends Entity
 
     protected void entityInit() {}
 
+    /**
+     * Called to update the entity's position/logic.
+     */
     public void onUpdate()
     {
         this.prevPosX = this.posX;
@@ -136,28 +157,28 @@ public class EntityFX extends Entity
 
     public void renderParticle(Tessellator p_70539_1_, float p_70539_2_, float p_70539_3_, float p_70539_4_, float p_70539_5_, float p_70539_6_, float p_70539_7_)
     {
-        float f6 = (float)this.particleTextureIndexX / 16.0F;
-        float f7 = f6 + 0.0624375F;
-        float f8 = (float)this.particleTextureIndexY / 16.0F;
-        float f9 = f8 + 0.0624375F;
-        float f10 = 0.1F * this.particleScale;
+        float var8 = (float)this.particleTextureIndexX / 16.0F;
+        float var9 = var8 + 0.0624375F;
+        float var10 = (float)this.particleTextureIndexY / 16.0F;
+        float var11 = var10 + 0.0624375F;
+        float var12 = 0.1F * this.particleScale;
 
         if (this.particleIcon != null)
         {
-            f6 = this.particleIcon.getMinU();
-            f7 = this.particleIcon.getMaxU();
-            f8 = this.particleIcon.getMinV();
-            f9 = this.particleIcon.getMaxV();
+            var8 = this.particleIcon.getMinU();
+            var9 = this.particleIcon.getMaxU();
+            var10 = this.particleIcon.getMinV();
+            var11 = this.particleIcon.getMaxV();
         }
 
-        float f11 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)p_70539_2_ - interpPosX);
-        float f12 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)p_70539_2_ - interpPosY);
-        float f13 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)p_70539_2_ - interpPosZ);
+        float var13 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)p_70539_2_ - interpPosX);
+        float var14 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)p_70539_2_ - interpPosY);
+        float var15 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)p_70539_2_ - interpPosZ);
         p_70539_1_.setColorRGBA_F(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha);
-        p_70539_1_.addVertexWithUV((double)(f11 - p_70539_3_ * f10 - p_70539_6_ * f10), (double)(f12 - p_70539_4_ * f10), (double)(f13 - p_70539_5_ * f10 - p_70539_7_ * f10), (double)f7, (double)f9);
-        p_70539_1_.addVertexWithUV((double)(f11 - p_70539_3_ * f10 + p_70539_6_ * f10), (double)(f12 + p_70539_4_ * f10), (double)(f13 - p_70539_5_ * f10 + p_70539_7_ * f10), (double)f7, (double)f8);
-        p_70539_1_.addVertexWithUV((double)(f11 + p_70539_3_ * f10 + p_70539_6_ * f10), (double)(f12 + p_70539_4_ * f10), (double)(f13 + p_70539_5_ * f10 + p_70539_7_ * f10), (double)f6, (double)f8);
-        p_70539_1_.addVertexWithUV((double)(f11 + p_70539_3_ * f10 - p_70539_6_ * f10), (double)(f12 - p_70539_4_ * f10), (double)(f13 + p_70539_5_ * f10 - p_70539_7_ * f10), (double)f6, (double)f9);
+        p_70539_1_.addVertexWithUV((double)(var13 - p_70539_3_ * var12 - p_70539_6_ * var12), (double)(var14 - p_70539_4_ * var12), (double)(var15 - p_70539_5_ * var12 - p_70539_7_ * var12), (double)var9, (double)var11);
+        p_70539_1_.addVertexWithUV((double)(var13 - p_70539_3_ * var12 + p_70539_6_ * var12), (double)(var14 + p_70539_4_ * var12), (double)(var15 - p_70539_5_ * var12 + p_70539_7_ * var12), (double)var9, (double)var10);
+        p_70539_1_.addVertexWithUV((double)(var13 + p_70539_3_ * var12 + p_70539_6_ * var12), (double)(var14 + p_70539_4_ * var12), (double)(var15 + p_70539_5_ * var12 + p_70539_7_ * var12), (double)var8, (double)var10);
+        p_70539_1_.addVertexWithUV((double)(var13 + p_70539_3_ * var12 - p_70539_6_ * var12), (double)(var14 - p_70539_4_ * var12), (double)(var15 + p_70539_5_ * var12 - p_70539_7_ * var12), (double)var8, (double)var11);
     }
 
     public int getFXLayer()
@@ -165,8 +186,14 @@ public class EntityFX extends Entity
         return 0;
     }
 
+    /**
+     * (abstract) Protected helper method to write subclass entity data to NBT.
+     */
     public void writeEntityToNBT(NBTTagCompound p_70014_1_) {}
 
+    /**
+     * (abstract) Protected helper method to read subclass entity data from NBT.
+     */
     public void readEntityFromNBT(NBTTagCompound p_70037_1_) {}
 
     public void setParticleIcon(IIcon p_110125_1_)
@@ -186,6 +213,9 @@ public class EntityFX extends Entity
         }
     }
 
+    /**
+     * Public method to set private field particleTextureIndex.
+     */
     public void setParticleTextureIndex(int p_70536_1_)
     {
         if (this.getFXLayer() != 0)
@@ -204,6 +234,9 @@ public class EntityFX extends Entity
         ++this.particleTextureIndexX;
     }
 
+    /**
+     * If returns false, the item will not inflict any damage against entities.
+     */
     public boolean canAttackWithItem()
     {
         return false;

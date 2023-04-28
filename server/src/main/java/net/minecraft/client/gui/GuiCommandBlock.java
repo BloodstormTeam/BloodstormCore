@@ -11,9 +11,12 @@ import org.lwjgl.input.Keyboard;
 
 @SideOnly(Side.CLIENT)
 public class GuiCommandBlock extends GuiScreen {
+    /** Text field containing the command block's command. */
     private GuiTextField commandTextField;
     private GuiTextField field_146486_g;
+    /** Command block being edited. */
     private final CommandBlockLogic localCommandBlock;
+    /** "Done" button for the GUI. */
     private GuiButton doneBtn;
     private GuiButton cancelBtn;
     private static final String __OBFID = "CL_00000748";
@@ -23,11 +26,17 @@ public class GuiCommandBlock extends GuiScreen {
         this.localCommandBlock = p_i45032_1_;
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         this.commandTextField.updateCursorCounter();
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         Keyboard.enableRepeatEvents(true);
@@ -51,6 +60,9 @@ public class GuiCommandBlock extends GuiScreen {
         this.doneBtn.enabled = this.commandTextField.getText().trim().length() > 0;
     }
 
+    /**
+     * Called when the screen is unloaded. Used to disable keyboard repeat events
+     */
     public void onGuiClosed()
     {
         Keyboard.enableRepeatEvents(false);
@@ -76,8 +88,7 @@ public class GuiCommandBlock extends GuiScreen {
                     this.mc.getNetHandler().addToSendQueue(new C17PacketCustomPayload("MC|AdvCdm", packetbuffer));
                 }
                 catch (Exception ignored) {}
-                finally
-                {
+                finally {
                     packetbuffer.release();
                 }
 
@@ -86,6 +97,9 @@ public class GuiCommandBlock extends GuiScreen {
         }
     }
 
+    /**
+     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
+     */
     protected void keyTyped(char p_73869_1_, int p_73869_2_)
     {
         this.commandTextField.textboxKeyTyped(p_73869_1_, p_73869_2_);
@@ -105,6 +119,9 @@ public class GuiCommandBlock extends GuiScreen {
         }
     }
 
+    /**
+     * Called when the mouse is clicked.
+     */
     protected void mouseClicked(int p_73864_1_, int p_73864_2_, int p_73864_3_)
     {
         super.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
@@ -112,6 +129,9 @@ public class GuiCommandBlock extends GuiScreen {
         this.field_146486_g.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();

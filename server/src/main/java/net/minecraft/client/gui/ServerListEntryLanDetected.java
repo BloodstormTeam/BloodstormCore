@@ -38,6 +38,9 @@ public class ServerListEntryLanDetected implements GuiListExtended.IGuiListEntry
         }
     }
 
+    /**
+     * Returns true if the mouse has been pressed on this control.
+     */
     public boolean mousePressed(int p_148278_1_, int p_148278_2_, int p_148278_3_, int p_148278_4_, int p_148278_5_, int p_148278_6_)
     {
         this.field_148292_c.func_146790_a(p_148278_1_);
@@ -51,6 +54,9 @@ public class ServerListEntryLanDetected implements GuiListExtended.IGuiListEntry
         return false;
     }
 
+    /**
+     * Fired when the mouse button is released. Arguments: index, x, y, mouseEvent, relativeX, relativeY
+     */
     public void mouseReleased(int p_148277_1_, int p_148277_2_, int p_148277_3_, int p_148277_4_, int p_148277_5_, int p_148277_6_) {}
 
     public LanServerDetector.LanServer func_148289_a()

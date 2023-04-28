@@ -1,7 +1,5 @@
 package net.minecraft.client.renderer.entity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Random;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.model.ModelEnderman;
@@ -11,18 +9,20 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityEnderman;
+import net.optifine.Config;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import shadersmod.client.Shaders;
 
-@SideOnly(Side.CLIENT)
 public class RenderEnderman extends RenderLiving
 {
     private static final ResourceLocation endermanEyesTexture = new ResourceLocation("textures/entity/enderman/enderman_eyes.png");
     private static final ResourceLocation endermanTextures = new ResourceLocation("textures/entity/enderman/enderman.png");
+
+    /** The model of the enderman */
     private ModelEnderman endermanModel;
     private Random rnd = new Random();
-    private static final String __OBFID = "CL_00000989";
 
     public RenderEnderman()
     {
@@ -31,68 +31,80 @@ public class RenderEnderman extends RenderLiving
         this.setRenderPassModel(this.endermanModel);
     }
 
-    public void doRender(EntityEnderman p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
+    public void doRender(EntityEnderman par1Entity, double par2, double par4, double par6, float par8, float par9)
     {
-        this.endermanModel.isCarrying = p_76986_1_.func_146080_bZ().getMaterial() != Material.air;
-        this.endermanModel.isAttacking = p_76986_1_.isScreaming();
+        this.endermanModel.isCarrying = par1Entity.func_146080_bZ().getMaterial() != Material.air;
+        this.endermanModel.isAttacking = par1Entity.isScreaming();
 
-        if (p_76986_1_.isScreaming())
+        if (par1Entity.isScreaming())
         {
-            double d3 = 0.02D;
-            p_76986_2_ += this.rnd.nextGaussian() * d3;
-            p_76986_6_ += this.rnd.nextGaussian() * d3;
+            double var10 = 0.02D;
+            par2 += this.rnd.nextGaussian() * var10;
+            par6 += this.rnd.nextGaussian() * var10;
         }
 
-        super.doRender((EntityLiving)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+        super.doRender((EntityLiving)par1Entity, par2, par4, par6, par8, par9);
     }
 
-    protected ResourceLocation getEntityTexture(EntityEnderman p_110775_1_)
+    /**
+     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
+     */
+    protected ResourceLocation getEntityTexture(EntityEnderman par1Entity)
     {
         return endermanTextures;
     }
 
-    protected void renderEquippedItems(EntityEnderman p_77029_1_, float p_77029_2_)
+    protected void renderEquippedItems(EntityEnderman par1EntityLivingBase, float par2)
     {
-        super.renderEquippedItems(p_77029_1_, p_77029_2_);
+        super.renderEquippedItems(par1EntityLivingBase, par2);
 
-        if (p_77029_1_.func_146080_bZ().getMaterial() != Material.air)
+        if (par1EntityLivingBase.func_146080_bZ().getMaterial() != Material.air)
         {
             GL11.glEnable(GL12.GL_RESCALE_NORMAL);
             GL11.glPushMatrix();
-            float f1 = 0.5F;
+            float var3 = 0.5F;
             GL11.glTranslatef(0.0F, 0.6875F, -0.75F);
-            f1 *= 1.0F;
+            var3 *= 1.0F;
             GL11.glRotatef(20.0F, 1.0F, 0.0F, 0.0F);
             GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
-            GL11.glScalef(-f1, -f1, f1);
-            int i = p_77029_1_.getBrightnessForRender(p_77029_2_);
-            int j = i % 65536;
-            int k = i / 65536;
-            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j / 1.0F, (float)k / 1.0F);
+            GL11.glScalef(-var3, -var3, var3);
+            int var4 = par1EntityLivingBase.getBrightnessForRender(par2);
+            int var5 = var4 % 65536;
+            int var6 = var4 / 65536;
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)var5 / 1.0F, (float)var6 / 1.0F);
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             this.bindTexture(TextureMap.locationBlocksTexture);
-            this.field_147909_c.renderBlockAsItem(p_77029_1_.func_146080_bZ(), p_77029_1_.getCarryingData(), 1.0F);
+            this.field_147909_c.renderBlockAsItem(par1EntityLivingBase.func_146080_bZ(), par1EntityLivingBase.getCarryingData(), 1.0F);
             GL11.glPopMatrix();
             GL11.glDisable(GL12.GL_RESCALE_NORMAL);
         }
     }
 
-    protected int shouldRenderPass(EntityEnderman p_77032_1_, int p_77032_2_, float p_77032_3_)
+    /**
+     * Queries whether should render the specified pass or not.
+     */
+    protected int shouldRenderPass(EntityEnderman par1EntityLivingBase, int par2, float par3)
     {
-        if (p_77032_2_ != 0)
+        if (par2 != 0)
         {
             return -1;
         }
         else
         {
             this.bindTexture(endermanEyesTexture);
-            float f1 = 1.0F;
+            float var4 = 1.0F;
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glDisable(GL11.GL_ALPHA_TEST);
             GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
             GL11.glDisable(GL11.GL_LIGHTING);
 
-            if (p_77032_1_.isInvisible())
+            if (par1EntityLivingBase.isInvisible())
             {
                 GL11.glDepthMask(false);
             }
@@ -101,43 +113,73 @@ public class RenderEnderman extends RenderLiving
                 GL11.glDepthMask(true);
             }
 
-            char c0 = 61680;
-            int j = c0 % 65536;
-            int k = c0 / 65536;
-            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j / 1.0F, (float)k / 1.0F);
+            char var5 = 61680;
+            int var6 = var5 % 65536;
+            int var7 = var5 / 65536;
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)var6 / 1.0F, (float)var7 / 1.0F);
             GL11.glEnable(GL11.GL_LIGHTING);
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, f1);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, var4);
+
+            if (Config.isShaders())
+            {
+                Shaders.beginSpiderEyes();
+            }
+
             return 1;
         }
     }
 
-    public void doRender(EntityLiving p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
+    public void doRender(EntityLiving par1Entity, double par2, double par4, double par6, float par8, float par9)
     {
-        this.doRender((EntityEnderman)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+        this.doRender((EntityEnderman)par1Entity, par2, par4, par6, par8, par9);
     }
 
-    protected int shouldRenderPass(EntityLivingBase p_77032_1_, int p_77032_2_, float p_77032_3_)
+    /**
+     * Queries whether should render the specified pass or not.
+     */
+    protected int shouldRenderPass(EntityLivingBase par1EntityLivingBase, int par2, float par3)
     {
-        return this.shouldRenderPass((EntityEnderman)p_77032_1_, p_77032_2_, p_77032_3_);
+        return this.shouldRenderPass((EntityEnderman)par1EntityLivingBase, par2, par3);
     }
 
-    protected void renderEquippedItems(EntityLivingBase p_77029_1_, float p_77029_2_)
+    protected void renderEquippedItems(EntityLivingBase par1EntityLivingBase, float par2)
     {
-        this.renderEquippedItems((EntityEnderman)p_77029_1_, p_77029_2_);
+        this.renderEquippedItems((EntityEnderman)par1EntityLivingBase, par2);
     }
 
-    public void doRender(EntityLivingBase p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
+    public void doRender(EntityLivingBase par1Entity, double par2, double par4, double par6, float par8, float par9)
     {
-        this.doRender((EntityEnderman)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+        this.doRender((EntityEnderman)par1Entity, par2, par4, par6, par8, par9);
     }
 
-    protected ResourceLocation getEntityTexture(Entity p_110775_1_)
+    /**
+     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
+     */
+    protected ResourceLocation getEntityTexture(Entity par1Entity)
     {
-        return this.getEntityTexture((EntityEnderman)p_110775_1_);
+        return this.getEntityTexture((EntityEnderman)par1Entity);
     }
 
-    public void doRender(Entity p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
+    public void doRender(Entity par1Entity, double par2, double par4, double par6, float par8, float par9)
     {
-        this.doRender((EntityEnderman)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+        this.doRender((EntityEnderman)par1Entity, par2, par4, par6, par8, par9);
     }
 }

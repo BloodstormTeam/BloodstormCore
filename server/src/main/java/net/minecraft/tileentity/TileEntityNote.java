@@ -1,9 +1,12 @@
 package net.minecraft.tileentity;
 
+import com.bloodstorm.core.api.event.block.NotePlayEvent;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
+import org.bukkit.Instrument;
+import org.bukkit.Note;
 
 public class TileEntityNote extends TileEntity
 {
@@ -41,11 +44,11 @@ public class TileEntityNote extends TileEntity
         this.markDirty();
     }
 
-    public void triggerNote(World p_145878_1_, int p_145878_2_, int p_145878_3_, int p_145878_4_)
+    public void triggerNote(World world, int x, int y, int z)
     {
-        if (p_145878_1_.getBlock(p_145878_2_, p_145878_3_ + 1, p_145878_4_).getMaterial() == Material.air)
+        if (world.getBlock(x, y + 1, z).getMaterial() == Material.air)
         {
-            Material material = p_145878_1_.getBlock(p_145878_2_, p_145878_3_ - 1, p_145878_4_).getMaterial();
+            Material material = world.getBlock(x, y - 1, z).getMaterial();
             byte b0 = 0;
 
             if (material == Material.rock)
@@ -68,15 +71,10 @@ public class TileEntityNote extends TileEntity
                 b0 = 4;
             }
 
-            // CraftBukkit start
-            org.bukkit.event.block.NotePlayEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callNotePlayEvent(this.worldObj, p_145878_2_, p_145878_3_, p_145878_4_, b0, this.note);
-
-            if (!event.isCancelled())
-            {
-                this.worldObj.addBlockEvent(p_145878_2_, p_145878_3_, p_145878_4_, Blocks.noteblock, event.getInstrument().getType(), event.getNote().getId());
+            NotePlayEvent notePlayEvent = new NotePlayEvent(this.worldObj.getBlock(x, y, z), Instrument.getByType(b0), new Note(this.note));
+            if (notePlayEvent.post()) {
+                this.worldObj.addBlockEvent(x, y, z, Blocks.noteblock, notePlayEvent.getInstrument().getType(), notePlayEvent.getNote().getId());
             }
-
-            // CraftBukkit end
         }
     }
 

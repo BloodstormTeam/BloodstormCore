@@ -1,9 +1,10 @@
 package net.minecraft.client.renderer.entity;
 
 import com.mojang.authlib.GameProfile;
+import java.util.UUID;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import java.util.UUID;
 import net.minecraft.block.Block;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -37,7 +38,6 @@ public class RenderPlayer extends RendererLivingEntity
     public ModelBiped modelArmorChestplate;
     public ModelBiped modelArmor;
     private static final String __OBFID = "CL_00001020";
-
     public RenderPlayer()
     {
         super(new ModelBiped(0.0F), 0.5F);
@@ -45,22 +45,21 @@ public class RenderPlayer extends RendererLivingEntity
         this.modelArmorChestplate = new ModelBiped(1.0F);
         this.modelArmor = new ModelBiped(0.5F);
     }
-
+    /**
+     * Queries whether should render the specified pass or not.
+     */
     protected int shouldRenderPass(AbstractClientPlayer p_77032_1_, int p_77032_2_, float p_77032_3_)
     {
         ItemStack itemstack = p_77032_1_.inventory.armorItemInSlot(3 - p_77032_2_);
-
         net.minecraftforge.client.event.RenderPlayerEvent.SetArmorModel event = new net.minecraftforge.client.event.RenderPlayerEvent.SetArmorModel(p_77032_1_, this, 3 - p_77032_2_, p_77032_3_, itemstack);
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event);
         if (event.result != -1)
         {
             return event.result;
         }
-
         if (itemstack != null)
         {
             Item item = itemstack.getItem();
-
             if (item instanceof ItemArmor)
             {
                 ItemArmor itemarmor = (ItemArmor)item;
@@ -78,7 +77,6 @@ public class RenderPlayer extends RendererLivingEntity
                 modelbiped.onGround = this.mainModel.onGround;
                 modelbiped.isRiding = this.mainModel.isRiding;
                 modelbiped.isChild = this.mainModel.isChild;
-
                 //Move outside if to allow for more then just CLOTH
                 int j = itemarmor.getColor(itemstack);
                 if (j != -1)
@@ -87,37 +85,28 @@ public class RenderPlayer extends RendererLivingEntity
                     float f2 = (float)(j >> 8 & 255) / 255.0F;
                     float f3 = (float)(j & 255) / 255.0F;
                     GL11.glColor3f(f1, f2, f3);
-
                     if (itemstack.isItemEnchanted())
                     {
                         return 31;
                     }
-
                     return 16;
                 }
-
                 GL11.glColor3f(1.0F, 1.0F, 1.0F);
-
                 if (itemstack.isItemEnchanted())
                 {
                     return 15;
                 }
-
                 return 1;
             }
         }
-
         return -1;
     }
-
     protected void func_82408_c(AbstractClientPlayer p_82408_1_, int p_82408_2_, float p_82408_3_)
     {
         ItemStack itemstack = p_82408_1_.inventory.armorItemInSlot(3 - p_82408_2_);
-
         if (itemstack != null)
         {
             Item item = itemstack.getItem();
-
             if (item instanceof ItemArmor)
             {
                 this.bindTexture(RenderBiped.getArmorResource(p_82408_1_, itemstack, p_82408_2_, "overlay"));
@@ -125,18 +114,21 @@ public class RenderPlayer extends RendererLivingEntity
             }
         }
     }
-
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void func_76986_a(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
     public void doRender(AbstractClientPlayer p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
     {
         if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderPlayerEvent.Pre(p_76986_1_, this, p_76986_9_))) return;
         GL11.glColor3f(1.0F, 1.0F, 1.0F);
         ItemStack itemstack = p_76986_1_.inventory.getCurrentItem();
         this.modelArmorChestplate.heldItemRight = this.modelArmor.heldItemRight = this.modelBipedMain.heldItemRight = itemstack != null ? 1 : 0;
-
         if (itemstack != null && p_76986_1_.getItemInUseCount() > 0)
         {
             EnumAction enumaction = itemstack.getItemUseAction();
-
             if (enumaction == EnumAction.block)
             {
                 this.modelArmorChestplate.heldItemRight = this.modelArmor.heldItemRight = this.modelBipedMain.heldItemRight = 3;
@@ -146,27 +138,25 @@ public class RenderPlayer extends RendererLivingEntity
                 this.modelArmorChestplate.aimedBow = this.modelArmor.aimedBow = this.modelBipedMain.aimedBow = true;
             }
         }
-
         this.modelArmorChestplate.isSneak = this.modelArmor.isSneak = this.modelBipedMain.isSneak = p_76986_1_.isSneaking();
         double d3 = p_76986_4_ - (double)p_76986_1_.yOffset;
-
         if (p_76986_1_.isSneaking() && !(p_76986_1_ instanceof EntityPlayerSP))
         {
             d3 -= 0.125D;
         }
-
         super.doRender((EntityLivingBase)p_76986_1_, p_76986_2_, d3, p_76986_6_, p_76986_8_, p_76986_9_);
         this.modelArmorChestplate.aimedBow = this.modelArmor.aimedBow = this.modelBipedMain.aimedBow = false;
         this.modelArmorChestplate.isSneak = this.modelArmor.isSneak = this.modelBipedMain.isSneak = false;
         this.modelArmorChestplate.heldItemRight = this.modelArmor.heldItemRight = this.modelBipedMain.heldItemRight = 0;
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderPlayerEvent.Post(p_76986_1_, this, p_76986_9_));
     }
-
+    /**
+     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
+     */
     protected ResourceLocation getEntityTexture(AbstractClientPlayer p_110775_1_)
     {
         return p_110775_1_.getLocationSkin();
     }
-
     protected void renderEquippedItems(AbstractClientPlayer p_77029_1_, float p_77029_2_)
     {
         net.minecraftforge.client.event.RenderPlayerEvent.Specials.Pre event = new net.minecraftforge.client.event.RenderPlayerEvent.Specials.Pre(p_77029_1_, this, p_77029_2_);
@@ -175,18 +165,15 @@ public class RenderPlayer extends RendererLivingEntity
         super.renderEquippedItems(p_77029_1_, p_77029_2_);
         super.renderArrowsStuckInEntity(p_77029_1_, p_77029_2_);
         ItemStack itemstack = p_77029_1_.inventory.armorItemInSlot(3);
-
         if (itemstack != null && event.renderHelmet)
         {
             GL11.glPushMatrix();
             this.modelBipedMain.bipedHead.postRender(0.0625F);
             float f1;
-
             if (itemstack.getItem() instanceof ItemBlock)
             {
                 net.minecraftforge.client.IItemRenderer customRenderer = net.minecraftforge.client.MinecraftForgeClient.getItemRenderer(itemstack, net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED);
                 boolean is3D = (customRenderer != null && customRenderer.shouldUseRenderHelper(net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED, itemstack, net.minecraftforge.client.IItemRenderer.ItemRendererHelper.BLOCK_3D));
-
                 if (is3D || RenderBlocks.renderItemIn3d(Block.getBlockFromItem(itemstack.getItem()).getRenderType()))
                 {
                     f1 = 0.625F;
@@ -194,7 +181,6 @@ public class RenderPlayer extends RendererLivingEntity
                     GL11.glRotatef(90.0F, 0.0F, 1.0F, 0.0F);
                     GL11.glScalef(f1, -f1, -f1);
                 }
-
                 this.renderManager.itemRenderer.renderItem(p_77029_1_, itemstack, 0);
             }
             else if (itemstack.getItem() == Items.skull)
@@ -202,11 +188,9 @@ public class RenderPlayer extends RendererLivingEntity
                 f1 = 1.0625F;
                 GL11.glScalef(f1, -f1, -f1);
                 GameProfile gameprofile = null;
-
                 if (itemstack.hasTagCompound())
                 {
                     NBTTagCompound nbttagcompound = itemstack.getTagCompound();
-
                     if (nbttagcompound.hasKey("SkullOwner", 10))
                     {
                         gameprofile = NBTUtil.func_152459_a(nbttagcompound.getCompoundTag("SkullOwner"));
@@ -216,19 +200,14 @@ public class RenderPlayer extends RendererLivingEntity
                         gameprofile = new GameProfile((UUID)null, nbttagcompound.getString("SkullOwner"));
                     }
                 }
-
                 TileEntitySkullRenderer.field_147536_b.func_152674_a(-0.5F, 0.0F, -0.5F, 1, 180.0F, itemstack.getItemDamage(), gameprofile);
             }
-
             GL11.glPopMatrix();
         }
-
         float f2;
-
         if (p_77029_1_.getCommandSenderName().equals("deadmau5") && p_77029_1_.func_152123_o())
         {
             this.bindTexture(p_77029_1_.getLocationSkin());
-
             for (int j = 0; j < 2; ++j)
             {
                 float f9 = p_77029_1_.prevRotationYaw + (p_77029_1_.rotationYaw - p_77029_1_.prevRotationYaw) * p_77029_2_ - (p_77029_1_.prevRenderYawOffset + (p_77029_1_.renderYawOffset - p_77029_1_.prevRenderYawOffset) * p_77029_2_);
@@ -246,11 +225,9 @@ public class RenderPlayer extends RendererLivingEntity
                 GL11.glPopMatrix();
             }
         }
-
         boolean flag = p_77029_1_.func_152122_n();
         flag = event.renderCape && flag;
         float f4;
-
         if (flag && !p_77029_1_.isInvisible() && !p_77029_1_.getHideCape())
         {
             this.bindTexture(p_77029_1_.getLocationCape());
@@ -263,33 +240,26 @@ public class RenderPlayer extends RendererLivingEntity
             double d1 = (double)MathHelper.sin(f4 * (float)Math.PI / 180.0F);
             double d2 = (double)(-MathHelper.cos(f4 * (float)Math.PI / 180.0F));
             float f5 = (float)d4 * 10.0F;
-
             if (f5 < -6.0F)
             {
                 f5 = -6.0F;
             }
-
             if (f5 > 32.0F)
             {
                 f5 = 32.0F;
             }
-
             float f6 = (float)(d3 * d1 + d0 * d2) * 100.0F;
             float f7 = (float)(d3 * d2 - d0 * d1) * 100.0F;
-
             if (f6 < 0.0F)
             {
                 f6 = 0.0F;
             }
-
             float f8 = p_77029_1_.prevCameraYaw + (p_77029_1_.cameraYaw - p_77029_1_.prevCameraYaw) * p_77029_2_;
             f5 += MathHelper.sin((p_77029_1_.prevDistanceWalkedModified + (p_77029_1_.distanceWalkedModified - p_77029_1_.prevDistanceWalkedModified) * p_77029_2_) * 6.0F) * 32.0F * f8;
-
             if (p_77029_1_.isSneaking())
             {
                 f5 += 25.0F;
             }
-
             GL11.glRotatef(6.0F + f6 / 2.0F + f5, 1.0F, 0.0F, 0.0F);
             GL11.glRotatef(f7 / 2.0F, 0.0F, 0.0F, 1.0F);
             GL11.glRotatef(-f7 / 2.0F, 0.0F, 1.0F, 0.0F);
@@ -297,30 +267,23 @@ public class RenderPlayer extends RendererLivingEntity
             this.modelBipedMain.renderCloak(0.0625F);
             GL11.glPopMatrix();
         }
-
         ItemStack itemstack1 = p_77029_1_.inventory.getCurrentItem();
-
         if (itemstack1 != null && event.renderItem)
         {
             GL11.glPushMatrix();
             this.modelBipedMain.bipedRightArm.postRender(0.0625F);
             GL11.glTranslatef(-0.0625F, 0.4375F, 0.0625F);
-
             if (p_77029_1_.fishEntity != null)
             {
                 itemstack1 = new ItemStack(Items.stick);
             }
-
             EnumAction enumaction = null;
-
             if (p_77029_1_.getItemInUseCount() > 0)
             {
                 enumaction = itemstack1.getItemUseAction();
             }
-
             net.minecraftforge.client.IItemRenderer customRenderer = net.minecraftforge.client.MinecraftForgeClient.getItemRenderer(itemstack1, net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED);
             boolean is3D = (customRenderer != null && customRenderer.shouldUseRenderHelper(net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED, itemstack1, net.minecraftforge.client.IItemRenderer.ItemRendererHelper.BLOCK_3D));
-
             if (is3D || itemstack1.getItem() instanceof ItemBlock && RenderBlocks.renderItemIn3d(Block.getBlockFromItem(itemstack1.getItem()).getRenderType()))
             {
                 f2 = 0.5F;
@@ -342,13 +305,11 @@ public class RenderPlayer extends RendererLivingEntity
             else if (itemstack1.getItem().isFull3D())
             {
                 f2 = 0.625F;
-
                 if (itemstack1.getItem().shouldRotateAroundWhenRendering())
                 {
                     GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
                     GL11.glTranslatef(0.0F, -0.125F, 0.0F);
                 }
-
                 if (p_77029_1_.getItemInUseCount() > 0 && enumaction == EnumAction.block)
                 {
                     GL11.glTranslatef(0.05F, 0.0F, -0.1F);
@@ -356,7 +317,6 @@ public class RenderPlayer extends RendererLivingEntity
                     GL11.glRotatef(-10.0F, 1.0F, 0.0F, 0.0F);
                     GL11.glRotatef(-60.0F, 0.0F, 0.0F, 1.0F);
                 }
-
                 GL11.glTranslatef(0.0F, 0.1875F, 0.0F);
                 GL11.glScalef(f2, -f2, f2);
                 GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
@@ -371,11 +331,9 @@ public class RenderPlayer extends RendererLivingEntity
                 GL11.glRotatef(-90.0F, 1.0F, 0.0F, 0.0F);
                 GL11.glRotatef(20.0F, 0.0F, 0.0F, 1.0F);
             }
-
             float f3;
             int k;
             float f12;
-
             if (itemstack1.getItem().requiresMultipleRenderPasses())
             {
                 for (k = 0; k < itemstack1.getItem().getRenderPasses(itemstack1.getItemDamage()); ++k)
@@ -397,29 +355,28 @@ public class RenderPlayer extends RendererLivingEntity
                 GL11.glColor4f(f11, f12, f3, 1.0F);
                 this.renderManager.itemRenderer.renderItem(p_77029_1_, itemstack1, 0);
             }
-
             GL11.glPopMatrix();
         }
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderPlayerEvent.Specials.Post(p_77029_1_, this, p_77029_2_));
     }
-
+    /**
+     * Allows the render to do any OpenGL state modifications necessary before the model is rendered. Args:
+     * entityLiving, partialTickTime
+     */
     protected void preRenderCallback(AbstractClientPlayer p_77041_1_, float p_77041_2_)
     {
         float f1 = 0.9375F;
         GL11.glScalef(f1, f1, f1);
     }
-
     protected void func_96449_a(AbstractClientPlayer p_96449_1_, double p_96449_2_, double p_96449_4_, double p_96449_6_, String p_96449_8_, float p_96449_9_, double p_96449_10_)
     {
         if (p_96449_10_ < 100.0D)
         {
             Scoreboard scoreboard = p_96449_1_.getWorldScoreboard();
             ScoreObjective scoreobjective = scoreboard.func_96539_a(2);
-
             if (scoreobjective != null)
             {
                 Score score = scoreboard.func_96529_a(p_96449_1_.getCommandSenderName(), scoreobjective);
-
                 if (p_96449_1_.isPlayerSleeping())
                 {
                     this.func_147906_a(p_96449_1_, score.getScorePoints() + " " + scoreobjective.getDisplayName(), p_96449_2_, p_96449_4_ - 1.5D, p_96449_6_, 64);
@@ -428,14 +385,11 @@ public class RenderPlayer extends RendererLivingEntity
                 {
                     this.func_147906_a(p_96449_1_, score.getScorePoints() + " " + scoreobjective.getDisplayName(), p_96449_2_, p_96449_4_, p_96449_6_, 64);
                 }
-
                 p_96449_4_ += (double)((float)this.getFontRendererFromRenderManager().FONT_HEIGHT * 1.15F * p_96449_9_);
             }
         }
-
         super.func_96449_a(p_96449_1_, p_96449_2_, p_96449_4_, p_96449_6_, p_96449_8_, p_96449_9_, p_96449_10_);
     }
-
     public void renderFirstPersonArm(EntityPlayer p_82441_1_)
     {
         float f = 1.0F;
@@ -444,7 +398,9 @@ public class RenderPlayer extends RendererLivingEntity
         this.modelBipedMain.setRotationAngles(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F, p_82441_1_);
         this.modelBipedMain.bipedRightArm.render(0.0625F);
     }
-
+    /**
+     * Sets a simple glTranslate on a LivingEntity.
+     */
     protected void renderLivingAt(AbstractClientPlayer p_77039_1_, double p_77039_2_, double p_77039_4_, double p_77039_6_)
     {
         if (p_77039_1_.isEntityAlive() && p_77039_1_.isPlayerSleeping())
@@ -456,7 +412,6 @@ public class RenderPlayer extends RendererLivingEntity
             super.renderLivingAt(p_77039_1_, p_77039_2_, p_77039_4_, p_77039_6_);
         }
     }
-
     protected void rotateCorpse(AbstractClientPlayer p_77043_1_, float p_77043_2_, float p_77043_3_, float p_77043_4_)
     {
         if (p_77043_1_.isEntityAlive() && p_77043_1_.isPlayerSleeping())
@@ -470,52 +425,67 @@ public class RenderPlayer extends RendererLivingEntity
             super.rotateCorpse(p_77043_1_, p_77043_2_, p_77043_3_, p_77043_4_);
         }
     }
-
     protected void func_96449_a(EntityLivingBase p_96449_1_, double p_96449_2_, double p_96449_4_, double p_96449_6_, String p_96449_8_, float p_96449_9_, double p_96449_10_)
     {
         this.func_96449_a((AbstractClientPlayer)p_96449_1_, p_96449_2_, p_96449_4_, p_96449_6_, p_96449_8_, p_96449_9_, p_96449_10_);
     }
-
+    /**
+     * Allows the render to do any OpenGL state modifications necessary before the model is rendered. Args:
+     * entityLiving, partialTickTime
+     */
     protected void preRenderCallback(EntityLivingBase p_77041_1_, float p_77041_2_)
     {
         this.preRenderCallback((AbstractClientPlayer)p_77041_1_, p_77041_2_);
     }
-
     protected void func_82408_c(EntityLivingBase p_82408_1_, int p_82408_2_, float p_82408_3_)
     {
         this.func_82408_c((AbstractClientPlayer)p_82408_1_, p_82408_2_, p_82408_3_);
     }
-
+    /**
+     * Queries whether should render the specified pass or not.
+     */
     protected int shouldRenderPass(EntityLivingBase p_77032_1_, int p_77032_2_, float p_77032_3_)
     {
         return this.shouldRenderPass((AbstractClientPlayer)p_77032_1_, p_77032_2_, p_77032_3_);
     }
-
     protected void renderEquippedItems(EntityLivingBase p_77029_1_, float p_77029_2_)
     {
         this.renderEquippedItems((AbstractClientPlayer)p_77029_1_, p_77029_2_);
     }
-
     protected void rotateCorpse(EntityLivingBase p_77043_1_, float p_77043_2_, float p_77043_3_, float p_77043_4_)
     {
         this.rotateCorpse((AbstractClientPlayer)p_77043_1_, p_77043_2_, p_77043_3_, p_77043_4_);
     }
-
+    /**
+     * Sets a simple glTranslate on a LivingEntity.
+     */
     protected void renderLivingAt(EntityLivingBase p_77039_1_, double p_77039_2_, double p_77039_4_, double p_77039_6_)
     {
         this.renderLivingAt((AbstractClientPlayer)p_77039_1_, p_77039_2_, p_77039_4_, p_77039_6_);
     }
-
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void func_76986_a(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
     public void doRender(EntityLivingBase p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
     {
         this.doRender((AbstractClientPlayer)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
     }
-
+    /**
+     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
+     */
     protected ResourceLocation getEntityTexture(Entity p_110775_1_)
     {
         return this.getEntityTexture((AbstractClientPlayer)p_110775_1_);
     }
-
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void func_76986_a(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
     public void doRender(Entity p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
     {
         this.doRender((AbstractClientPlayer)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);

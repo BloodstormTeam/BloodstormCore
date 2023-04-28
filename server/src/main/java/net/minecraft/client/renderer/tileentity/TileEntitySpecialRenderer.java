@@ -1,14 +1,11 @@
 package net.minecraft.client.renderer.tileentity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
-@SideOnly(Side.CLIENT)
 public abstract class TileEntitySpecialRenderer
 {
     protected TileEntityRendererDispatcher field_147501_a;
@@ -18,11 +15,11 @@ public abstract class TileEntitySpecialRenderer
 
     protected void bindTexture(ResourceLocation p_147499_1_)
     {
-        TextureManager texturemanager = this.field_147501_a.field_147553_e;
+        TextureManager var2 = this.field_147501_a.field_147553_e;
 
-        if (texturemanager != null)
+        if (var2 != null)
         {
-            texturemanager.bindTexture(p_147499_1_);
+            var2.bindTexture(p_147499_1_);
         }
     }
 
@@ -35,6 +32,6 @@ public abstract class TileEntitySpecialRenderer
 
     public FontRenderer func_147498_b()
     {
-        return this.field_147501_a.getFontRenderer();
+        return this.field_147501_a.func_147548_a();
     }
 }

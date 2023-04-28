@@ -1,12 +1,9 @@
 package net.minecraft.client.model;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.opengl.GL11;
 
-@SideOnly(Side.CLIENT)
 public class ModelBiped extends ModelBase
 {
     public ModelRenderer bipedHead;
@@ -18,9 +15,19 @@ public class ModelBiped extends ModelBase
     public ModelRenderer bipedLeftLeg;
     public ModelRenderer bipedEars;
     public ModelRenderer bipedCloak;
+
+    /**
+     * Records whether the model should be rendered holding an item in the left hand, and if that item is a block.
+     */
     public int heldItemLeft;
+
+    /**
+     * Records whether the model should be rendered holding an item in the right hand, and if that item is a block.
+     */
     public int heldItemRight;
     public boolean isSneak;
+
+    /** Records whether the model should be rendered aiming a bow. */
     public boolean aimedBow;
     private static final String __OBFID = "CL_00000840";
 
@@ -67,20 +74,23 @@ public class ModelBiped extends ModelBase
         this.bipedLeftLeg.setRotationPoint(1.9F, 12.0F + p_i1149_2_, 0.0F);
     }
 
+    /**
+     * Sets the models various rotation angles then renders the model.
+     */
     public void render(Entity p_78088_1_, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float p_78088_7_)
     {
         this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, p_78088_7_, p_78088_1_);
 
         if (this.isChild)
         {
-            float f6 = 2.0F;
+            float var8 = 2.0F;
             GL11.glPushMatrix();
-            GL11.glScalef(1.5F / f6, 1.5F / f6, 1.5F / f6);
+            GL11.glScalef(1.5F / var8, 1.5F / var8, 1.5F / var8);
             GL11.glTranslatef(0.0F, 16.0F * p_78088_7_, 0.0F);
             this.bipedHead.render(p_78088_7_);
             GL11.glPopMatrix();
             GL11.glPushMatrix();
-            GL11.glScalef(1.0F / f6, 1.0F / f6, 1.0F / f6);
+            GL11.glScalef(1.0F / var8, 1.0F / var8, 1.0F / var8);
             GL11.glTranslatef(0.0F, 24.0F * p_78088_7_, 0.0F);
             this.bipedBody.render(p_78088_7_);
             this.bipedRightArm.render(p_78088_7_);
@@ -102,6 +112,11 @@ public class ModelBiped extends ModelBase
         }
     }
 
+    /**
+     * Sets the model's various rotation angles. For bipeds, par1 and par2 are used for animating the movement of arms
+     * and legs, where par1 represents the time(so that arms and legs swing back and forth) and par2 represents how
+     * "far" arms and legs can swing at most.
+     */
     public void setRotationAngles(float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity p_78087_7_)
     {
         this.bipedHead.rotateAngleY = p_78087_4_ / (180F / (float)Math.PI);
@@ -139,13 +154,13 @@ public class ModelBiped extends ModelBase
 
         this.bipedRightArm.rotateAngleY = 0.0F;
         this.bipedLeftArm.rotateAngleY = 0.0F;
-        float f6;
-        float f7;
+        float var8;
+        float var9;
 
         if (this.onGround > -9990.0F)
         {
-            f6 = this.onGround;
-            this.bipedBody.rotateAngleY = MathHelper.sin(MathHelper.sqrt_float(f6) * (float)Math.PI * 2.0F) * 0.2F;
+            var8 = this.onGround;
+            this.bipedBody.rotateAngleY = MathHelper.sin(MathHelper.sqrt_float(var8) * (float)Math.PI * 2.0F) * 0.2F;
             this.bipedRightArm.rotationPointZ = MathHelper.sin(this.bipedBody.rotateAngleY) * 5.0F;
             this.bipedRightArm.rotationPointX = -MathHelper.cos(this.bipedBody.rotateAngleY) * 5.0F;
             this.bipedLeftArm.rotationPointZ = -MathHelper.sin(this.bipedBody.rotateAngleY) * 5.0F;
@@ -153,13 +168,13 @@ public class ModelBiped extends ModelBase
             this.bipedRightArm.rotateAngleY += this.bipedBody.rotateAngleY;
             this.bipedLeftArm.rotateAngleY += this.bipedBody.rotateAngleY;
             this.bipedLeftArm.rotateAngleX += this.bipedBody.rotateAngleY;
-            f6 = 1.0F - this.onGround;
-            f6 *= f6;
-            f6 *= f6;
-            f6 = 1.0F - f6;
-            f7 = MathHelper.sin(f6 * (float)Math.PI);
-            float f8 = MathHelper.sin(this.onGround * (float)Math.PI) * -(this.bipedHead.rotateAngleX - 0.7F) * 0.75F;
-            this.bipedRightArm.rotateAngleX = (float)((double)this.bipedRightArm.rotateAngleX - ((double)f7 * 1.2D + (double)f8));
+            var8 = 1.0F - this.onGround;
+            var8 *= var8;
+            var8 *= var8;
+            var8 = 1.0F - var8;
+            var9 = MathHelper.sin(var8 * (float)Math.PI);
+            float var10 = MathHelper.sin(this.onGround * (float)Math.PI) * -(this.bipedHead.rotateAngleX - 0.7F) * 0.75F;
+            this.bipedRightArm.rotateAngleX = (float)((double)this.bipedRightArm.rotateAngleX - ((double)var9 * 1.2D + (double)var10));
             this.bipedRightArm.rotateAngleY += this.bipedBody.rotateAngleY * 2.0F;
             this.bipedRightArm.rotateAngleZ = MathHelper.sin(this.onGround * (float)Math.PI) * -0.4F;
         }
@@ -194,16 +209,16 @@ public class ModelBiped extends ModelBase
 
         if (this.aimedBow)
         {
-            f6 = 0.0F;
-            f7 = 0.0F;
+            var8 = 0.0F;
+            var9 = 0.0F;
             this.bipedRightArm.rotateAngleZ = 0.0F;
             this.bipedLeftArm.rotateAngleZ = 0.0F;
-            this.bipedRightArm.rotateAngleY = -(0.1F - f6 * 0.6F) + this.bipedHead.rotateAngleY;
-            this.bipedLeftArm.rotateAngleY = 0.1F - f6 * 0.6F + this.bipedHead.rotateAngleY + 0.4F;
+            this.bipedRightArm.rotateAngleY = -(0.1F - var8 * 0.6F) + this.bipedHead.rotateAngleY;
+            this.bipedLeftArm.rotateAngleY = 0.1F - var8 * 0.6F + this.bipedHead.rotateAngleY + 0.4F;
             this.bipedRightArm.rotateAngleX = -((float)Math.PI / 2F) + this.bipedHead.rotateAngleX;
             this.bipedLeftArm.rotateAngleX = -((float)Math.PI / 2F) + this.bipedHead.rotateAngleX;
-            this.bipedRightArm.rotateAngleX -= f6 * 1.2F - f7 * 0.4F;
-            this.bipedLeftArm.rotateAngleX -= f6 * 1.2F - f7 * 0.4F;
+            this.bipedRightArm.rotateAngleX -= var8 * 1.2F - var9 * 0.4F;
+            this.bipedLeftArm.rotateAngleX -= var8 * 1.2F - var9 * 0.4F;
             this.bipedRightArm.rotateAngleZ += MathHelper.cos(p_78087_3_ * 0.09F) * 0.05F + 0.05F;
             this.bipedLeftArm.rotateAngleZ -= MathHelper.cos(p_78087_3_ * 0.09F) * 0.05F + 0.05F;
             this.bipedRightArm.rotateAngleX += MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
@@ -211,6 +226,9 @@ public class ModelBiped extends ModelBase
         }
     }
 
+    /**
+     * renders the ears (specifically, deadmau5's)
+     */
     public void renderEars(float p_78110_1_)
     {
         this.bipedEars.rotateAngleY = this.bipedHead.rotateAngleY;
@@ -220,6 +238,9 @@ public class ModelBiped extends ModelBase
         this.bipedEars.render(p_78110_1_);
     }
 
+    /**
+     * Renders the cloak of the current biped (in most cases, it's a player)
+     */
     public void renderCloak(float p_78111_1_)
     {
         this.bipedCloak.render(p_78111_1_);

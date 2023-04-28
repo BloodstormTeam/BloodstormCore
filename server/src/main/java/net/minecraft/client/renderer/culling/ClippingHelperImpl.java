@@ -1,13 +1,10 @@
 package net.minecraft.client.renderer.culling;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import java.nio.FloatBuffer;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.opengl.GL11;
 
-@SideOnly(Side.CLIENT)
 public class ClippingHelperImpl extends ClippingHelper
 {
     private static ClippingHelperImpl instance = new ClippingHelperImpl();
@@ -16,19 +13,25 @@ public class ClippingHelperImpl extends ClippingHelper
     private FloatBuffer field_78564_h = GLAllocation.createDirectFloatBuffer(16);
     private static final String __OBFID = "CL_00000975";
 
+    /**
+     * Initialises the ClippingHelper object then returns an instance of it.
+     */
     public static ClippingHelper getInstance()
     {
         instance.init();
         return instance;
     }
 
+    /**
+     * Normalize the frustum.
+     */
     private void normalize(float[][] p_78559_1_, int p_78559_2_)
     {
-        float f = MathHelper.sqrt_float(p_78559_1_[p_78559_2_][0] * p_78559_1_[p_78559_2_][0] + p_78559_1_[p_78559_2_][1] * p_78559_1_[p_78559_2_][1] + p_78559_1_[p_78559_2_][2] * p_78559_1_[p_78559_2_][2]);
-        p_78559_1_[p_78559_2_][0] /= f;
-        p_78559_1_[p_78559_2_][1] /= f;
-        p_78559_1_[p_78559_2_][2] /= f;
-        p_78559_1_[p_78559_2_][3] /= f;
+        float var3 = MathHelper.sqrt_float(p_78559_1_[p_78559_2_][0] * p_78559_1_[p_78559_2_][0] + p_78559_1_[p_78559_2_][1] * p_78559_1_[p_78559_2_][1] + p_78559_1_[p_78559_2_][2] * p_78559_1_[p_78559_2_][2]);
+        p_78559_1_[p_78559_2_][0] /= var3;
+        p_78559_1_[p_78559_2_][1] /= var3;
+        p_78559_1_[p_78559_2_][2] /= var3;
+        p_78559_1_[p_78559_2_][3] /= var3;
     }
 
     private void init()

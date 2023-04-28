@@ -36,11 +36,16 @@ import com.google.common.collect.Lists;
 
 @SideOnly(Side.CLIENT)
 public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
+    /** The RNG used by the Main Menu Screen. */
     private static final Random rand = new Random();
+    /** Counts the number of screen updates. */
     private float updateCounter;
+    /** The splash message. */
     private String splashText;
     private GuiButton buttonResetDemo;
+    /** Timer used to rotate the panorama, increases every tick. */
     private int panoramaTimer;
+    /** Texture allocated for the current viewport of the main menu's panorama background. */
     private DynamicTexture viewportTexture;
     private final Object field_104025_t = new Object();
     private String field_92025_p;
@@ -48,6 +53,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
     private String field_104024_v;
     private static final ResourceLocation splashTexts = new ResourceLocation("texts/splashes.txt");
     private static final ResourceLocation minecraftTitleTextures = new ResourceLocation("textures/gui/title/minecraft.png");
+    /** An array of all the paths to the panorama pictures. */
     private static final ResourceLocation[] titlePanoramaPaths = new ResourceLocation[] {new ResourceLocation("textures/gui/title/background/panorama_0.png"), new ResourceLocation("textures/gui/title/background/panorama_1.png"), new ResourceLocation("textures/gui/title/background/panorama_2.png"), new ResourceLocation("textures/gui/title/background/panorama_3.png"), new ResourceLocation("textures/gui/title/background/panorama_4.png"), new ResourceLocation("textures/gui/title/background/panorama_5.png")};
     public static final String field_96138_a = "Please click " + EnumChatFormatting.UNDERLINE + "here" + EnumChatFormatting.RESET + " for more information.";
     private int field_92024_r;
@@ -120,18 +126,30 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
         }
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         ++this.panoramaTimer;
     }
 
+    /**
+     * Returns true if this GUI should pause the game when it is displayed in single-player
+     */
     public boolean doesGuiPauseGame()
     {
         return false;
     }
 
+    /**
+     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
+     */
     protected void keyTyped(char p_73869_1_, int p_73869_2_) {}
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         this.viewportTexture = new DynamicTexture(256, 256);
@@ -189,6 +207,9 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
         }
     }
 
+    /**
+     * Adds Singleplayer and Multiplayer buttons on Main Menu for players who have bought the game.
+     */
     private void addSingleplayerMultiplayerButtons(int p_73969_1_, int p_73969_2_)
     {
         this.buttonList.add(new GuiButton(1, this.width / 2 - 100, p_73969_1_, I18n.format("menu.singleplayer", new Object[0])));
@@ -202,6 +223,9 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
         this.buttonList.add(fmlModButton);
     }
 
+    /**
+     * Adds Demo buttons on Main Menu for players who are playing Demo.
+     */
     private void addDemoButtons(int p_73972_1_, int p_73972_2_)
     {
         this.buttonList.add(new GuiButton(11, this.width / 2 - 100, p_73972_1_, I18n.format("menu.playdemo", new Object[0])));
@@ -302,6 +326,9 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
         }
     }
 
+    /**
+     * Draws the main menu panorama
+     */
     private void drawPanorama(int p_73970_1_, int p_73970_2_, float p_73970_3_)
     {
         Tessellator tessellator = Tessellator.instance;
@@ -388,6 +415,9 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
     }
 
+    /**
+     * Rotate and blurs the skybox view in the main menu
+     */
     private void rotateAndBlurSkybox(float p_73968_1_)
     {
         this.mc.getTextureManager().bindTexture(this.field_110351_G);
@@ -419,6 +449,9 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
         GL11.glColorMask(true, true, true, true);
     }
 
+    /**
+     * Renders the skybox in the main menu
+     */
     private void renderSkybox(int p_73971_1_, int p_73971_2_, float p_73971_3_)
     {
         this.mc.getFramebuffer().unbindFramebuffer();
@@ -448,6 +481,9 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
         tessellator.draw();
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         GL11.glDisable(GL11.GL_ALPHA_TEST);
@@ -515,6 +551,9 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
         super.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
     }
 
+    /**
+     * Called when the mouse is clicked.
+     */
     protected void mouseClicked(int p_73864_1_, int p_73864_2_, int p_73864_3_)
     {
         super.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);

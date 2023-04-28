@@ -39,9 +39,13 @@ public class GuiContainerCreative extends InventoryEffectRenderer
 {
     private static final ResourceLocation field_147061_u = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
     private static InventoryBasic field_147060_v = new InventoryBasic("tmp", true, 45);
+    /** Currently selected creative inventory tab index. */
     private static int selectedTabIndex = CreativeTabs.tabBlock.getTabIndex();
+    /** Amount scrolled in Creative mode inventory (0 = top, 1 = bottom) */
     private float currentScroll;
+    /** True if the scrollbar is being dragged */
     private boolean isScrolling;
+    /** True if the left mouse button was held down last time drawScreen was called. */
     private boolean wasClicking;
     private GuiTextField searchField;
     private List field_147063_B;
@@ -61,6 +65,9 @@ public class GuiContainerCreative extends InventoryEffectRenderer
         this.xSize = 195;
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         if (!this.mc.playerController.isInCreativeMode())
@@ -245,6 +252,9 @@ public class GuiContainerCreative extends InventoryEffectRenderer
         }
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         if (this.mc.playerController.isInCreativeMode())
@@ -276,6 +286,9 @@ public class GuiContainerCreative extends InventoryEffectRenderer
         }
     }
 
+    /**
+     * Called when the screen is unloaded. Used to disable keyboard repeat events
+     */
     public void onGuiClosed()
     {
         super.onGuiClosed();
@@ -288,6 +301,9 @@ public class GuiContainerCreative extends InventoryEffectRenderer
         Keyboard.enableRepeatEvents(false);
     }
 
+    /**
+     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
+     */
     protected void keyTyped(char p_73869_1_, int p_73869_2_)
     {
         if (!CreativeTabs.creativeTabArray[selectedTabIndex].hasSearchBar())
@@ -404,6 +420,9 @@ public class GuiContainerCreative extends InventoryEffectRenderer
         containercreative.scrollTo(0.0F);
     }
 
+    /**
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
+     */
     protected void drawGuiContainerForegroundLayer(int p_146979_1_, int p_146979_2_)
     {
         CreativeTabs creativetabs = CreativeTabs.creativeTabArray[selectedTabIndex];
@@ -415,6 +434,9 @@ public class GuiContainerCreative extends InventoryEffectRenderer
         }
     }
 
+    /**
+     * Called when the mouse is clicked.
+     */
     protected void mouseClicked(int p_73864_1_, int p_73864_2_, int p_73864_3_)
     {
         if (p_73864_3_ == 0)
@@ -438,6 +460,10 @@ public class GuiContainerCreative extends InventoryEffectRenderer
         super.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
     }
 
+    /**
+     * Called when the mouse is moved or a mouse button is released.  Signature: (mouseX, mouseY, which) which==-1 is
+     * mouseMove, which==0 or which==1 is mouseUp
+     */
     protected void mouseMovedOrUp(int p_146286_1_, int p_146286_2_, int p_146286_3_)
     {
         if (p_146286_3_ == 0)
@@ -462,6 +488,9 @@ public class GuiContainerCreative extends InventoryEffectRenderer
         super.mouseMovedOrUp(p_146286_1_, p_146286_2_, p_146286_3_);
     }
 
+    /**
+     * returns (if you are not on the inventoryTab) and (the flag isn't set) and (you have more than 1 page of items)
+     */
     private boolean needsScrollBars()
     {
         if (CreativeTabs.creativeTabArray[selectedTabIndex] == null) return false;
@@ -561,6 +590,9 @@ public class GuiContainerCreative extends InventoryEffectRenderer
         containercreative.scrollTo(0.0F);
     }
 
+    /**
+     * Handles mouse input.
+     */
     public void handleMouseInput()
     {
         super.handleMouseInput();
@@ -596,6 +628,9 @@ public class GuiContainerCreative extends InventoryEffectRenderer
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         boolean flag = Mouse.isButtonDown(0);
@@ -843,6 +878,10 @@ public class GuiContainerCreative extends InventoryEffectRenderer
         return p_147049_2_ >= l && p_147049_2_ <= l + 28 && p_147049_3_ >= i1 && p_147049_3_ <= i1 + 32;
     }
 
+    /**
+     * Renders the creative inventory hovering text if mouse is over it. Returns true if did render or false otherwise.
+     * Params: current creative tab to be checked, current mouse x position, current mouse y position.
+     */
     protected boolean renderCreativeInventoryHoveringText(CreativeTabs p_147052_1_, int p_147052_2_, int p_147052_3_)
     {
         int k = p_147052_1_.getTabColumn();
@@ -957,12 +996,14 @@ public class GuiContainerCreative extends InventoryEffectRenderer
 
     public int func_147056_g()
     {
+        /** Currently selected creative inventory tab index. */
         return selectedTabIndex;
     }
 
     @SideOnly(Side.CLIENT)
     static class ContainerCreative extends Container
         {
+            /** the list of items in this container */
             public List itemList = new ArrayList();
             private static final String __OBFID = "CL_00000753";
 
@@ -992,6 +1033,9 @@ public class GuiContainerCreative extends InventoryEffectRenderer
                 return true;
             }
 
+            /**
+             * Updates the gui slots ItemStack's based on scroll position.
+             */
             public void scrollTo(float p_148329_1_)
             {
                 int i = this.itemList.size() / 9 - 5 + 1;
@@ -1027,6 +1071,10 @@ public class GuiContainerCreative extends InventoryEffectRenderer
 
             protected void retrySlotClick(int p_75133_1_, int p_75133_2_, boolean p_75133_3_, EntityPlayer p_75133_4_) {}
 
+            /**
+             * Called when a player shift-clicks on a slot. You must override this or you will crash when someone does
+             * that.
+             */
             public ItemStack transferStackInSlot(EntityPlayer p_82846_1_, int p_82846_2_)
             {
                 if (p_82846_2_ >= this.inventorySlots.size() - 9 && p_82846_2_ < this.inventorySlots.size())
@@ -1047,6 +1095,10 @@ public class GuiContainerCreative extends InventoryEffectRenderer
                 return p_94530_2_.yDisplayPosition > 90;
             }
 
+            /**
+             * Returns true if the player can "drag-spilt" items into this slot,. returns true by default. Called to
+             * check if the slot can be added to a list of Slots to split the held ItemStack across.
+             */
             public boolean canDragIntoSlot(Slot p_94531_1_)
             {
                 return p_94531_1_.inventory instanceof InventoryPlayer || p_94531_1_.yDisplayPosition > 90 && p_94531_1_.xDisplayPosition <= 162;
@@ -1070,46 +1122,75 @@ public class GuiContainerCreative extends InventoryEffectRenderer
             this.field_148332_b.onPickupFromSlot(p_82870_1_, p_82870_2_);
         }
 
+        /**
+         * Check if the stack is a valid item for this slot. Always true beside for the armor slots.
+         */
         public boolean isItemValid(ItemStack p_75214_1_)
         {
             return this.field_148332_b.isItemValid(p_75214_1_);
         }
 
+        /**
+         * Helper fnct to get the stack in the slot.
+         */
         public ItemStack getStack()
         {
             return this.field_148332_b.getStack();
         }
 
+        /**
+         * Returns if this slot contains a stack.
+         */
         public boolean getHasStack()
         {
             return this.field_148332_b.getHasStack();
         }
 
+        /**
+         * Helper method to put a stack in the slot.
+         */
         public void putStack(ItemStack p_75215_1_)
         {
             this.field_148332_b.putStack(p_75215_1_);
         }
 
+        /**
+         * Called when the stack in a Slot changes
+         */
         public void onSlotChanged()
         {
             this.field_148332_b.onSlotChanged();
         }
 
+        /**
+         * Returns the maximum stack size for a given slot (usually the same as getInventoryStackLimit(), but 1 in the
+         * case of armor slots)
+         */
         public int getSlotStackLimit()
         {
             return this.field_148332_b.getSlotStackLimit();
         }
 
+        /**
+         * Returns the icon index on items.png that is used as background image of the slot.
+         */
         public IIcon getBackgroundIconIndex()
         {
             return this.field_148332_b.getBackgroundIconIndex();
         }
 
+        /**
+         * Decrease the size of the stack in slot (first int arg) by the amount of the second int arg. Returns the new
+         * stack.
+         */
         public ItemStack decrStackSize(int p_75209_1_)
         {
             return this.field_148332_b.decrStackSize(p_75209_1_);
         }
 
+        /**
+         * returns true if this slot is in par2 of par1
+         */
         public boolean isSlotInInventory(IInventory p_75217_1_, int p_75217_2_)
         {
             return this.field_148332_b.isSlotInInventory(p_75217_1_, p_75217_2_);

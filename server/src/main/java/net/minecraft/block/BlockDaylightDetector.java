@@ -1,5 +1,6 @@
 package net.minecraft.block;
 
+import com.bloodstorm.core.api.event.EventFactory;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Random;
@@ -73,7 +74,7 @@ public class BlockDaylightDetector extends BlockContainer
 
             if (l != i1)
             {
-                i1 = org.bukkit.craftbukkit.event.CraftEventFactory.callRedstoneChange(p_149957_1_, p_149957_2_, p_149957_3_, p_149957_4_, l, i1).getNewCurrent(); // CraftBukkit - Call BlockRedstoneEvent
+                EventFactory.postRedstoneEvent(p_149957_1_, p_149957_2_, p_149957_3_, p_149957_4_, l, i1);
                 p_149957_1_.setBlockMetadataWithNotify(p_149957_2_, p_149957_3_, p_149957_4_, i1, 3);
             }
         }

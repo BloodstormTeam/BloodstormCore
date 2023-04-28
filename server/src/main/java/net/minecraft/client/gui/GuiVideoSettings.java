@@ -2,105 +2,188 @@ package net.minecraft.client.gui;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.GameSettings;
+import net.optifine.*;
+import shadersmod.client.GuiShaders;
 
 @SideOnly(Side.CLIENT)
 public class GuiVideoSettings extends GuiScreen
 {
-    private GuiScreen parentGuiScreen;
-    protected String screenTitle = "Video Settings";
-    private GameSettings guiGameSettings;
-    private GuiListExtended optionsRowList;
-    private static final GameSettings.Options[] videoOptions = new GameSettings.Options[] {GameSettings.Options.GRAPHICS, GameSettings.Options.RENDER_DISTANCE, GameSettings.Options.AMBIENT_OCCLUSION, GameSettings.Options.FRAMERATE_LIMIT, GameSettings.Options.ANAGLYPH, GameSettings.Options.VIEW_BOBBING, GameSettings.Options.GUI_SCALE, GameSettings.Options.ADVANCED_OPENGL, GameSettings.Options.GAMMA, GameSettings.Options.RENDER_CLOUDS, GameSettings.Options.PARTICLES, GameSettings.Options.USE_FULLSCREEN, GameSettings.Options.ENABLE_VSYNC, GameSettings.Options.MIPMAP_LEVELS, GameSettings.Options.ANISOTROPIC_FILTERING};
+    private GuiScreen field_146498_f;
+    protected String field_146500_a = "Video Settings";
+    private GameSettings field_146499_g;
+    private static GameSettings.Options[] field_146502_i = new GameSettings.Options[] {GameSettings.Options.GRAPHICS, GameSettings.Options.RENDER_DISTANCE, GameSettings.Options.AMBIENT_OCCLUSION, GameSettings.Options.FRAMERATE_LIMIT, GameSettings.Options.AO_LEVEL, GameSettings.Options.VIEW_BOBBING, GameSettings.Options.GUI_SCALE, GameSettings.Options.ADVANCED_OPENGL, GameSettings.Options.GAMMA, GameSettings.Options.CHUNK_LOADING, GameSettings.Options.DYNAMIC_LIGHTS, GameSettings.Options.FOG_START};
     private static final String __OBFID = "CL_00000718";
+    private TooltipManager tooltipManager = new TooltipManager(this, new TooltipProviderOptions());
 
-    public GuiVideoSettings(GuiScreen p_i1062_1_, GameSettings p_i1062_2_)
+    public GuiVideoSettings(GuiScreen par1GuiScreen, GameSettings par2GameSettings)
     {
-        this.parentGuiScreen = p_i1062_1_;
-        this.guiGameSettings = p_i1062_2_;
+        this.field_146498_f = par1GuiScreen;
+        this.field_146499_g = par2GameSettings;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
-        this.screenTitle = I18n.format("options.videoTitle", new Object[0]);
+        this.field_146500_a = I18n.format("options.videoTitle");
         this.buttonList.clear();
-        this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height - 27, I18n.format("gui.done", new Object[0])));
+        int y;
 
-        if (OpenGlHelper.field_153197_d)
+        for (y = 0; y < field_146502_i.length; ++y)
         {
-            this.optionsRowList = new GuiOptionsRowList(this.mc, this.width, this.height, 32, this.height - 32, 25, videoOptions);
-        }
-        else
-        {
-            GameSettings.Options[] aoptions = new GameSettings.Options[videoOptions.length - 1];
-            int i = 0;
-            GameSettings.Options[] aoptions1 = videoOptions;
-            int j = aoptions1.length;
+            GameSettings.Options x = field_146502_i[y];
 
-            for (int k = 0; k < j; ++k)
+            int x1 = this.width / 2 - 155 + y % 2 * 160;
+            int y1 = this.height / 6 + 21 * (y / 2) - 12;
+
+            if (x.getEnumFloat())
             {
-                GameSettings.Options options = aoptions1[k];
-
-                if (options != GameSettings.Options.ADVANCED_OPENGL)
-                {
-                    aoptions[i] = options;
-                    ++i;
-                }
+                this.buttonList.add(new GuiOptionSliderOF(x.returnEnumOrdinal(), x1, y1, x));
             }
-
-            this.optionsRowList = new GuiOptionsRowList(this.mc, this.width, this.height, 32, this.height - 32, 25, aoptions);
+            else
+            {
+                this.buttonList.add(new GuiOptionButtonOF(x.returnEnumOrdinal(), x1, y1, x, this.field_146499_g.getKeyBinding(x)));
+            }
         }
+
+        y = this.height / 6 + 21 * (field_146502_i.length / 2) - 12;
+        int var6 = this.width / 2 - 155;
+        this.buttonList.add(new GuiOptionButton(231, var6, y, Lang.get("of.options.shaders")));
+        var6 = this.width / 2 - 155 + 160;
+        this.buttonList.add(new GuiOptionButton(202, var6, y, Lang.get("of.options.quality")));
+        y += 21;
+        var6 = this.width / 2 - 155 + 0;
+        this.buttonList.add(new GuiOptionButton(201, var6, y, Lang.get("of.options.details")));
+        var6 = this.width / 2 - 155 + 160;
+        this.buttonList.add(new GuiOptionButton(212, var6, y, Lang.get("of.options.performance")));
+        y += 21;
+        var6 = this.width / 2 - 155 + 0;
+        this.buttonList.add(new GuiOptionButton(211, var6, y, Lang.get("of.options.animations")));
+        var6 = this.width / 2 - 155 + 160;
+        this.buttonList.add(new GuiOptionButton(222, var6, y, Lang.get("of.options.other")));
+        y += 21;
+        this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 168 + 11, I18n.format("gui.done")));
     }
 
-    protected void actionPerformed(GuiButton p_146284_1_)
+    protected void actionPerformed(GuiButton button)
     {
-        if (p_146284_1_.enabled)
+        if (button.enabled)
         {
-            if (p_146284_1_.id == 200)
+            int guiScale = this.field_146499_g.guiScale;
+
+            if (button.id < 200 && button instanceof GuiOptionButton)
+            {
+                this.field_146499_g.setOptionValue(((GuiOptionButton)button).returnEnumOptions(), 1);
+                button.displayString = this.field_146499_g.getKeyBinding(GameSettings.Options.getEnumOptions(button.id));
+            }
+
+            if (button.id == 200)
             {
                 this.mc.gameSettings.saveOptions();
-                this.mc.displayGuiScreen(this.parentGuiScreen);
+                this.mc.displayGuiScreen(this.field_146498_f);
+            }
+
+            if (this.field_146499_g.guiScale != guiScale)
+            {
+                ScaledResolution scr = new ScaledResolution(this.mc, this.mc.displayWidth, this.mc.displayHeight);
+                int var4 = scr.getScaledWidth();
+                int var5 = scr.getScaledHeight();
+                this.setWorldAndResolution(this.mc, var4, var5);
+            }
+
+            if (button.id == 201)
+            {
+                this.mc.gameSettings.saveOptions();
+                GuiDetailSettingsOF scr1 = new GuiDetailSettingsOF(this, this.field_146499_g);
+                this.mc.displayGuiScreen(scr1);
+            }
+
+            if (button.id == 202)
+            {
+                this.mc.gameSettings.saveOptions();
+                GuiQualitySettingsOF scr2 = new GuiQualitySettingsOF(this, this.field_146499_g);
+                this.mc.displayGuiScreen(scr2);
+            }
+
+            if (button.id == 211)
+            {
+                this.mc.gameSettings.saveOptions();
+                GuiAnimationSettingsOF scr3 = new GuiAnimationSettingsOF(this, this.field_146499_g);
+                this.mc.displayGuiScreen(scr3);
+            }
+
+            if (button.id == 212)
+            {
+                this.mc.gameSettings.saveOptions();
+                GuiPerformanceSettingsOF scr4 = new GuiPerformanceSettingsOF(this, this.field_146499_g);
+                this.mc.displayGuiScreen(scr4);
+            }
+
+            if (button.id == 222)
+            {
+                this.mc.gameSettings.saveOptions();
+                GuiOtherSettingsOF scr5 = new GuiOtherSettingsOF(this, this.field_146499_g);
+                this.mc.displayGuiScreen(scr5);
+            }
+
+            if (button.id == 231)
+            {
+                if (Config.isAntialiasing() || Config.isAntialiasingConfigured())
+                {
+                    Config.showGuiMessage(Lang.get("of.message.shaders.aa1"), Lang.get("of.message.shaders.aa2"));
+                    return;
+                }
+
+                if (Config.isAnisotropicFiltering())
+                {
+                    Config.showGuiMessage(Lang.get("of.message.shaders.af1"), Lang.get("of.message.shaders.af2"));
+                    return;
+                }
+
+                if (Config.isFastRender())
+                {
+                    Config.showGuiMessage(Lang.get("of.message.shaders.fr1"), Lang.get("of.message.shaders.fr2"));
+                    return;
+                }
+
+                this.mc.gameSettings.saveOptions();
+                GuiShaders scr6 = new GuiShaders(this, this.field_146499_g);
+                this.mc.displayGuiScreen(scr6);
             }
         }
     }
 
-    protected void mouseClicked(int p_73864_1_, int p_73864_2_, int p_73864_3_)
-    {
-        int l = this.guiGameSettings.guiScale;
-        super.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
-        this.optionsRowList.func_148179_a(p_73864_1_, p_73864_2_, p_73864_3_);
-
-        if (this.guiGameSettings.guiScale != l)
-        {
-            ScaledResolution scaledresolution = new ScaledResolution(this.mc, this.mc.displayWidth, this.mc.displayHeight);
-            int i1 = scaledresolution.getScaledWidth();
-            int j1 = scaledresolution.getScaledHeight();
-            this.setWorldAndResolution(this.mc, i1, j1);
-        }
-    }
-
-    protected void mouseMovedOrUp(int p_146286_1_, int p_146286_2_, int p_146286_3_)
-    {
-        int l = this.guiGameSettings.guiScale;
-        super.mouseMovedOrUp(p_146286_1_, p_146286_2_, p_146286_3_);
-        this.optionsRowList.func_148181_b(p_146286_1_, p_146286_2_, p_146286_3_);
-
-        if (this.guiGameSettings.guiScale != l)
-        {
-            ScaledResolution scaledresolution = new ScaledResolution(this.mc, this.mc.displayWidth, this.mc.displayHeight);
-            int i1 = scaledresolution.getScaledWidth();
-            int j1 = scaledresolution.getScaledHeight();
-            this.setWorldAndResolution(this.mc, i1, j1);
-        }
-    }
-
-    public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
+    /**
+     * Draws the screen and all the components in it.
+     */
+    public void drawScreen(int x, int y, float z)
     {
         this.drawDefaultBackground();
-        this.optionsRowList.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
-        this.drawCenteredString(this.fontRendererObj, this.screenTitle, this.width / 2, 5, 16777215);
-        super.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
+        this.drawCenteredString(this.fontRendererObj, this.field_146500_a, this.width / 2, 15, 16777215);
+        String ver = "OptiFine HD U7 Ultra";
+        this.drawString(this.fontRendererObj, ver, 2, this.height - 10, 8421504);
+        String verMc = "Minecraft 1.7.10";
+        int lenMc = this.fontRendererObj.getStringWidth(verMc);
+        this.drawString(this.fontRendererObj, verMc, this.width - lenMc - 2, this.height - 10, 8421504);
+        super.drawScreen(x, y, z);
+        this.tooltipManager.drawTooltips(x, y, this.buttonList);
+    }
+
+    public static int getButtonWidth(GuiButton btn)
+    {
+        return btn.width;
+    }
+
+    public static int getButtonHeight(GuiButton btn)
+    {
+        return btn.height;
+    }
+
+    public static void drawGradientRect(GuiScreen guiScreen, int left, int top, int right, int bottom, int startColor, int endColor)
+    {
+        guiScreen.drawGradientRect(left, top, right, bottom, startColor, endColor);
     }
 }

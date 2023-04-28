@@ -635,7 +635,9 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
                         this.tick();
                         this.serverIsRunning = true;
                     }
-                } catch (Exception ignored) {};
+                } catch (Exception ignored) {
+                    ignored.printStackTrace();
+                };
                 FMLCommonHandler.instance().handleServerStopping();
                 FMLCommonHandler.instance().expectServerStopped(); // has to come before finalTick to avoid race conditions
             } else {
@@ -669,12 +671,12 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IPlay
                 org.spigotmc.WatchdogThread.doStop(); // Spigot
                 this.stopServer();
                 this.serverStopped = true;
-            } catch (Throwable ignored) {}
-            finally {
+            } catch (Throwable ignored) {
+                ignored.printStackTrace();
+            } finally {
                 try {
                     this.reader.getTerminal().restore();
                 } catch (Exception ignored) {}
-
                 // CraftBukkit end
                 FMLCommonHandler.instance().handleServerStopped();
                 this.serverStopped = true;

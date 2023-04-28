@@ -1,12 +1,9 @@
 package net.minecraft.client.model;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.opengl.GL11;
 
-@SideOnly(Side.CLIENT)
 public class ModelQuadruped extends ModelBase
 {
     public ModelRenderer head = new ModelRenderer(this, 0, 0);
@@ -40,19 +37,22 @@ public class ModelQuadruped extends ModelBase
         this.leg4.setRotationPoint(3.0F, (float)(24 - p_i1154_1_), -5.0F);
     }
 
+    /**
+     * Sets the models various rotation angles then renders the model.
+     */
     public void render(Entity p_78088_1_, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float p_78088_7_)
     {
         this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, p_78088_7_, p_78088_1_);
 
         if (this.isChild)
         {
-            float f6 = 2.0F;
+            float var8 = 2.0F;
             GL11.glPushMatrix();
             GL11.glTranslatef(0.0F, this.field_78145_g * p_78088_7_, this.field_78151_h * p_78088_7_);
             this.head.render(p_78088_7_);
             GL11.glPopMatrix();
             GL11.glPushMatrix();
-            GL11.glScalef(1.0F / f6, 1.0F / f6, 1.0F / f6);
+            GL11.glScalef(1.0F / var8, 1.0F / var8, 1.0F / var8);
             GL11.glTranslatef(0.0F, 24.0F * p_78088_7_, 0.0F);
             this.body.render(p_78088_7_);
             this.leg1.render(p_78088_7_);
@@ -72,9 +72,14 @@ public class ModelQuadruped extends ModelBase
         }
     }
 
+    /**
+     * Sets the model's various rotation angles. For bipeds, par1 and par2 are used for animating the movement of arms
+     * and legs, where par1 represents the time(so that arms and legs swing back and forth) and par2 represents how
+     * "far" arms and legs can swing at most.
+     */
     public void setRotationAngles(float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity p_78087_7_)
     {
-        float f6 = (180F / (float)Math.PI);
+        float var8 = (180F / (float)Math.PI);
         this.head.rotateAngleX = p_78087_5_ / (180F / (float)Math.PI);
         this.head.rotateAngleY = p_78087_4_ / (180F / (float)Math.PI);
         this.body.rotateAngleX = ((float)Math.PI / 2F);

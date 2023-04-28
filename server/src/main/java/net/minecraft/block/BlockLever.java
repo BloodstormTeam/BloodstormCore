@@ -1,5 +1,7 @@
 package net.minecraft.block;
 
+import com.bloodstorm.core.api.event.EventFactory;
+import com.bloodstorm.core.api.event.block.BlockRedstoneEvent;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
@@ -11,9 +13,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import net.minecraftforge.common.util.ForgeDirection;
-import static net.minecraftforge.common.util.ForgeDirection.*;
 
-import org.bukkit.event.block.BlockRedstoneEvent; // CraftBukkit
+import static net.minecraftforge.common.util.ForgeDirection.*;
 
 public class BlockLever extends Block
 {
@@ -272,14 +273,11 @@ public class BlockLever extends Block
             int i1 = p_149727_1_.getBlockMetadata(p_149727_2_, p_149727_3_, p_149727_4_);
             int j1 = i1 & 7;
             int k1 = 8 - (i1 & 8);
-            // CraftBukkit start - Interact Lever
-            org.bukkit.block.Block block = p_149727_1_.getWorld().getBlockAt(p_149727_2_, p_149727_3_, p_149727_4_);
             int old = (k1 != 8) ? 15 : 0;
             int current = (k1 == 8) ? 15 : 0;
-            BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(block, old, current);
-            p_149727_1_.getServer().getPluginManager().callEvent(eventRedstone);
 
-            if ((eventRedstone.getNewCurrent() > 0) != (k1 == 8))
+            BlockRedstoneEvent blockRedstoneEvent = EventFactory.postRedstoneEvent(p_149727_1_, p_149727_2_, p_149727_3_, p_149727_4_, old, current);
+            if ((blockRedstoneEvent.getNewValue() > 0) != (k1 == 8))
             {
                 return true;
             }

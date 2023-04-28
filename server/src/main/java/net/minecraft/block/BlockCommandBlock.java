@@ -1,6 +1,9 @@
 package net.minecraft.block;
 
 import java.util.Random;
+
+import com.bloodstorm.core.api.event.EventFactory;
+import com.bloodstorm.core.api.event.block.BlockRedstoneEvent;
 import net.minecraft.block.material.Material;
 import net.minecraft.command.server.CommandBlockLogic;
 import net.minecraft.entity.EntityLivingBase;
@@ -9,8 +12,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityCommandBlock;
 import net.minecraft.world.World;
-
-import org.bukkit.event.block.BlockRedstoneEvent; // CraftBukkit
 
 public class BlockCommandBlock extends BlockContainer
 {
@@ -34,19 +35,15 @@ public class BlockCommandBlock extends BlockContainer
             int l = p_149695_1_.getBlockMetadata(p_149695_2_, p_149695_3_, p_149695_4_);
             boolean flag1 = (l & 1) != 0;
             // CraftBukkit start
-            org.bukkit.block.Block bukkitBlock = p_149695_1_.getWorld().getBlockAt(p_149695_2_, p_149695_3_, p_149695_4_);
             int old = flag1 ? 15 : 0;
             int current = flag ? 15 : 0;
-            BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(bukkitBlock, old, current);
-            p_149695_1_.getServer().getPluginManager().callEvent(eventRedstone);
-            // CraftBukkit end
-
-            if (eventRedstone.getNewCurrent() > 0 && !(eventRedstone.getOldCurrent() > 0))   // CraftBukkit
+            BlockRedstoneEvent blockRedstoneEvent = EventFactory.postRedstoneEvent(p_149695_1_, p_149695_2_, p_149695_3_, p_149695_4_, old, current);
+            if (blockRedstoneEvent.getNewValue() > 0 && !(blockRedstoneEvent.getOldValue() > 0))   // CraftBukkit
             {
                 p_149695_1_.setBlockMetadataWithNotify(p_149695_2_, p_149695_3_, p_149695_4_, l | 1, 4);
                 p_149695_1_.scheduleBlockUpdate(p_149695_2_, p_149695_3_, p_149695_4_, this, this.tickRate(p_149695_1_));
             }
-            else if (!(eventRedstone.getNewCurrent() > 0) && eventRedstone.getOldCurrent() > 0)     // CraftBukkit
+            else if (!(blockRedstoneEvent.getNewValue() > 0) && blockRedstoneEvent.getOldValue() > 0)     // CraftBukkit
             {
                 p_149695_1_.setBlockMetadataWithNotify(p_149695_2_, p_149695_3_, p_149695_4_, l & -2, 4);
             }

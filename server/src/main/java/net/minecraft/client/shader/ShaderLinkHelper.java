@@ -1,11 +1,8 @@
 package net.minecraft.client.shader;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.util.JsonException;
 
-@SideOnly(Side.CLIENT)
 public class ShaderLinkHelper {
     private static ShaderLinkHelper staticShaderLinkHelper;
     private static final String __OBFID = "CL_00001045";
@@ -29,15 +26,15 @@ public class ShaderLinkHelper {
 
     public int func_148078_c() throws JsonException
     {
-        int i = OpenGlHelper.func_153183_d();
+        int var1 = OpenGlHelper.func_153183_d();
 
-        if (i <= 0)
+        if (var1 <= 0)
         {
-            throw new JsonException("Could not create shader program (returned program ID " + i + ")");
+            throw new JsonException("Could not create shader program (returned program ID " + var1 + ")");
         }
         else
         {
-            return i;
+            return var1;
         }
     }
 

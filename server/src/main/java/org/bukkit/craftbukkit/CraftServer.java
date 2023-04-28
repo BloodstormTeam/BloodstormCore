@@ -133,10 +133,10 @@ public final class CraftServer implements Server {
     private int waterAnimalSpawn = -1;
     private int ambientSpawn = -1;
     private File container;
-    private WarningState warningState = WarningState.DEFAULT;
+    private WarningState warningState;
     private boolean printSaveWarning;
     private CraftIconCache icon;
-    private boolean overrideAllCommandBlockCommands = false;
+    private boolean overrideAllCommandBlockCommands;
 
     public CraftServer(net.minecraft.server.MinecraftServer console, net.minecraft.server.management.ServerConfigurationManager playerList) {
         this.console = console;

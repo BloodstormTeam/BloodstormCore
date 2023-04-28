@@ -15,6 +15,10 @@ repositories {
         name = "Minecraft"
         url = uri("https://libraries.minecraft.net/")
     }
+    maven {
+        name = "jitpack"
+        url = uri("https://jitpack.io")
+    }
 }
 
 dependencies {
@@ -31,6 +35,9 @@ dependencies {
     implementation("org.ow2.asm:asm:9.5")
     implementation("org.ow2.asm:asm-commons:9.5")
     implementation("org.ow2.asm:asm-util:9.5")
+
+    implementation("com.github.therealbush:eventbus-kotlin:v1.0.1")
+
     implementation("com.google.code.findbugs:jsr305:1.3.9")
     implementation( "net.sf.jopt-simple:jopt-simple:4.5")
     implementation("lzma:lzma:0.0.1")

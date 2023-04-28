@@ -17,7 +17,9 @@ import org.lwjgl.opengl.GL11;
 @SideOnly(Side.CLIENT)
 public class GuiNewChat extends Gui {
     private final Minecraft mc;
+    /** A list of messages previously sent through the chat GUI */
     private final List sentMessages = new ArrayList();
+    /** Chat lines to be displayed in the chat box */
     private final List chatLines = new ArrayList();
     private final List field_146253_i = new ArrayList();
     private int field_146250_j;
@@ -127,6 +129,9 @@ public class GuiNewChat extends Gui {
         }
     }
 
+    /**
+     * Clears the chat.
+     */
     public void clearChatMessages()
     {
         this.field_146253_i.clear();
@@ -139,7 +144,11 @@ public class GuiNewChat extends Gui {
         this.printChatMessageWithOptionalDeletion(p_146227_1_, 0);
     }
 
-    public void printChatMessageWithOptionalDeletion(IChatComponent p_146234_1_, int p_146234_2_) {
+    /**
+     * prints the ChatComponent to Chat. If the ID is not 0, deletes an existing Chat Line of that ID from the GUI
+     */
+    public void printChatMessageWithOptionalDeletion(IChatComponent p_146234_1_, int p_146234_2_)
+    {
         this.func_146237_a(p_146234_1_, p_146234_2_, this.mc.ingameGUI.getUpdateCounter(), false);
     }
 
@@ -257,11 +266,17 @@ public class GuiNewChat extends Gui {
         }
     }
 
+    /**
+     * Gets the list of messages previously sent through the chat GUI
+     */
     public List getSentMessages()
     {
         return this.sentMessages;
     }
 
+    /**
+     * Adds this string to the list of sent messages, for recall using the up/down arrow keys
+     */
     public void addToSentMessages(String p_146239_1_)
     {
         if (this.sentMessages.isEmpty() || !((String)this.sentMessages.get(this.sentMessages.size() - 1)).equals(p_146239_1_))
@@ -270,12 +285,18 @@ public class GuiNewChat extends Gui {
         }
     }
 
+    /**
+     * Resets the chat scroll (executed when the GUI is closed, among others)
+     */
     public void resetScroll()
     {
         this.field_146250_j = 0;
         this.field_146251_k = false;
     }
 
+    /**
+     * Scrolls the chat by the given number of lines.
+     */
     public void scroll(int p_146229_1_)
     {
         this.field_146250_j += p_146229_1_;
@@ -353,11 +374,17 @@ public class GuiNewChat extends Gui {
         }
     }
 
+    /**
+     * Returns true if the chat GUI is open
+     */
     public boolean getChatOpen()
     {
         return this.mc.currentScreen instanceof GuiChat;
     }
 
+    /**
+     * finds and deletes a Chat line by ID
+     */
     public void deleteChatLine(int p_146242_1_)
     {
         Iterator iterator = this.field_146253_i.iterator();

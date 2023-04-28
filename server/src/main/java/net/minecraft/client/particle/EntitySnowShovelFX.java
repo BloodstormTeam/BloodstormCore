@@ -1,11 +1,8 @@
 package net.minecraft.client.particle;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.World;
 
-@SideOnly(Side.CLIENT)
 public class EntitySnowShovelFX extends EntityFX
 {
     float snowDigParticleScale;
@@ -36,22 +33,25 @@ public class EntitySnowShovelFX extends EntityFX
 
     public void renderParticle(Tessellator p_70539_1_, float p_70539_2_, float p_70539_3_, float p_70539_4_, float p_70539_5_, float p_70539_6_, float p_70539_7_)
     {
-        float f6 = ((float)this.particleAge + p_70539_2_) / (float)this.particleMaxAge * 32.0F;
+        float var8 = ((float)this.particleAge + p_70539_2_) / (float)this.particleMaxAge * 32.0F;
 
-        if (f6 < 0.0F)
+        if (var8 < 0.0F)
         {
-            f6 = 0.0F;
+            var8 = 0.0F;
         }
 
-        if (f6 > 1.0F)
+        if (var8 > 1.0F)
         {
-            f6 = 1.0F;
+            var8 = 1.0F;
         }
 
-        this.particleScale = this.snowDigParticleScale * f6;
+        this.particleScale = this.snowDigParticleScale * var8;
         super.renderParticle(p_70539_1_, p_70539_2_, p_70539_3_, p_70539_4_, p_70539_5_, p_70539_6_, p_70539_7_);
     }
 
+    /**
+     * Called to update the entity's position/logic.
+     */
     public void onUpdate()
     {
         this.prevPosX = this.posX;

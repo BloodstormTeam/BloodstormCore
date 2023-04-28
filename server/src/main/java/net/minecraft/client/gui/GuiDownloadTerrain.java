@@ -18,13 +18,22 @@ public class GuiDownloadTerrain extends GuiScreen
         this.field_146594_a = p_i45023_1_;
     }
 
+    /**
+     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
+     */
     protected void keyTyped(char p_73869_1_, int p_73869_2_) {}
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         this.buttonList.clear();
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         ++this.field_146593_f;
@@ -40,6 +49,9 @@ public class GuiDownloadTerrain extends GuiScreen
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawBackground(0);
@@ -47,6 +59,9 @@ public class GuiDownloadTerrain extends GuiScreen
         super.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
     }
 
+    /**
+     * Returns true if this GUI should pause the game when it is displayed in single-player
+     */
     public boolean doesGuiPauseGame()
     {
         return false;

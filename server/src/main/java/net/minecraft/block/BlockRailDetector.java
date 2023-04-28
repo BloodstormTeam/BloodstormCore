@@ -1,5 +1,7 @@
 package net.minecraft.block;
 
+import com.bloodstorm.core.api.event.EventFactory;
+import com.bloodstorm.core.api.event.block.BlockRedstoneEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.List;
@@ -15,8 +17,6 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
-import org.bukkit.event.block.BlockRedstoneEvent; // CraftBukkit
 
 public class BlockRailDetector extends BlockRailBase
 {
@@ -91,10 +91,8 @@ public class BlockRailDetector extends BlockRailBase
         // CraftBukkit start
         if (flag != flag1)
         {
-            org.bukkit.block.Block block = p_150054_1_.getWorld().getBlockAt(p_150054_2_, p_150054_3_, p_150054_4_);
-            BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(block, flag ? 15 : 0, flag1 ? 15 : 0);
-            p_150054_1_.getServer().getPluginManager().callEvent(eventRedstone);
-            flag1 = eventRedstone.getNewCurrent() > 0;
+            BlockRedstoneEvent blockRedstoneEvent = EventFactory.postRedstoneEvent(p_150054_1_, p_150054_2_, p_150054_3_, p_150054_4_, flag ? 15 : 0, flag1 ? 15 : 0);
+            flag1 = blockRedstoneEvent.getNewValue() > 0;
         }
 
         // CraftBukkit end

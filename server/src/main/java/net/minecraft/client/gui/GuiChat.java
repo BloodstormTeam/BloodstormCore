@@ -39,13 +39,20 @@ public class GuiChat extends GuiScreen implements GuiYesNoCallback
 {
     private static final Set field_152175_f = Sets.newHashSet("http", "https");
     private String field_146410_g = "";
+    /**
+     * keeps position of which chat message you will select when you press up, (does not increase for duplicated
+     * messages sent immediately after each other)
+     */
     private int sentHistoryCursor = -1;
     private boolean field_146417_i;
     private boolean field_146414_r;
     private int field_146413_s;
     private List field_146412_t = new ArrayList();
+    /** used to pass around the URI to various dialogues and to the host os */
     private URI clickedURI;
+    /** Chat entry field */
     protected GuiTextField inputField;
+    /** is the text that appears when you press the chat key and the input box appears pre-filled */
     private String defaultInputFieldText = "";
     private static final String __OBFID = "CL_00000682";
 
@@ -56,6 +63,9 @@ public class GuiChat extends GuiScreen implements GuiYesNoCallback
         this.defaultInputFieldText = p_i1024_1_;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         Keyboard.enableRepeatEvents(true);
@@ -68,17 +78,26 @@ public class GuiChat extends GuiScreen implements GuiYesNoCallback
         this.inputField.setCanLoseFocus(false);
     }
 
+    /**
+     * Called when the screen is unloaded. Used to disable keyboard repeat events
+     */
     public void onGuiClosed()
     {
         Keyboard.enableRepeatEvents(false);
         this.mc.ingameGUI.getChatGUI().resetScroll();
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         this.inputField.updateCursorCounter();
     }
 
+    /**
+     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
+     */
     protected void keyTyped(char p_73869_1_, int p_73869_2_)
     {
         this.field_146414_r = false;
@@ -139,6 +158,9 @@ public class GuiChat extends GuiScreen implements GuiYesNoCallback
         this.mc.thePlayer.sendChatMessage(p_146403_1_);
     }
 
+    /**
+     * Handles mouse input.
+     */
     public void handleMouseInput()
     {
         super.handleMouseInput();
@@ -165,6 +187,9 @@ public class GuiChat extends GuiScreen implements GuiYesNoCallback
         }
     }
 
+    /**
+     * Called when the mouse is clicked.
+     */
     protected void mouseClicked(int p_73864_1_, int p_73864_2_, int p_73864_3_)
     {
         if (p_73864_3_ == 0 && this.mc.gameSettings.chatLinks)
@@ -327,6 +352,10 @@ public class GuiChat extends GuiScreen implements GuiYesNoCallback
         }
     }
 
+    /**
+     * input is relative and is applied directly to the sentHistoryCursor so -1 is the previous message, 1 is the next
+     * message from the current cursor position
+     */
     public void getSentHistory(int p_146402_1_)
     {
         int j = this.sentHistoryCursor + p_146402_1_;
@@ -362,6 +391,9 @@ public class GuiChat extends GuiScreen implements GuiYesNoCallback
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         drawRect(2, this.height - 14, this.width - 2, this.height - 2, Integer.MIN_VALUE);
@@ -476,6 +508,9 @@ public class GuiChat extends GuiScreen implements GuiYesNoCallback
         }
     }
 
+    /**
+     * Returns true if this GUI should pause the game when it is displayed in single-player
+     */
     public boolean doesGuiPauseGame()
     {
         return false;

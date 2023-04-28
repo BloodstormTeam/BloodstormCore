@@ -1,5 +1,7 @@
 package net.minecraft.block;
 
+import com.bloodstorm.core.api.event.EventFactory;
+import com.bloodstorm.core.api.event.block.BlockRedstoneEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Random;
@@ -15,8 +17,6 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
-import org.bukkit.event.block.BlockRedstoneEvent; // CraftBukkit
 
 public class BlockDoor extends Block
 {
@@ -351,9 +351,8 @@ public class BlockDoor extends Block
 
                 if (oldPower == 0 ^ power == 0)
                 {
-                    BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(bukkitBlock, oldPower, power);
-                    p_149695_1_.getServer().getPluginManager().callEvent(eventRedstone);
-                    this.func_150014_a(p_149695_1_, p_149695_2_, p_149695_3_, p_149695_4_, eventRedstone.getNewCurrent() > 0);
+                    BlockRedstoneEvent blockRedstoneEvent = EventFactory.postRedstoneEvent(p_149695_1_, p_149695_2_, p_149695_3_, p_149695_4_, oldPower, power);
+                    this.func_150014_a(p_149695_1_, p_149695_2_, p_149695_3_, p_149695_4_, blockRedstoneEvent.getNewValue() > 0);
                 }
 
                 // CraftBukkit end

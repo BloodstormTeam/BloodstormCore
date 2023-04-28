@@ -1,64 +1,69 @@
 package net.minecraft.client.renderer;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.Proxy;
 import java.net.URL;
+import java.net.Proxy.Type;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.imageio.ImageIO;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
+import net.optifine.CapeImageBuffer;
+import net.optifine.Config;
+import net.optifine.HttpPipeline;
+import net.optifine.HttpRequest;
+import net.optifine.HttpResponse;
+import net.optifine.TextureUtils;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.io.FileUtils;
 
-@SideOnly(Side.CLIENT)
 public class ThreadDownloadImageData extends SimpleTexture {
-    private static final AtomicInteger threadDownloadCounter = new AtomicInteger(0);
+    private static final AtomicInteger field_147643_d = new AtomicInteger(0);
     private final File field_152434_e;
     private final String imageUrl;
     private final IImageBuffer imageBuffer;
     private BufferedImage bufferedImage;
     private Thread imageThread;
     private boolean textureUploaded;
-    private static final String __OBFID = "CL_00001049";
+    public Boolean imageFound = null;
+    public boolean pipeline = false;
 
-    public ThreadDownloadImageData(File p_i1049_1_, String p_i1049_2_, ResourceLocation p_i1049_3_, IImageBuffer p_i1049_4_)
+    public ThreadDownloadImageData(File par1GuiCreateFlatWorld, String p_i1049_2_, ResourceLocation p_i1049_3_, IImageBuffer p_i1049_4_)
     {
         super(p_i1049_3_);
-        this.field_152434_e = p_i1049_1_;
+        this.field_152434_e = par1GuiCreateFlatWorld;
         this.imageUrl = p_i1049_2_;
         this.imageBuffer = p_i1049_4_;
     }
 
-    private void checkTextureUploaded()
+    private void func_147640_e()
     {
-        if (!this.textureUploaded)
+        if (!this.textureUploaded && this.bufferedImage != null)
         {
-            if (this.bufferedImage != null)
-            {
-                if (this.textureLocation != null)
-                {
-                    this.deleteGlTexture();
-                }
+            this.textureUploaded = true;
 
-                TextureUtil.uploadTextureImage(super.getGlTextureId(), this.bufferedImage);
-                this.textureUploaded = true;
+            if (this.textureLocation != null)
+            {
+                this.func_147631_c();
             }
+
+            TextureUtil.uploadTextureImage(super.getGlTextureId(), this.bufferedImage);
         }
     }
 
     public int getGlTextureId()
     {
-        this.checkTextureUploaded();
+        this.func_147640_e();
         return super.getGlTextureId();
     }
 
-    public void setBufferedImage(BufferedImage p_147641_1_)
+    public void func_147641_a(BufferedImage p_147641_1_)
     {
         this.bufferedImage = p_147641_1_;
 
@@ -66,13 +71,15 @@ public class ThreadDownloadImageData extends SimpleTexture {
         {
             this.imageBuffer.func_152634_a();
         }
+
+        this.imageFound = Boolean.valueOf(this.bufferedImage != null);
     }
 
-    public void loadTexture(IResourceManager p_110551_1_) throws IOException
+    public void loadTexture(IResourceManager par1ResourceManager) throws IOException
     {
         if (this.bufferedImage == null && this.textureLocation != null)
         {
-            super.loadTexture(p_110551_1_);
+            super.loadTexture(par1ResourceManager);
         }
 
         if (this.imageThread == null)
@@ -85,11 +92,12 @@ public class ThreadDownloadImageData extends SimpleTexture {
 
                     if (this.imageBuffer != null)
                     {
-                        this.setBufferedImage(this.imageBuffer.parseUserSkin(this.bufferedImage));
+                        this.func_147641_a(this.imageBuffer.parseUserSkin(this.bufferedImage));
                     }
+
+                    this.loadingFinished();
                 }
-                catch (IOException ioexception)
-                {
+                catch (IOException var3) {
                     this.func_152433_a();
                 }
             }
@@ -102,51 +110,131 @@ public class ThreadDownloadImageData extends SimpleTexture {
 
     protected void func_152433_a()
     {
-        this.imageThread = new Thread("Texture Downloader #" + threadDownloadCounter.incrementAndGet())
+        this.imageThread = new Thread("Texture Downloader #" + field_147643_d.incrementAndGet())
         {
-            private static final String __OBFID = "CL_00001050";
             public void run()
             {
-                HttpURLConnection httpurlconnection = null;
-                try
-                {
-                    httpurlconnection = (HttpURLConnection)(new URL(ThreadDownloadImageData.this.imageUrl)).openConnection(Minecraft.getMinecraft().getProxy());
-                    httpurlconnection.setDoInput(true);
-                    httpurlconnection.setDoOutput(false);
-                    httpurlconnection.connect();
+                HttpURLConnection var1 = null;
 
-                    if (httpurlconnection.getResponseCode() / 100 == 2)
+                if (ThreadDownloadImageData.this.shouldPipeline())
+                {
+                    ThreadDownloadImageData.this.loadPipelined();
+                }
+                else
+                {
+                    try
                     {
-                        BufferedImage bufferedimage;
+                        var1 = (HttpURLConnection)(new URL(ThreadDownloadImageData.this.imageUrl)).openConnection(Minecraft.getMinecraft().getProxy());
+                        var1.setDoInput(true);
+                        var1.setDoOutput(false);
+                        var1.connect();
+
+                        if (var1.getResponseCode() / 100 != 2)
+                        {
+                            if (var1.getErrorStream() != null)
+                            {
+                                Config.readAll(var1.getErrorStream());
+                            }
+
+                            return;
+                        }
+
+                        BufferedImage var6;
 
                         if (ThreadDownloadImageData.this.field_152434_e != null)
                         {
-                            FileUtils.copyInputStreamToFile(httpurlconnection.getInputStream(), ThreadDownloadImageData.this.field_152434_e);
-                            bufferedimage = ImageIO.read(ThreadDownloadImageData.this.field_152434_e);
+                            FileUtils.copyInputStreamToFile(var1.getInputStream(), ThreadDownloadImageData.this.field_152434_e);
+                            var6 = ImageIO.read(ThreadDownloadImageData.this.field_152434_e);
                         }
                         else
                         {
-                            bufferedimage = ImageIO.read(httpurlconnection.getInputStream());
+                            var6 = ImageIO.read(var1.getInputStream());
                         }
 
                         if (ThreadDownloadImageData.this.imageBuffer != null)
                         {
-                            bufferedimage = ThreadDownloadImageData.this.imageBuffer.parseUserSkin(bufferedimage);
+                            var6 = ThreadDownloadImageData.this.imageBuffer.parseUserSkin(var6);
                         }
 
-                        ThreadDownloadImageData.this.setBufferedImage(bufferedimage);
+                        ThreadDownloadImageData.this.func_147641_a(var6);
                     }
-                }
-                catch (Exception ignored) {}
-                finally {
-                    if (httpurlconnection != null)
-                    {
-                        httpurlconnection.disconnect();
+                    catch (Exception ignored) {}
+                    finally {
+                        if (var1 != null)
+                        {
+                            var1.disconnect();
+                        }
+
+                        ThreadDownloadImageData.this.loadingFinished();
                     }
                 }
             }
         };
         this.imageThread.setDaemon(true);
         this.imageThread.start();
+    }
+
+    private boolean shouldPipeline()
+    {
+        if (!this.pipeline)
+        {
+            return false;
+        }
+        else
+        {
+            Proxy proxy = Minecraft.getMinecraft().getProxy();
+            return proxy.type() != Type.DIRECT && proxy.type() != Type.SOCKS ? false : this.imageUrl.startsWith("http://");
+        }
+    }
+
+    private void loadPipelined()
+    {
+        try
+        {
+            HttpRequest var6 = HttpPipeline.makeRequest(this.imageUrl, Minecraft.getMinecraft().getProxy());
+            HttpResponse resp = HttpPipeline.executeRequest(var6);
+
+            if (resp.getStatus() / 100 != 2)
+            {
+                return;
+            }
+
+            byte[] body = resp.getBody();
+            ByteArrayInputStream bais = new ByteArrayInputStream(body);
+            BufferedImage var2;
+
+            if (this.field_152434_e != null)
+            {
+                FileUtils.copyInputStreamToFile(bais, this.field_152434_e);
+                var2 = ImageIO.read(this.field_152434_e);
+            }
+            else
+            {
+                var2 = TextureUtils.readBufferedImage(bais);
+            }
+
+            if (this.imageBuffer != null)
+            {
+                var2 = this.imageBuffer.parseUserSkin(var2);
+            }
+
+            this.func_147641_a(var2);
+            return;
+        }
+        catch (Exception ignored) {}
+        finally {
+            this.loadingFinished();
+        }
+    }
+
+    private void loadingFinished()
+    {
+        this.imageFound = Boolean.valueOf(this.bufferedImage != null);
+
+        if (this.imageBuffer instanceof CapeImageBuffer)
+        {
+            CapeImageBuffer cib = (CapeImageBuffer)this.imageBuffer;
+            cib.cleanup();
+        }
     }
 }

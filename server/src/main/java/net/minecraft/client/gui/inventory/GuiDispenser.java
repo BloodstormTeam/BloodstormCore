@@ -22,6 +22,9 @@ public class GuiDispenser extends GuiContainer
         this.tileDispenser = p_i1098_2_;
     }
 
+    /**
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
+     */
     protected void drawGuiContainerForegroundLayer(int p_146979_1_, int p_146979_2_)
     {
         String s = this.tileDispenser.hasCustomInventoryName() ? this.tileDispenser.getInventoryName() : I18n.format(this.tileDispenser.getInventoryName(), new Object[0]);

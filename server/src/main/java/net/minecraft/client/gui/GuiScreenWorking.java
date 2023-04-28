@@ -13,23 +13,36 @@ public class GuiScreenWorking extends GuiScreen implements IProgressUpdate
     private boolean field_146592_h;
     private static final String __OBFID = "CL_00000707";
 
+    /**
+     * "Saving level", or the loading,or downloading equivelent
+     */
     public void displayProgressMessage(String p_73720_1_)
     {
         this.resetProgressAndMessage(p_73720_1_);
     }
 
+    /**
+     * this string, followed by "working..." and then the "% complete" are the 3 lines shown. This resets progress to 0,
+     * and the WorkingString to "working...".
+     */
     public void resetProgressAndMessage(String p_73721_1_)
     {
         this.field_146591_a = p_73721_1_;
         this.resetProgresAndWorkingMessage("Working...");
     }
 
+    /**
+     * This is called with "Working..." by resetProgressAndMessage
+     */
     public void resetProgresAndWorkingMessage(String p_73719_1_)
     {
         this.field_146589_f = p_73719_1_;
         this.setLoadingProgress(0);
     }
 
+    /**
+     * Updates the progress bar on the loading screen to the specified amount. Args: loadProgress
+     */
     public void setLoadingProgress(int p_73718_1_)
     {
         this.field_146590_g = p_73718_1_;
@@ -40,6 +53,9 @@ public class GuiScreenWorking extends GuiScreen implements IProgressUpdate
         this.field_146592_h = true;
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         if (this.field_146592_h)

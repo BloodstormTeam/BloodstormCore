@@ -553,7 +553,7 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
         }
     }
 
-    protected void despawnEntity()
+    public void despawnEntity()
     {
         this.entityAge = 0;
     }

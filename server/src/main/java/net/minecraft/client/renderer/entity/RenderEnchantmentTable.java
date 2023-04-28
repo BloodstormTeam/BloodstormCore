@@ -1,7 +1,5 @@
 package net.minecraft.client.renderer.entity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.model.ModelBook;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.Entity;
@@ -11,7 +9,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
-@SideOnly(Side.CLIENT)
 public class RenderEnchantmentTable extends TileEntitySpecialRenderer
 {
     private static final ResourceLocation field_147540_b = new ResourceLocation("textures/entity/enchanting_table_book.png");
@@ -22,52 +19,52 @@ public class RenderEnchantmentTable extends TileEntitySpecialRenderer
     {
         GL11.glPushMatrix();
         GL11.glTranslatef((float)p_147500_2_ + 0.5F, (float)p_147500_4_ + 0.75F, (float)p_147500_6_ + 0.5F);
-        float f1 = (float)p_147500_1_.field_145926_a + p_147500_8_;
-        GL11.glTranslatef(0.0F, 0.1F + MathHelper.sin(f1 * 0.1F) * 0.01F, 0.0F);
-        float f2;
+        float var9 = (float)p_147500_1_.field_145926_a + p_147500_8_;
+        GL11.glTranslatef(0.0F, 0.1F + MathHelper.sin(var9 * 0.1F) * 0.01F, 0.0F);
+        float var10;
 
-        for (f2 = p_147500_1_.field_145928_o - p_147500_1_.field_145925_p; f2 >= (float)Math.PI; f2 -= ((float)Math.PI * 2F))
+        for (var10 = p_147500_1_.field_145928_o - p_147500_1_.field_145925_p; var10 >= (float)Math.PI; var10 -= ((float)Math.PI * 2F))
         {
             ;
         }
 
-        while (f2 < -(float)Math.PI)
+        while (var10 < -(float)Math.PI)
         {
-            f2 += ((float)Math.PI * 2F);
+            var10 += ((float)Math.PI * 2F);
         }
 
-        float f3 = p_147500_1_.field_145925_p + f2 * p_147500_8_;
-        GL11.glRotatef(-f3 * 180.0F / (float)Math.PI, 0.0F, 1.0F, 0.0F);
+        float var11 = p_147500_1_.field_145925_p + var10 * p_147500_8_;
+        GL11.glRotatef(-var11 * 180.0F / (float)Math.PI, 0.0F, 1.0F, 0.0F);
         GL11.glRotatef(80.0F, 0.0F, 0.0F, 1.0F);
         this.bindTexture(field_147540_b);
-        float f4 = p_147500_1_.field_145931_j + (p_147500_1_.field_145933_i - p_147500_1_.field_145931_j) * p_147500_8_ + 0.25F;
-        float f5 = p_147500_1_.field_145931_j + (p_147500_1_.field_145933_i - p_147500_1_.field_145931_j) * p_147500_8_ + 0.75F;
-        f4 = (f4 - (float)MathHelper.truncateDoubleToInt((double)f4)) * 1.6F - 0.3F;
-        f5 = (f5 - (float)MathHelper.truncateDoubleToInt((double)f5)) * 1.6F - 0.3F;
+        float var12 = p_147500_1_.field_145931_j + (p_147500_1_.field_145933_i - p_147500_1_.field_145931_j) * p_147500_8_ + 0.25F;
+        float var13 = p_147500_1_.field_145931_j + (p_147500_1_.field_145933_i - p_147500_1_.field_145931_j) * p_147500_8_ + 0.75F;
+        var12 = (var12 - (float)MathHelper.truncateDoubleToInt((double)var12)) * 1.6F - 0.3F;
+        var13 = (var13 - (float)MathHelper.truncateDoubleToInt((double)var13)) * 1.6F - 0.3F;
 
-        if (f4 < 0.0F)
+        if (var12 < 0.0F)
         {
-            f4 = 0.0F;
+            var12 = 0.0F;
         }
 
-        if (f5 < 0.0F)
+        if (var13 < 0.0F)
         {
-            f5 = 0.0F;
+            var13 = 0.0F;
         }
 
-        if (f4 > 1.0F)
+        if (var12 > 1.0F)
         {
-            f4 = 1.0F;
+            var12 = 1.0F;
         }
 
-        if (f5 > 1.0F)
+        if (var13 > 1.0F)
         {
-            f5 = 1.0F;
+            var13 = 1.0F;
         }
 
-        float f6 = p_147500_1_.field_145927_n + (p_147500_1_.field_145930_m - p_147500_1_.field_145927_n) * p_147500_8_;
+        float var14 = p_147500_1_.field_145927_n + (p_147500_1_.field_145930_m - p_147500_1_.field_145927_n) * p_147500_8_;
         GL11.glEnable(GL11.GL_CULL_FACE);
-        this.field_147541_c.render((Entity)null, f1, f4, f5, f6, 0.0F, 0.0625F);
+        this.field_147541_c.render((Entity)null, var9, var12, var13, var14, 0.0F, 0.0625F);
         GL11.glPopMatrix();
     }
 

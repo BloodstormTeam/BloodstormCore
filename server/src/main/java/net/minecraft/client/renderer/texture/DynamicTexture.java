@@ -1,39 +1,65 @@
 package net.minecraft.client.renderer.texture;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import net.minecraft.client.resources.IResourceManager;
+import net.optifine.Config;
+import shadersmod.client.ShadersTex;
 
-@SideOnly(Side.CLIENT)
 public class DynamicTexture extends AbstractTexture
 {
     private final int[] dynamicTextureData;
-    private final int width;
-    private final int height;
-    private static final String __OBFID = "CL_00001048";
 
-    public DynamicTexture(BufferedImage p_i1270_1_)
+    /** width of this icon in pixels */
+    private final int width;
+
+    /** height of this icon in pixels */
+    private final int height;
+    private boolean shadersInitialized;
+
+    public DynamicTexture(BufferedImage par1BufferedImage)
     {
-        this(p_i1270_1_.getWidth(), p_i1270_1_.getHeight());
-        p_i1270_1_.getRGB(0, 0, p_i1270_1_.getWidth(), p_i1270_1_.getHeight(), this.dynamicTextureData, 0, p_i1270_1_.getWidth());
+        this(par1BufferedImage.getWidth(), par1BufferedImage.getHeight());
+        par1BufferedImage.getRGB(0, 0, par1BufferedImage.getWidth(), par1BufferedImage.getHeight(), this.dynamicTextureData, 0, par1BufferedImage.getWidth());
         this.updateDynamicTexture();
     }
 
-    public DynamicTexture(int p_i1271_1_, int p_i1271_2_)
+    public DynamicTexture(int par1, int par2)
     {
-        this.width = p_i1271_1_;
-        this.height = p_i1271_2_;
-        this.dynamicTextureData = new int[p_i1271_1_ * p_i1271_2_];
-        TextureUtil.allocateTexture(this.getGlTextureId(), p_i1271_1_, p_i1271_2_);
+        this.shadersInitialized = false;
+        this.width = par1;
+        this.height = par2;
+        this.dynamicTextureData = new int[par1 * par2 * 3];
+
+        if (Config.isShaders())
+        {
+            ShadersTex.initDynamicTexture(this.getGlTextureId(), par1, par2, this);
+            this.shadersInitialized = true;
+        }
+        else
+        {
+            TextureUtil.allocateTexture(this.getGlTextureId(), par1, par2);
+        }
     }
 
-    public void loadTexture(IResourceManager p_110551_1_) throws IOException {}
+    public void loadTexture(IResourceManager par1ResourceManager) throws IOException {}
 
     public void updateDynamicTexture()
     {
-        TextureUtil.uploadTexture(this.getGlTextureId(), this.dynamicTextureData, this.width, this.height);
+        if (Config.isShaders())
+        {
+            if (!this.shadersInitialized)
+            {
+                ShadersTex.initDynamicTexture(this.getGlTextureId(), this.width, this.height, this);
+                this.shadersInitialized = true;
+            }
+
+            ShadersTex.updateDynamicTexture(this.getGlTextureId(), this.dynamicTextureData, this.width, this.height, this);
+        }
+        else
+        {
+            TextureUtil.uploadTexture(this.getGlTextureId(), this.dynamicTextureData, this.width, this.height);
+        }
     }
 
     public int[] getTextureData()

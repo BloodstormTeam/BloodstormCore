@@ -1,148 +1,227 @@
 package net.minecraft.profiler;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import net.optifine.Config;
 
 public class Profiler {
+
+    /** List of parent sections */
     private final List sectionList = new ArrayList();
+
+    /** List of timestamps (System.nanoTime) */
     private final List timestampList = new ArrayList();
+
+    /** Flag profiling enabled */
     public boolean profilingEnabled;
+
+    /** Current profiling section */
     private String profilingSection = "";
+
+    /** Profiling map */
     private final Map profilingMap = new HashMap();
     private static final String __OBFID = "CL_00001497";
+    public boolean profilerGlobalEnabled = true;
+    private boolean profilerLocalEnabled;
+    private long startTickNano;
+    public long timeTickNano;
+    private long startUpdateChunksNano;
+    public long timeUpdateChunksNano;
 
+    public Profiler()
+    {
+        this.profilerLocalEnabled = this.profilerGlobalEnabled;
+        this.startTickNano = 0L;
+        this.timeTickNano = 0L;
+        this.startUpdateChunksNano = 0L;
+        this.timeUpdateChunksNano = 0L;
+    }
+
+    /**
+     * Clear profiling.
+     */
     public void clearProfiling()
     {
         this.profilingMap.clear();
         this.profilingSection = "";
         this.sectionList.clear();
+        this.profilerLocalEnabled = this.profilerGlobalEnabled;
     }
 
-    public void startSection(String p_76320_1_)
+    /**
+     * Start section
+     */
+    public void startSection(String par1Str)
     {
-        if (this.profilingEnabled)
+        /*
+        if (Config.getGameSettings().showDebugInfo)
         {
-            if (this.profilingSection.length() > 0)
+            if (this.startTickNano == 0L && par1Str.equals("tick"))
             {
-                this.profilingSection = this.profilingSection + ".";
+                this.startTickNano = System.nanoTime();
             }
 
-            this.profilingSection = this.profilingSection + p_76320_1_;
-            this.sectionList.add(this.profilingSection);
-            this.timestampList.add(Long.valueOf(System.nanoTime()));
+            if (this.startTickNano != 0L && par1Str.equals("preRenderErrors"))
+            {
+                this.timeTickNano = System.nanoTime() - this.startTickNano;
+                this.startTickNano = 0L;
+            }
+
+            if (this.startUpdateChunksNano == 0L && par1Str.equals("updatechunks"))
+            {
+                this.startUpdateChunksNano = System.nanoTime();
+            }
+
+            if (this.startUpdateChunksNano != 0L && par1Str.equals("terrain"))
+            {
+                this.timeUpdateChunksNano = System.nanoTime() - this.startUpdateChunksNano;
+                this.startUpdateChunksNano = 0L;
+            }
+        }
+
+         */
+
+        if (this.profilerLocalEnabled)
+        {
+            if (this.profilingEnabled)
+            {
+                if (this.profilingSection.length() > 0)
+                {
+                    this.profilingSection = this.profilingSection + ".";
+                }
+
+                this.profilingSection = this.profilingSection + par1Str;
+                this.sectionList.add(this.profilingSection);
+                this.timestampList.add(Long.valueOf(System.nanoTime()));
+            }
         }
     }
 
+    /**
+     * End section
+     */
     public void endSection()
     {
-        if (this.profilingEnabled)
+        if (this.profilerLocalEnabled)
         {
-            long i = System.nanoTime();
-            long j = ((Long)this.timestampList.remove(this.timestampList.size() - 1)).longValue();
-            this.sectionList.remove(this.sectionList.size() - 1);
-            long k = i - j;
-
-            if (this.profilingMap.containsKey(this.profilingSection))
+            if (this.profilingEnabled)
             {
-                this.profilingMap.put(this.profilingSection, Long.valueOf(((Long)this.profilingMap.get(this.profilingSection)).longValue() + k));
-            }
-            else
-            {
-                this.profilingMap.put(this.profilingSection, Long.valueOf(k));
-            }
+                long var1 = System.nanoTime();
+                long var3 = ((Long)this.timestampList.remove(this.timestampList.size() - 1)).longValue();
+                this.sectionList.remove(this.sectionList.size() - 1);
+                long var5 = var1 - var3;
 
-            this.profilingSection = !this.sectionList.isEmpty() ? (String)this.sectionList.get(this.sectionList.size() - 1) : "";
+                if (this.profilingMap.containsKey(this.profilingSection))
+                {
+                    this.profilingMap.put(this.profilingSection, Long.valueOf(((Long)this.profilingMap.get(this.profilingSection)).longValue() + var5));
+                }
+                else
+                {
+                    this.profilingMap.put(this.profilingSection, Long.valueOf(var5));
+                }
+
+                this.profilingSection = !this.sectionList.isEmpty() ? (String)this.sectionList.get(this.sectionList.size() - 1) : "";
+            }
         }
     }
 
-    public List getProfilingData(String p_76321_1_)
+    /**
+     * Get profiling data
+     */
+    public List getProfilingData(String par1Str)
     {
-        if (!this.profilingEnabled)
+        this.profilerLocalEnabled = this.profilerGlobalEnabled;
+
+        if (!this.profilerLocalEnabled)
+        {
+            return new ArrayList(Collections.singletonList(new Result("root", 0.0D, 0.0D)));
+        }
+        else if (!this.profilingEnabled)
         {
             return null;
         }
         else
         {
-            long i = this.profilingMap.containsKey("root") ? ((Long)this.profilingMap.get("root")).longValue() : 0L;
-            long j = this.profilingMap.containsKey(p_76321_1_) ? ((Long)this.profilingMap.get(p_76321_1_)).longValue() : -1L;
-            ArrayList arraylist = new ArrayList();
+            long var3 = this.profilingMap.containsKey("root") ? ((Long)this.profilingMap.get("root")).longValue() : 0L;
+            long var5 = this.profilingMap.containsKey(par1Str) ? ((Long)this.profilingMap.get(par1Str)).longValue() : -1L;
+            ArrayList var7 = new ArrayList();
 
-            if (p_76321_1_.length() > 0)
+            if (par1Str.length() > 0)
             {
-                p_76321_1_ = p_76321_1_ + ".";
+                par1Str = par1Str + ".";
             }
 
-            long k = 0L;
-            Iterator iterator = this.profilingMap.keySet().iterator();
+            long var8 = 0L;
+            Iterator var10 = this.profilingMap.keySet().iterator();
 
-            while (iterator.hasNext())
+            while (var10.hasNext())
             {
-                String s1 = (String)iterator.next();
+                String var20 = (String)var10.next();
 
-                if (s1.length() > p_76321_1_.length() && s1.startsWith(p_76321_1_) && s1.indexOf(".", p_76321_1_.length() + 1) < 0)
+                if (var20.length() > par1Str.length() && var20.startsWith(par1Str) && var20.indexOf(".", par1Str.length() + 1) < 0)
                 {
-                    k += ((Long)this.profilingMap.get(s1)).longValue();
+                    var8 += ((Long)this.profilingMap.get(var20)).longValue();
                 }
             }
 
-            float f = (float)k;
+            float var201 = (float)var8;
 
-            if (k < j)
+            if (var8 < var5)
             {
-                k = j;
+                var8 = var5;
             }
 
-            if (i < k)
+            if (var3 < var8)
             {
-                i = k;
+                var3 = var8;
             }
 
-            Iterator iterator1 = this.profilingMap.keySet().iterator();
-            String s2;
+            Iterator var21 = this.profilingMap.keySet().iterator();
+            String var12;
 
-            while (iterator1.hasNext())
+            while (var21.hasNext())
             {
-                s2 = (String)iterator1.next();
+                var12 = (String)var21.next();
 
-                if (s2.length() > p_76321_1_.length() && s2.startsWith(p_76321_1_) && s2.indexOf(".", p_76321_1_.length() + 1) < 0)
+                if (var12.length() > par1Str.length() && var12.startsWith(par1Str) && var12.indexOf(".", par1Str.length() + 1) < 0)
                 {
-                    long l = ((Long)this.profilingMap.get(s2)).longValue();
-                    double d0 = (double)l * 100.0D / (double)k;
-                    double d1 = (double)l * 100.0D / (double)i;
-                    String s3 = s2.substring(p_76321_1_.length());
-                    arraylist.add(new Profiler.Result(s3, d0, d1));
+                    long var13 = ((Long)this.profilingMap.get(var12)).longValue();
+                    double var15 = (double)var13 * 100.0D / (double)var8;
+                    double var17 = (double)var13 * 100.0D / (double)var3;
+                    String var19 = var12.substring(par1Str.length());
+                    var7.add(new Profiler.Result(var19, var15, var17));
                 }
             }
 
-            iterator1 = this.profilingMap.keySet().iterator();
+            var21 = this.profilingMap.keySet().iterator();
 
-            while (iterator1.hasNext())
+            while (var21.hasNext())
             {
-                s2 = (String)iterator1.next();
-                this.profilingMap.put(s2, Long.valueOf(((Long)this.profilingMap.get(s2)).longValue() * 999L / 1000L));
+                var12 = (String)var21.next();
+                this.profilingMap.put(var12, Long.valueOf(((Long)this.profilingMap.get(var12)).longValue() * 999L / 1000L));
             }
 
-            if ((float)k > f)
+            if ((float)var8 > var201)
             {
-                arraylist.add(new Profiler.Result("unspecified", (double)((float)k - f) * 100.0D / (double)k, (double)((float)k - f) * 100.0D / (double)i));
+                var7.add(new Profiler.Result("unspecified", (double)((float)var8 - var201) * 100.0D / (double)var8, (double)((float)var8 - var201) * 100.0D / (double)var3));
             }
 
-            Collections.sort(arraylist);
-            arraylist.add(0, new Profiler.Result(p_76321_1_, 100.0D, (double)k * 100.0D / (double)i));
-            return arraylist;
+            Collections.sort(var7);
+            var7.add(0, new Profiler.Result(par1Str, 100.0D, (double)var8 * 100.0D / (double)var3));
+            return var7;
         }
     }
 
-    public void endStartSection(String p_76318_1_)
+    /**
+     * End current section and start a new section
+     */
+    public void endStartSection(String par1Str)
     {
-        this.endSection();
-        this.startSection(p_76318_1_);
+        if (this.profilerLocalEnabled)
+        {
+            this.endSection();
+            this.startSection(par1Str);
+        }
     }
 
     public String getNameOfLastSection()
@@ -151,33 +230,31 @@ public class Profiler {
     }
 
     public static final class Result implements Comparable
+    {
+        public double field_76332_a;
+        public double field_76330_b;
+        public String field_76331_c;
+
+        public Result(String par1Str, double par2, double par4)
         {
-            public double field_76332_a;
-            public double field_76330_b;
-            public String field_76331_c;
-            private static final String __OBFID = "CL_00001498";
-
-            public Result(String p_i1554_1_, double p_i1554_2_, double p_i1554_4_)
-            {
-                this.field_76331_c = p_i1554_1_;
-                this.field_76332_a = p_i1554_2_;
-                this.field_76330_b = p_i1554_4_;
-            }
-
-            public int compareTo(Profiler.Result p_compareTo_1_)
-            {
-                return p_compareTo_1_.field_76332_a < this.field_76332_a ? -1 : (p_compareTo_1_.field_76332_a > this.field_76332_a ? 1 : p_compareTo_1_.field_76331_c.compareTo(this.field_76331_c));
-            }
-
-            @SideOnly(Side.CLIENT)
-            public int func_76329_a()
-            {
-                return (this.field_76331_c.hashCode() & 11184810) + 4473924;
-            }
-
-            public int compareTo(Object p_compareTo_1_)
-            {
-                return this.compareTo((Profiler.Result)p_compareTo_1_);
-            }
+            this.field_76331_c = par1Str;
+            this.field_76332_a = par2;
+            this.field_76330_b = par4;
         }
+
+        public int compareTo(Profiler.Result par1Obj)
+        {
+            return par1Obj.field_76332_a < this.field_76332_a ? -1 : (par1Obj.field_76332_a > this.field_76332_a ? 1 : par1Obj.field_76331_c.compareTo(this.field_76331_c));
+        }
+
+        public int func_76329_a()
+        {
+            return (this.field_76331_c.hashCode() & 11184810) + 4473924;
+        }
+
+        public int compareTo(Object par1Obj)
+        {
+            return this.compareTo((Profiler.Result)par1Obj);
+        }
+    }
 }

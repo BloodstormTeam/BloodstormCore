@@ -1,16 +1,16 @@
 package net.minecraft.client.particle;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-@SideOnly(Side.CLIENT)
 public class EntityDropParticleFX extends EntityFX
 {
+    /** the material type for dropped items/blocks */
     private Material materialType;
+
+    /** The height of the current bob */
     private int bobTimer;
     private static final String __OBFID = "CL_00000901";
 
@@ -46,11 +46,17 @@ public class EntityDropParticleFX extends EntityFX
         return this.materialType == Material.water ? super.getBrightnessForRender(p_70070_1_) : 257;
     }
 
+    /**
+     * Gets how bright this entity is.
+     */
     public float getBrightness(float p_70013_1_)
     {
         return this.materialType == Material.water ? super.getBrightness(p_70013_1_) : 1.0F;
     }
 
+    /**
+     * Called to update the entity's position/logic.
+     */
     public void onUpdate()
     {
         this.prevPosX = this.posX;
@@ -110,13 +116,13 @@ public class EntityDropParticleFX extends EntityFX
             this.motionZ *= 0.699999988079071D;
         }
 
-        Material material = this.worldObj.getBlock(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)).getMaterial();
+        Material var1 = this.worldObj.getBlock(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)).getMaterial();
 
-        if (material.isLiquid() || material.isSolid())
+        if (var1.isLiquid() || var1.isSolid())
         {
-            double d0 = (double)((float)(MathHelper.floor_double(this.posY) + 1) - BlockLiquid.getLiquidHeightPercent(this.worldObj.getBlockMetadata(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ))));
+            double var2 = (double)((float)(MathHelper.floor_double(this.posY) + 1) - BlockLiquid.getLiquidHeightPercent(this.worldObj.getBlockMetadata(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ))));
 
-            if (this.posY < d0)
+            if (this.posY < var2)
             {
                 this.setDead();
             }

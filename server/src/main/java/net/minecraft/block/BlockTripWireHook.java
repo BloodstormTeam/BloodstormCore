@@ -1,6 +1,9 @@
 package net.minecraft.block;
 
 import java.util.Random;
+
+import com.bloodstorm.core.api.event.EventFactory;
+import com.bloodstorm.core.api.event.block.BlockRedstoneEvent;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
@@ -10,9 +13,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import net.minecraftforge.common.util.ForgeDirection;
-import static net.minecraftforge.common.util.ForgeDirection.*;
 
-import org.bukkit.event.block.BlockRedstoneEvent; // CraftBukkit
+import static net.minecraftforge.common.util.ForgeDirection.*;
 
 public class BlockTripWireHook extends Block
 {
@@ -213,11 +215,8 @@ public class BlockTripWireHook extends Block
         }
 
         // CraftBukkit start
-        org.bukkit.block.Block block = p_150136_1_.getWorld().getBlockAt(p_150136_2_, p_150136_3_, p_150136_4_);
-        BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(block, 15, 0);
-        p_150136_1_.getServer().getPluginManager().callEvent(eventRedstone);
-
-        if (eventRedstone.getNewCurrent() > 0)
+        BlockRedstoneEvent blockRedstoneEvent = EventFactory.postRedstoneEvent(p_150136_1_, p_150136_2_, p_150136_3_, p_150136_4_, 15, 0);
+        if (blockRedstoneEvent.getNewValue() > 0)
         {
             return;
         }

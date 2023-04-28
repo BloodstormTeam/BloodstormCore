@@ -24,6 +24,9 @@ public abstract class GuiResourcePackList extends GuiListExtended
         this.setHasListHeader(true, (int)((float)p_i45055_1_.fontRenderer.FONT_HEIGHT * 1.5F));
     }
 
+    /**
+     * Handles drawing a list's header row.
+     */
     protected void drawListHeader(int p_148129_1_, int p_148129_2_, Tessellator p_148129_3_)
     {
         String s = EnumChatFormatting.UNDERLINE + "" + EnumChatFormatting.BOLD + this.func_148202_k();
@@ -42,11 +45,17 @@ public abstract class GuiResourcePackList extends GuiListExtended
         return this.func_148201_l().size();
     }
 
+    /**
+     * Gets the IGuiListEntry object for the given index
+     */
     public ResourcePackListEntry getListEntry(int p_148180_1_)
     {
         return (ResourcePackListEntry)this.func_148201_l().get(p_148180_1_);
     }
 
+    /**
+     * Gets the width of the list
+     */
     public int getListWidth()
     {
         return this.width;

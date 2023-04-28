@@ -27,6 +27,9 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback
         this.field_146443_h = p_i1046_2_;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         int i = 0;
@@ -162,6 +165,9 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();

@@ -16,7 +16,6 @@ import net.minecraft.world.World;
 
 // CraftBukkit start
 import org.bukkit.craftbukkit.util.BlockStateListPopulator;
-import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 // CraftBukkit end
 
@@ -150,19 +149,6 @@ public class BlockPumpkin extends BlockDirectional
         int l = MathHelper.floor_double((double)(p_149689_5_.rotationYaw * 4.0F / 360.0F) + 2.5D) & 3;
         p_149689_1_.setBlockMetadataWithNotify(p_149689_2_, p_149689_3_, p_149689_4_, l, 2);
     }
-
-    // CraftBukkit start
-    public void onNeighborBlockChange(World world, int i, int j, int k, Block block)
-    {
-        if (block != null && block.canProvidePower())
-        {
-            org.bukkit.block.Block bukkitBlock = world.getWorld().getBlockAt(i, j, k);
-            int power = bukkitBlock.getBlockPower();
-            BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(bukkitBlock, power, power);
-            world.getServer().getPluginManager().callEvent(eventRedstone);
-        }
-    }
-    // CraftBukkit end
 
     @SideOnly(Side.CLIENT)
     public void registerBlockIcons(IIconRegister p_149651_1_)

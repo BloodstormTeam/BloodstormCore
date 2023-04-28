@@ -50,12 +50,18 @@ public class GuiCreateWorld extends GuiScreen
         this.field_146330_J = I18n.format("selectWorld.newWorld", new Object[0]);
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         this.field_146333_g.updateCursorCounter();
         this.field_146335_h.updateCursorCounter();
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         Keyboard.enableRepeatEvents(true);
@@ -168,6 +174,9 @@ public class GuiCreateWorld extends GuiScreen
         return p_146317_1_;
     }
 
+    /**
+     * Called when the screen is unloaded. Used to disable keyboard repeat events
+     */
     public void onGuiClosed()
     {
         Keyboard.enableRepeatEvents(false);
@@ -350,6 +359,9 @@ public class GuiCreateWorld extends GuiScreen
         }
     }
 
+    /**
+     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
+     */
     protected void keyTyped(char p_73869_1_, int p_73869_2_)
     {
         if (this.field_146333_g.isFocused() && !this.field_146344_y)
@@ -372,6 +384,9 @@ public class GuiCreateWorld extends GuiScreen
         this.func_146314_g();
     }
 
+    /**
+     * Called when the mouse is clicked.
+     */
     protected void mouseClicked(int p_73864_1_, int p_73864_2_, int p_73864_3_)
     {
         super.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
@@ -386,6 +401,9 @@ public class GuiCreateWorld extends GuiScreen
         }
     }
 
+    /**
+     * Draws the screen and all the components in it.
+     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();

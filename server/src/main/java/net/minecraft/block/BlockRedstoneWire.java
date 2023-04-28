@@ -1,5 +1,7 @@
 package net.minecraft.block;
 
+import com.bloodstorm.core.api.event.EventFactory;
+import com.bloodstorm.core.api.event.block.BlockRedstoneEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.ArrayList;
@@ -17,8 +19,6 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
-import org.bukkit.event.block.BlockRedstoneEvent; // CraftBukkit
 
 public class BlockRedstoneWire extends Block
 {
@@ -162,11 +162,8 @@ public class BlockRedstoneWire extends Block
         }
 
         // CraftBukkit start
-        if (k1 != i3)
-        {
-            BlockRedstoneEvent event = new BlockRedstoneEvent(p_150175_1_.getWorld().getBlockAt(p_150175_2_, p_150175_3_, p_150175_4_), k1, i3);
-            p_150175_1_.getServer().getPluginManager().callEvent(event);
-            i3 = event.getNewCurrent();
+        if (k1 != i3) {
+            i3 = EventFactory.postRedstoneEvent(p_150175_1_, p_150175_2_, p_150175_3_, p_150175_4_, k1, i3).getNewValue();
         }
 
         // CraftBukkit end

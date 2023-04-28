@@ -1,15 +1,19 @@
 package net.minecraft.client.model;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.Entity;
 
-@SideOnly(Side.CLIENT)
 public class ModelSlime extends ModelBase
 {
+    /** The slime's bodies, both the inside box and the outside box */
     ModelRenderer slimeBodies;
+
+    /** The slime's right eye */
     ModelRenderer slimeRightEye;
+
+    /** The slime's left eye */
     ModelRenderer slimeLeftEye;
+
+    /** The slime's mouth */
     ModelRenderer slimeMouth;
     private static final String __OBFID = "CL_00000858";
 
@@ -31,6 +35,9 @@ public class ModelSlime extends ModelBase
         }
     }
 
+    /**
+     * Sets the models various rotation angles then renders the model.
+     */
     public void render(Entity p_78088_1_, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float p_78088_7_)
     {
         this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, p_78088_7_, p_78088_1_);

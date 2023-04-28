@@ -36,6 +36,9 @@ public class GuiBeacon extends GuiContainer {
         this.ySize = 219;
     }
 
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     public void initGui()
     {
         super.initGui();
@@ -45,6 +48,9 @@ public class GuiBeacon extends GuiContainer {
         this.beaconConfirmButton.enabled = false;
     }
 
+    /**
+     * Called from the main game loop to update the screen.
+     */
     public void updateScreen()
     {
         super.updateScreen();
@@ -169,6 +175,9 @@ public class GuiBeacon extends GuiContainer {
         }
     }
 
+    /**
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
+     */
     protected void drawGuiContainerForegroundLayer(int p_146979_1_, int p_146979_2_)
     {
         RenderHelper.disableStandardItemLighting();
@@ -222,6 +231,9 @@ public class GuiBeacon extends GuiContainer {
                 this.field_146143_q = p_i1077_6_;
             }
 
+            /**
+             * Draws this button to the screen.
+             */
             public void drawButton(Minecraft p_146112_1_, int p_146112_2_, int p_146112_3_)
             {
                 if (this.visible)
