@@ -3,4 +3,7 @@ rootProject.name = 'Crucible'
 include 'server'
 include 'authlib'
 include 'launchwrapper'
+include 'server:benchmarks'
+findProject(':server:benchmarks')?.name = 'benchmarks'
+include 'benchmarks'
 

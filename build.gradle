@@ -1,15 +1,21 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import kotlinx.benchmark.gradle.BenchmarkTarget
 
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.8.21'
+    id 'org.jetbrains.kotlin.plugin.allopen' version "1.8.21"
+    id 'org.jetbrains.kotlinx.benchmark' version '0.4.7'
+}
+
+allOpen {
+    annotation("org.openjdk.jmh.annotations.State")
+}
+
+sourceSets {
+    benchmarks
 }
 
 repositories {
     mavenCentral()
-}
-
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 compileKotlin {
@@ -22,4 +28,18 @@ compileTestKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation("org.jetbrains.kotlinx:kotlinx-benchmark-runtime:0.4.7")
+    benchmarksImplementation sourceSets.main.output + sourceSets.main.runtimeClasspath
+}
+
+benchmark {
+    targets(({
+        register("benchmarks") {
+            jmhVersion = "1.21"
+        }
+    } as Closure<NamedDomainObjectContainer<BenchmarkTarget>>))
 }
